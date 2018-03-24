@@ -16,10 +16,17 @@ def youd(c,m):
 
 def main():
     ms = []
-    c,m=input('输入平台 room：').split(' ')
-    ms = m.split(',')
-    for room in ms:
-        down = threading.Thread(target=youd,args=(room,))
-        dowm.start()
+    datas = []
+    datas=input('输入平台 room：').split(' ')
+    b = len(datas)
+    for i in range(b):
+        if datas[i].isalpha():
+            ms = datas[i+1].split(',')
+            for room in ms:
+                down = threading.Thread(target=youd,args=(datas[i],room,))
+                dowm.start() 
+            i+=1
+            
+    
 if __name__ =="__main__":
     main()
