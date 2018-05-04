@@ -13,6 +13,14 @@ def youd(c,m):
         finally:
             time.sleep(20)
 
+def huod(c,m):
+    while True:
+        try:
+            os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
+        except:
+            pass
+        finally:
+            time.sleep(20)
 
 def main():
     ms = []
@@ -22,9 +30,14 @@ def main():
     for i in range(b):
         if datas[i].isalpha():
             ms = datas[i+1].split(',')
-            for room in ms:
-                down = threading.Thread(target=youd,args=(datas[i],room,))
-                dowm.start() 
+            if datas[i]=='huomao':
+                for room in ms:
+                    down = threading.Thread(target=huod,args=(datas[i],room,))
+                    down.start()
+            else:
+                for room in ms:
+                    down = threading.Thread(target=youd,args=(datas[i],room,))
+                    down.start()
             i+=1
             
     
