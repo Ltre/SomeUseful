@@ -309,7 +309,7 @@ def doDownload(room):
                     jishu=0;
                     while True:
                         wait(0.5);
-                        os.system('rclone move "{}" milo:milo/b'.format(sPath));
+                        os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
                         if(not exists(sPath)):
                             log.info('{}存储成功..'.format(sName));
                             break;
