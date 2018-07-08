@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-import os, sys, statvfs
+import os, sys
 from os.path import split, join, exists, abspath, isdir, expanduser
 import re
 import logging
@@ -43,8 +43,7 @@ sleepEvent = None;
 wait = None;
 
 vfs=os.statvfs("/home")
-dir(statvfs)
-available=vfs[statvfs.F_BAVAIL]*vfs[statvfs.F_BSIZE]/(1024*1024*1024)
+available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 
 def prepare():
     global sHome
