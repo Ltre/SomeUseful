@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-import os, sys
+import os, sys, statvfs
 from os.path import split, join, exists, abspath, isdir, expanduser
 import re
 import logging
@@ -41,6 +41,10 @@ sLogDir = '';
 log = None;
 sleepEvent = None;
 wait = None;
+
+vfs=os.statvfs("/home")
+dir(statvfs)
+available=vfs[statvfs.F_BAVAIL]*vfs[statvfs.F_BSIZE]/(1024*1024*1024)
 
 def prepare():
     global sHome
@@ -183,7 +187,7 @@ class Room():
             return sUrl;
 
     def download(self, sPath, stream=sys.stdout, nVerbose=1):
-        global log
+        global log, available
         def adaptName(sPath):
             if (os.path.exists(sPath)):
                 sName, sExt = os.path.splitext(sPath)
@@ -213,6 +217,8 @@ class Room():
                 nSize += f1.write(bBuffer);
                 if (nVerbose):
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
+                if (available<2):
+                    break
                 bBuffer = res.read(1024 * 128);
             if (nVerbose):
                 stream.write('\n');
