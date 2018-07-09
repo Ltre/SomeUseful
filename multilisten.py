@@ -186,7 +186,7 @@ class Room():
             return sUrl;
 
     def download(self, sPath, stream=sys.stdout, nVerbose=1):
-        global log, available
+        global log, available,vfs
         def adaptName(sPath):
             if (os.path.exists(sPath)):
                 sName, sExt = os.path.splitext(sPath)
@@ -216,6 +216,8 @@ class Room():
                 nSize += f1.write(bBuffer);
                 if (nVerbose):
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
+                available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
+                print(available \n)
                 if (available<2):
                     break
                 bBuffer = res.read(1024 * 128);
