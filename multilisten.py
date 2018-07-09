@@ -213,13 +213,13 @@ class Room():
             n = 1024*1024;
             bBuffer = res.read(1024 * 128);
             tnumber = 0
+            print('剩余空间%.2f\n' % (available))
             while bBuffer:
                 nSize += f1.write(bBuffer);
                 if (nVerbose):
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
-                tnumber+=1
-                print('剩余空间%.2f\n' % (available))
-                if (tnubmer>=1000):
+                tnumber+=1               
+                if (tnumber>=1000):
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
                     tnumber = 0
