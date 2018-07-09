@@ -217,7 +217,7 @@ class Room():
                 if (nVerbose):
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
                 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
-                print(available \n)
+                print(available+'\n')
                 if (available<2):
                     break
                 bBuffer = res.read(1024 * 128);
