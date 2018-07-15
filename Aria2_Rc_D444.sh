@@ -300,8 +300,8 @@ ssl(){
     service nginx stop
     service php7.0-fpm stop
 
-    port_exist_check 80
-    port_exist_check 443
+    port_exist_check 81
+    port_exist_check 444
 
     ssl_install
     acme
