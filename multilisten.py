@@ -218,12 +218,14 @@ class Room():
                 nSize += f1.write(bBuffer);
                 if (nVerbose):
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
-                tnumber+=1               
+                tnumber+=1 
+                a = 1
                 if (tnumber>=200):
+                    a =a +1
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     #print('剩余空间%.2f\n' % (available))
                     tnumber = 0
-                if (available<2):
+                if (a>500):
                     break
                 bBuffer = res.read(1024 * 128);
             if (nVerbose):
