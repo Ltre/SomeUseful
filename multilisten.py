@@ -223,8 +223,8 @@ class Room():
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     #print('剩余空间%.2f\n' % (available))
                     tnumber = 0
-                if (available<2):
-                    break
+                    if (available<2):
+                        break
                 bBuffer = res.read(1024 * 128);
             if (nVerbose):
                 stream.write('\n');
