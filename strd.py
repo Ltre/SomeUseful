@@ -13,6 +13,17 @@ def youd(c,m):
         finally:
             time.sleep(20)
 
+            
+def pandad(c,m):
+    while True:
+        try:
+            os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
+        except:
+            pass
+        finally:
+            time.sleep(20)
+           
+        
 def huod(c,m):
     while True:
         try:
@@ -34,6 +45,12 @@ def main():
                 for room in ms:
                     down = threading.Thread(target=huod,args=(datas[i],room,))
                     down.start()
+                    
+            if datas[i]=='pandatv':
+                for room in ms:
+                    down = threading.Thread(target=huod,args=(datas[i],room,))
+                    down.start()
+                    
             else:
                 for room in ms:
                     down = threading.Thread(target=youd,args=(datas[i],room,))
