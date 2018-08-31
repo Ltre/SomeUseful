@@ -221,9 +221,10 @@ class Room():
                 tnumber+=1               
                 if (tnumber>=200):
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
-                    #print('剩余空间%.2f\n' % (available))
+                    print('剩余空间%.2f\n' % (available))
                     tnumber = 0
-                    if (available<1.5):
+                    if (available<16.03):
+                        print('success\n')
                         break
                 bBuffer = res.read(1024 * 128);
             if (nVerbose):
