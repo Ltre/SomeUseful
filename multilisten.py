@@ -46,12 +46,6 @@ vfs=os.statvfs("/home")
 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 
 import requests
-def get_proxy():
-    return requests.get("http://123.207.35.36:5010/get/").content
-def delete_proxy(proxy):
-    requests.get("http://123.207.35.36:5010/delete/?proxy={}".format(proxy))
-
-
 
 def prepare():
     global sHome
@@ -61,8 +55,15 @@ def prepare():
     global sleepEvent
     global wait
     
-    proxy = get_proxy()
-    proxies={"http": "http://{}".format(proxy)}     
+    r = requests.get('http://127.0.0.1:8000/?types=0&count=5&country=国内')
+    ip_ports = json.loads(r.text)
+    print ip_ports
+    ip = ip_ports[0][0]
+    port = ip_ports[0][1]
+    proxies={
+        'http':'http://%s:%s'%(ip,port),
+        'https':'http://%s:%s'%(ip,port)
+    }
     proxy_support = urllib.request.ProxyHandler(proxies)
     
     sHome = expanduser('~')
