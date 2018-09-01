@@ -45,28 +45,13 @@ wait = None;
 vfs=os.statvfs("/home")
 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-from urllib.request import Request
-
-def get_ip_list(obj):
-    ip_text = obj.findAll('tr', {'class': 'odd'})
-    ip_list = []
-    for i in range(len(ip_text)):
-        ip_tag = ip_text[i].findAll('td')
-        ip_port = ip_tag[1].get_text() + ':' + ip_tag[2].get_text()
-        ip_list.append(ip_port)
-    print("共收集到了{}个代理IP".format(len(ip_list)))
-    # print(ip_list)
-    return ip_list
+import requests
+def get_proxy():
+    return requests.get("http://123.207.35.36:5010/get/").content
+def delete_proxy(proxy):
+    requests.get("http://123.207.35.36:5010/delete/?proxy={}".format(proxy))
 
 
-def get_random_ip(bsObj):
-    ip_list = get_ip_list(bsObj)
-    import random
-    random_ip = 'http://' + random.choice(ip_list)
-    proxy_ip = {'http:': random_ip}
-    return proxy_ip
 
 def prepare():
     global sHome
@@ -76,26 +61,9 @@ def prepare():
     global sleepEvent
     global wait
     
-    url = 'http://www.xicidaili.com/'
-    headers = {
-        'User-Agent': 'User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'}
-    request = Request(url, headers=headers)
-    
-    for i in range(10):
-        try:
-            response = urlopen(request)
-        except Exception as e:
-            if i >= 9:
-                do_some_log()
-            else:
-                time.sleep(0.6)
-        else:
-            time.sleep(0.1)
-            break
-            
-    bsObj = BeautifulSoup(response, 'lxml')
-    random_ip = get_random_ip(bsObj)
-    proxy_support = urllib.request.ProxyHandler(random_ip)
+    proxy = get_proxy()
+    proxies={"http": "http://{}".format(proxy)}     
+    proxy_support = urllib.request.ProxyHandler(proxies)
     
     sHome = expanduser('~')
     sSelfDir = split(__file__)[0];
