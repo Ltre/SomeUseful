@@ -56,7 +56,7 @@ def get_ip_list(obj):
         ip_tag = ip_text[i].findAll('td')
         ip_port = ip_tag[1].get_text() + ':' + ip_tag[2].get_text()
         ip_list.append(ip_port)
-    # print("共收集到了{}个代理IP".format(len(ip_list)))
+    print("共收集到了{}个代理IP".format(len(ip_list)))
     # print(ip_list)
     return ip_list
 
