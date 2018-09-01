@@ -84,7 +84,7 @@ def prepare():
     for i in range(10):
         try:
             response = urlopen(request)
-        except Exception, e:
+        except Exception as e:
             if i >= 9:
                 do_some_log()
             else:
