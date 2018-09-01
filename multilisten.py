@@ -80,7 +80,19 @@ def prepare():
     headers = {
         'User-Agent': 'User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'}
     request = Request(url, headers=headers)
-    response = urlopen(request)
+    
+    for i in range(10):
+        try:
+            response = urlopen(request)
+        except Exception, e:
+            if i >= 9:
+                do_some_log()
+            else:
+                time.sleep(0.6)
+        else:
+            time.sleep(0.1)
+            break
+            
     bsObj = BeautifulSoup(response, 'lxml')
     random_ip = get_random_ip(bsObj)
     proxy_support = urllib.request.ProxyHandler(random_ip)
