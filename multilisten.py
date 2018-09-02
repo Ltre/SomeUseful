@@ -177,7 +177,7 @@ class Room():
             if(cishu>0):
                 wait(0.5);
                 print('重试\n')
-                return getInfo(self,cishu-1);
+                return self.getInfo(cishu-1);
             prepare();
             #raise;
         else:
