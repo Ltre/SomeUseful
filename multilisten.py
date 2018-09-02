@@ -58,18 +58,15 @@ def prepare():
     
     global ii
     
-    r = requests.get('http://127.0.0.1:8765/?types=0&count=5&country=国内')
+    r = requests.get('http://127.0.0.1:8765/?types=0&count=15&country=国内')
     ip_ports = json.loads(r.text)
     print(ip_ports)
     ip = ip_ports[ii][0]
     port = ip_ports[ii][1]
     ii += 1
-    if(ii>=5):
+    if(ii>=15):
         ii=0
-    proxies={
-        'http':'%s:%s'%(ip,port),
-        'https':'%s:%s'%(ip,port)
-    }
+    proxies={'http':'%s:%s'%(ip,port)}
     print('取用的IP地址：{}\n'.format(proxies))
     proxy_support = urllib.request.ProxyHandler(proxies)
     
@@ -82,7 +79,7 @@ def prepare():
     sleepEvent = threading.Event();
     wait = sleepEvent.wait;
     opener = urllib.request.build_opener(proxy_support);
-    opener.addheaders = [('User-agent', 'Mozilla/5.0')];
+    opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36')];
     urllib.request.install_opener(opener);
     socket.setdefaulttimeout(30);
 prepare();
@@ -176,6 +173,7 @@ class Room():
             self.sStatus = _status;
         except Exception as e:
             log.error('failed to get room info: {}'.format(e));
+            prepare();
             #raise;
         else:
             return _status;
