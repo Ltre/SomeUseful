@@ -58,7 +58,7 @@ def prepare():
     
     global ii
     
-    r = requests.get('http://127.0.0.1:8000/?types=0&count=5&country=国内')
+    r = requests.get('http://127.0.0.1:8765/?types=0&count=5&country=国内')
     ip_ports = json.loads(r.text)
     print(ip_ports)
     ip = ip_ports[ii][0]
@@ -70,6 +70,7 @@ def prepare():
         'http':'http://%s:%s'%(ip,port),
         'https':'http://%s:%s'%(ip,port)
     }
+    print('取用的IP地址：{}\n'.format(proxies))
     proxy_support = urllib.request.ProxyHandler(proxies)
     
     sHome = expanduser('~')
