@@ -67,8 +67,8 @@ def prepare():
     if(ii>=5):
         ii=0
     proxies={
-        'http':'http://%s:%s'%(ip,port),
-        'https':'http://%s:%s'%(ip,port)
+        'http':'%s:%s'%(ip,port),
+        'https':'%s:%s'%(ip,port)
     }
     print('取用的IP地址：{}\n'.format(proxies))
     proxy_support = urllib.request.ProxyHandler(proxies)
