@@ -158,9 +158,10 @@ class Room():
                 self.sUser = '';
             finally:
                 if ('f1' in locals()): f1.close();
-    def getInfo(self):
+    def getInfo(self,cishu=5):
         global log
-        global sApi5, sApi6
+        global sApi5, sApi6  
+        
         try:
             if (self.nId is None): self.getRealId();
             res = urlopen(sApi5.format(self.nId));
@@ -173,6 +174,10 @@ class Room():
             self.sStatus = _status;
         except Exception as e:
             log.error('failed to get room info: {}'.format(e));
+            if(cishu>0):
+                wait(0.5);
+                print('重试\n')
+                return getInfo(self,cishu-1);
             prepare();
             #raise;
         else:
