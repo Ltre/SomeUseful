@@ -46,6 +46,7 @@ vfs=os.statvfs("/home")
 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 
 import requests
+ii=0
 
 def prepare():
     global sHome
@@ -55,11 +56,16 @@ def prepare():
     global sleepEvent
     global wait
     
+    global ii
+    
     r = requests.get('http://127.0.0.1:8000/?types=0&count=5&country=国内')
     ip_ports = json.loads(r.text)
     print(ip_ports)
-    ip = ip_ports[0][0]
-    port = ip_ports[0][1]
+    ip = ip_ports[ii][0]
+    port = ip_ports[ii][1]
+    ii += 1
+    if(ii>=5):
+        ii=0
     proxies={
         'http':'http://%s:%s'%(ip,port),
         'https':'http://%s:%s'%(ip,port)
