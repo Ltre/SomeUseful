@@ -226,7 +226,7 @@ class Room():
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
         
-        r = urllib.urlopen(sUrl, timeout=10).getcode()
+        r = urlopen(sUrl, timeout=10).getcode()
         if(r==200):
             pass
         else:
