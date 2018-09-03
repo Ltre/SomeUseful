@@ -64,7 +64,7 @@ def prepare():
     ip = ip_ports[ii][0]
     port = ip_ports[ii][1]
     ii += 1
-    if(ii>=15):
+    if(ii>=20):
         ii=0
     proxies={'http':'%s:%s'%(ip,port)}
     print('取用的IP地址：{}\n'.format(proxies))
