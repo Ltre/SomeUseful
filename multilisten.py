@@ -203,6 +203,7 @@ class Room():
         try:
             aUrl = [x['url'] for x in mData['durl']];
             sUrl = self.sUrl = mData['durl'][0]['url'];
+            ssUrl = self.ssUrl = mData['durl'][1]['url'];
         except AttributeError as e:
             log.error('failed to get stream URL: {}'.format(e));
             return False;
@@ -224,6 +225,15 @@ class Room():
             return sOutPath;
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
+        
+        r = requests.get(url, allow_redirects = False)
+        status=r.status_code
+        if(status==200):
+            pass
+        else:
+            print('主线中断，切换备线\n')
+            sUrl = self.ssUrl
+        
         sPath = adaptName(sPath);
         #iUrls = iter(aUrls);
         #sUrl = next(iUrls);
