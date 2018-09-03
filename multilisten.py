@@ -58,7 +58,7 @@ def prepare():
     
     global ii
     
-    r = requests.get('http://127.0.0.1:8765/?types=0&count=15&country=国内')
+    r = requests.get('http://127.0.0.1:8765/?types=2&count=20&country=国内')
     ip_ports = json.loads(r.text)
     print(ip_ports)
     ip = ip_ports[ii][0]
