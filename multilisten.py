@@ -226,9 +226,8 @@ class Room():
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
         
-        r = requests.get(sUrl, allow_redirects = False)
-        status=r.status_code
-        if(status==200):
+        r = urllib.urlopen(sUrl, timeout=10).getcode()
+        if(r==200):
             pass
         else:
             print('主线中断，切换备线\n')
