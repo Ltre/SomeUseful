@@ -226,7 +226,7 @@ class Room():
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
         
-        r = requests.get(url, allow_redirects = False)
+        r = requests.get(sUrl, allow_redirects = False)
         status=r.status_code
         if(status==200):
             pass
