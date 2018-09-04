@@ -259,7 +259,7 @@ class Room():
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
                     tnumber = 0
-                if (available<1.5 and room.nId !=151159):
+                if (available<1.5 and self.nId !=151159):
                         print('剩余空间不足，进行存储\n')
                         break
                 bBuffer = res.read(1024 * 128);
