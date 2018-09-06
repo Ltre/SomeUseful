@@ -254,7 +254,8 @@ class Room():
                 if (nVerbose):
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
                 tnumber+=1               
-                if (tnumber>=200):
+                if (tnumber>=100):
+                    break
                     vfs=os.statvfs("/home")
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
@@ -375,7 +376,7 @@ def doDownload(room):
                 log.info('{} downloaded to {}'.format(room.nId, sPath));
                 try:
                     downThread = threading.Thread(
-                            target=doDownload,
+                            target=upload,
                             name=str(room.nId),
                             args=(room,sPath,sName,),
                             daemon=True
