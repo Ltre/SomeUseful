@@ -176,7 +176,7 @@ class Room():
             log.error('failed to get room info: {}'.format(e));
             
             prepare();
-            getInfo(self);
+            self.getInfo();
             #raise;
         else:
             return _status;
