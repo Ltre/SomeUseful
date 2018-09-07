@@ -104,6 +104,7 @@ class Room():
         self.sStatus = None;
         self._stream = io.StringIO();
         self.thread = None;
+        self.ii = 1;
         #log.debug({key: value for key, value in vars(self).items() if not key.startswith('_') and value});
     def getRoomByUser(self):
         assert self.nUser;
@@ -258,9 +259,10 @@ class Room():
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
                     tnumber = 0
-                if (available<1.5 and self.nId !=151159):
-                        print('剩余空间不足，进行存储\n')
-                        break
+                if (available<1.5 and (self.ii == 1 and self.nId !=151159)):
+                    self.ii = 0
+                    print('剩余空间不足，进行存储\n')
+                    break
                 bBuffer = res.read(1024 * 128);
             if (nVerbose):
                 stream.write('\n');
