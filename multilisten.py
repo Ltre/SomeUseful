@@ -345,6 +345,8 @@ def upload(room,sPath,sName):
         os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
         if(not exists(sPath)):
             log.info('{}存储成功..'.format(sName));
+            if(room.ii == 0):
+                room.ii = 1
             break;
         else:
             if(jishu>=10):
