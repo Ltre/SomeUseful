@@ -158,7 +158,7 @@ class Room():
                 self.sUser = '';
             finally:
                 if ('f1' in locals()): f1.close();
-    def getInfo(self,cishu=5):
+    def getInfo(self):
         global log
         global sApi5, sApi6  
         
@@ -174,11 +174,9 @@ class Room():
             self.sStatus = _status;
         except Exception as e:
             log.error('failed to get room info: {}'.format(e));
-            if(cishu>0):
-                wait(0.5);
-                print('重试\n')
-                return self.getInfo(cishu-1);
+            
             prepare();
+            getInfo(self);
             #raise;
         else:
             return _status;
@@ -381,7 +379,7 @@ def doDownload(room):
                             args=(room,sPath,sName,),
                             daemon=True
                     );
-                    room.thread = downThread;
+
                     downThread.start();
                             
                     doCleanup(room, sPath);
