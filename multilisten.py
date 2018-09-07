@@ -158,7 +158,7 @@ class Room():
                 self.sUser = '';
             finally:
                 if ('f1' in locals()): f1.close();
-    def getInfo(self,cishu=5):
+    def getInfo(self):
         global log
         global sApi5, sApi6  
         
@@ -174,11 +174,9 @@ class Room():
             self.sStatus = _status;
         except Exception as e:
             log.error('failed to get room info: {}'.format(e));
-            if(cishu>0):
-                wait(0.5);
-                print('重试\n')
-                return self.getInfo(cishu-1);
+            
             prepare();
+            getInfo(self);
             #raise;
         else:
             return _status;
@@ -255,6 +253,7 @@ class Room():
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
                 tnumber+=1               
                 if (tnumber>=200):
+                    #break
                     vfs=os.statvfs("/home")
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
@@ -336,6 +335,25 @@ def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
         if ('file' in locals()): file.close();
     return True;
 
+
+def upload(room,sPath,sName):
+    jishu=0;
+    while True:
+        wait(0.5);
+        os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
+        if(not exists(sPath)):
+            log.info('{}存储成功..'.format(sName));
+            break;
+        else:
+            if(jishu>=10):
+                print('重试多次失败，请手动检查');
+                with open('/root/names.txt','a') as f:
+                    f.writelines(sName);
+                    f.close;
+                    break;
+            jishu+=1;
+            print('存储失败，重新存储..\n')
+
 def doDownload(room):
     global FILEDIR, sHome;
     global wait;
@@ -355,22 +373,14 @@ def doDownload(room):
             if (isSuccess):
                 log.info('{} downloaded to {}'.format(room.nId, sPath));
                 try:
-                    jishu=0;
-                    while True:
-                        wait(0.5);
-                        os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
-                        if(not exists(sPath)):
-                            log.info('{}存储成功..'.format(sName));
-                            break;
-                        else:
-                            if(jishu>=10):
-                                print('重试多次失败，请手动检查');
-                                with open('/root/names.txt','a') as f:
-                                    f.writelines(sName);
-                                    f.close;
-                                    break;
-                            jishu+=1;
-                            print('存储失败，重新存储..\n')
+                    downThread = threading.Thread(
+                            target=upload,
+                            name=str(room.nId),
+                            args=(room,sPath,sName,),
+                            daemon=True
+                    );
+
+                    downThread.start();
                             
                     doCleanup(room, sPath);
                 except Exception as e:
@@ -386,7 +396,7 @@ def doDownload(room):
                                     .format(e, sLogFile)
                             );
                     raise
-        wait(2);
+        #wait(2);
     room._stream.seek(0);
     room._stream.truncate();
     log.info('{} download thread ended'.format(room.nId));
