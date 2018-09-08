@@ -225,12 +225,14 @@ class Room():
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
         
-        r = urlopen(sUrl, timeout=10).getcode()
-        if(r==200):
-            pass
-        else:
+        try:
+            r = urlopen(sUrl, timeout=10).getcode()
+        except urllib.error.HTTPError as e:
             print('主线中断，切换备线\n')
             sUrl = self.ssUrl
+            
+        else:
+            pass
         
         sPath = adaptName(sPath);
         #iUrls = iter(aUrls);
