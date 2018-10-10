@@ -45,6 +45,9 @@ wait = None;
 vfs=os.statvfs("/home")
 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 
+import requests
+ii=0
+
 def prepare():
     global sHome
     global sSelfDir
@@ -52,6 +55,21 @@ def prepare():
     global log
     global sleepEvent
     global wait
+    
+    global ii
+    
+    r = requests.get('http://127.0.0.1:8765/?types=2&count=20&country=国内')
+    ip_ports = json.loads(r.text)
+    print(ip_ports)
+    ip = ip_ports[ii][0]
+    port = ip_ports[ii][1]
+    ii += 1
+    if(ii>=20):
+        ii=0
+    proxies={'http':'%s:%s'%(ip,port)}
+    print('取用的IP地址：{}\n'.format(proxies))
+    proxy_support = urllib.request.ProxyHandler(proxies)
+    
     sHome = expanduser('~')
     sSelfDir = split(__file__)[0];
     sLogDir = join(sSelfDir, 'multilisten.log.d');
@@ -60,8 +78,8 @@ def prepare():
     log.setLevel(DEBUGLEVEL);
     sleepEvent = threading.Event();
     wait = sleepEvent.wait;
-    opener = urllib.request.build_opener();
-    opener.addheaders = [('User-agent', 'Mozilla/5.0')];
+    opener = urllib.request.build_opener(proxy_support);
+    opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36')];
     urllib.request.install_opener(opener);
     socket.setdefaulttimeout(30);
 prepare();
@@ -86,6 +104,7 @@ class Room():
         self.sStatus = None;
         self._stream = io.StringIO();
         self.thread = None;
+        self.ii = 1;
         #log.debug({key: value for key, value in vars(self).items() if not key.startswith('_') and value});
     def getRoomByUser(self):
         assert self.nUser;
@@ -142,7 +161,8 @@ class Room():
                 if ('f1' in locals()): f1.close();
     def getInfo(self):
         global log
-        global sApi5, sApi6
+        global sApi5, sApi6  
+        
         try:
             if (self.nId is None): self.getRealId();
             res = urlopen(sApi5.format(self.nId));
@@ -155,6 +175,9 @@ class Room():
             self.sStatus = _status;
         except Exception as e:
             log.error('failed to get room info: {}'.format(e));
+            
+            prepare();
+            self.getInfo();
             #raise;
         else:
             return _status;
@@ -179,6 +202,7 @@ class Room():
         try:
             aUrl = [x['url'] for x in mData['durl']];
             sUrl = self.sUrl = mData['durl'][0]['url'];
+            ssUrl = self.ssUrl = mData['durl'][1]['url'];
         except AttributeError as e:
             log.error('failed to get stream URL: {}'.format(e));
             return False;
@@ -200,6 +224,16 @@ class Room():
             return sOutPath;
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
+        
+        try:
+            r = urlopen(sUrl, timeout=10).getcode()
+        except urllib.error.HTTPError as e:
+            print('主线中断，切换备线\n')
+            sUrl = self.ssUrl
+            
+        else:
+            pass
+        
         sPath = adaptName(sPath);
         #iUrls = iter(aUrls);
         #sUrl = next(iUrls);
@@ -222,13 +256,15 @@ class Room():
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
                 tnumber+=1               
                 if (tnumber>=200):
+                    #break
                     vfs=os.statvfs("/home")
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
                     tnumber = 0
-                if (available<1.5):
-                        print('剩余空间不足，进行存储\n')
-                        break
+                if (available<1.5 and (self.ii == 1 and self.nId !=151159)):
+                    self.ii = 0
+                    print('剩余空间不足，进行存储\n')
+                    break
                 bBuffer = res.read(1024 * 128);
             if (nVerbose):
                 stream.write('\n');
@@ -303,6 +339,27 @@ def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
         if ('file' in locals()): file.close();
     return True;
 
+
+def upload(room,sPath,sName):
+    jishu=0;
+    while True:
+        wait(0.5);
+        os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
+        if(not exists(sPath)):
+            log.info('{}存储成功..'.format(sName));
+            if(room.ii == 0):
+                room.ii = 1
+            break;
+        else:
+            if(jishu>=10):
+                print('重试多次失败，请手动检查');
+                with open('/root/names.txt','a') as f:
+                    f.writelines(sName);
+                    f.close;
+                    break;
+            jishu+=1;
+            print('存储失败，重新存储..\n')
+
 def doDownload(room):
     global FILEDIR, sHome;
     global wait;
@@ -322,22 +379,14 @@ def doDownload(room):
             if (isSuccess):
                 log.info('{} downloaded to {}'.format(room.nId, sPath));
                 try:
-                    jishu=0;
-                    while True:
-                        wait(0.5);
-                        os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
-                        if(not exists(sPath)):
-                            log.info('{}存储成功..'.format(sName));
-                            break;
-                        else:
-                            if(jishu>=10):
-                                print('重试多次失败，请手动检查');
-                                with open('/root/names.txt','a') as f:
-                                    f.writelines(sName);
-                                    f.close;
-                                    break;
-                            jishu+=1;
-                            print('存储失败，重新存储..\n')
+                    downThread = threading.Thread(
+                            target=upload,
+                            name=str(room.nId),
+                            args=(room,sPath,sName,),
+                            daemon=True
+                    );
+
+                    downThread.start();
                             
                     doCleanup(room, sPath);
                 except Exception as e:
@@ -353,7 +402,7 @@ def doDownload(room):
                                     .format(e, sLogFile)
                             );
                     raise
-        wait(2);
+        #wait(2);
     room._stream.seek(0);
     room._stream.truncate();
     log.info('{} download thread ended'.format(room.nId));
