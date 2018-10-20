@@ -42,7 +42,7 @@ log = None;
 sleepEvent = None;
 wait = None;
 
-vfs=os.statvfs("/home")
+vfs=os.statvfs("/root")
 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 
 import requests
@@ -247,7 +247,7 @@ class Room():
             n = 1024*1024;
             bBuffer = res.read(1024 * 128);
             tnumber = 0
-            vfs=os.statvfs("/home")
+            vfs=os.statvfs("/root")
             available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
             print('剩余空间%.2f\n' % (available))
             while bBuffer:
@@ -370,7 +370,7 @@ def doDownload(room):
         sName = '{}-{}-{}.flv'.format(sTime, room.sUser, room.sTitle);
         sName = re.sub(r'[^\w_\-.()]', '_', sName);
         if (not exists(sDir)):
-            os.mkdirs(sDir);
+            os.makedirs(sDir);
         assert isdir(sDir);
         sPath = os.path.join(sDir, sName);
         isSuccess = room.getStream();
