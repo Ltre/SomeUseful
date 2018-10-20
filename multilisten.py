@@ -257,7 +257,7 @@ class Room():
                 tnumber+=1               
                 if (tnumber>=200):
                     #break
-                    vfs=os.statvfs("/home")
+                    vfs=os.statvfs("/root")
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
                     tnumber = 0
@@ -370,7 +370,7 @@ def doDownload(room):
         sName = '{}-{}-{}.flv'.format(sTime, room.sUser, room.sTitle);
         sName = re.sub(r'[^\w_\-.()]', '_', sName);
         if (not exists(sDir)):
-            os.mkdir(sDir);
+            os.mkdirs(sDir);
         assert isdir(sDir);
         sPath = os.path.join(sDir, sName);
         isSuccess = room.getStream();
