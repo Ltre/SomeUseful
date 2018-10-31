@@ -224,7 +224,22 @@ acme(){
         fi
     else
         echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
-        exit 1
+        sleep 2
+        ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /home/wwwroot/ssl/DirectoryLister.crt --keypath /home/wwwroot/ssl/DirectoryLister.key --ecc
+		if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} 证书配置成功 ${Font}"
+        sleep 2
+        else
+        echo -e "${Error} ${RedBG} 证书配置失败 ${Font}"
+        fi
+		~/.acme.sh/acme.sh --installcert -d ${domain2} --fullchainpath /home/wwwroot/ssl/aria2ng.crt --keypath /home/wwwroot/ssl/aria2ng.key --ecc
+		if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} 证书配置成功 ${Font}"
+        sleep 2
+        else
+        echo -e "${Error} ${RedBG} 证书配置失败 ${Font}"
+        fi
+	#exit 1
     fi
 }
 port_exist_check(){
