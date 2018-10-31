@@ -50,8 +50,8 @@ is_root(){
 }
 debian_source(){
     # 添加源
-    echo "deb http://packages.dotdeb.org jessie all" | tee --append /etc/apt/sources.list
-    echo "deb-src http://packages.dotdeb.org jessie all" | tee --append /etc/apt/sources.list
+    #echo "deb http://packages.dotdeb.org jessie all" | tee --append /etc/apt/sources.list
+    #echo "deb-src http://packages.dotdeb.org jessie all" | tee --append /etc/apt/sources.list
     # 添加key
     wget --no-check-certificate https://www.dotdeb.org/dotdeb.gpg
     if [[ -f dotdeb.gpg ]];then
