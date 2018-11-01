@@ -432,10 +432,13 @@ echo -e "${GreenBG} 开始配置自启 ${Font}"
 wget --no-check-certificate https://raw.githubusercontent.com/chiakge/Aria2-Rclone-DirectoryLister-Aria2Ng/master/sh/aria2 -O /etc/init.d/aria2
 chmod +x /etc/init.d/aria2
 update-rc.d -f aria2 defaults
-wget https://raw.githubusercontent.com/chiakge/Aria2-Rclone-DirectoryLister-Aria2Ng/chiakge-patch-1/sh/autoupload.sh
+#wget https://raw.githubusercontent.com/chiakge/Aria2-Rclone-DirectoryLister-Aria2Ng/chiakge-patch-1/sh/autoupload.sh
+
+cd /root/.aria2
+
 sed -i '4i\name='${name}'' autoupload.sh
 sed -i '4i\folder='${folder}'' autoupload.sh
-mv autoupload.sh /root/.aria2/autoupload.sh
+#mv autoupload.sh /root/.aria2/autoupload.sh
 chmod +x /root/.aria2/autoupload.sh
 wget https://raw.githubusercontent.com/chiakge/Aria2-Rclone-DirectoryLister-Aria2Ng/chiakge-patch-1/sh/rcloned
 web="/home/wwwroot/${domain}/Cloud"
