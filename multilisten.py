@@ -84,6 +84,8 @@ def prepare():
     socket.setdefaulttimeout(30);
 prepare();
 
+os.system("apt install -y yamdi")
+
 def display(*args, **kargs):
     try:
         print(*args, **kargs);
@@ -342,6 +344,11 @@ def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
 
 def upload(room,sPath,sName):
     jishu=0;
+    change='waitting'+sName
+    os.system('ffmpeg -i "{}" -y -vcodec copy -acodec copy /root/b/d"{}"'.format(sPath,change))
+    os.system('rm -rf "{}"'.format(sPath))
+    os.system('yamdi -i /root/b/d/"{}" -o "{}"'.format(change,sPath))
+    os.system('rm -rf "{}"'.format(change))
     while True:
         wait(0.5);
         os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
