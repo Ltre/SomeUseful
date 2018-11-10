@@ -84,7 +84,7 @@ def prepare():
     socket.setdefaulttimeout(30);
 prepare();
 
-os.system("apt install -y yamdi")
+os.system("apt install -y yamdi ffmpeg")
 
 def display(*args, **kargs):
     try:
