@@ -342,13 +342,14 @@ def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
     return True;
 
 
-def upload(room,sPath,sName):
+def upload(room,sPath,sName,sDir):
     jishu=0;
-    change='waitting'+sName
-    os.system('ffmpeg -i "{}" -y -vcodec copy -acodec copy /root/b/d"{}"'.format(sPath,change))
+    change ='waitting'+sName
+    cPath = os.path.join(sDir, change)
+    os.system('ffmpeg -i "{}" -y -vcodec copy -acodec copy "{}"'.format(sPath,cPath))
     os.system('rm -rf "{}"'.format(sPath))
-    os.system('yamdi -i /root/b/d/"{}" -o "{}"'.format(change,sPath))
-    os.system('rm -rf "{}"'.format(change))
+    os.system('yamdi -i "{}" -o "{}"'.format(cPath,sPath))
+    os.system('rm -rf "{}"'.format(cPath))
     while True:
         wait(0.5);
         os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
@@ -389,7 +390,7 @@ def doDownload(room):
                     downThread = threading.Thread(
                             target=upload,
                             name=str(room.nId),
-                            args=(room,sPath,sName,),
+                            args=(room,sPath,sName,sDir,),
                             daemon=True
                     );
 
