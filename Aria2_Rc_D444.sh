@@ -460,7 +460,11 @@ main(){
 	sleep 2
             standard
             ssl
-			aria_install
+			echo -e "是否安装aria2（默认y）:"&& read choose
+			case $choose in
+			 n|N) sleep 1;;
+			 *) aria_install;;
+			esac
 			rclone_install
 			init_install
 }
