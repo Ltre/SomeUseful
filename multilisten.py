@@ -363,6 +363,7 @@ def upload(room,sPath,sName,sDir):
                 print('重试多次失败，请手动检查');
                 with open('/root/names.txt','a') as f:
                     f.writelines(sName);
+                    f.write('\n')
                     f.close;
                     break;
             jishu+=1;
