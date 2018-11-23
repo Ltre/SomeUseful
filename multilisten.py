@@ -230,8 +230,15 @@ class Room():
         try:
             r = urlopen(sUrl, timeout=10).getcode()
         except urllib.error.HTTPError as e:
-            print('主线中断，切换备线\n')
-            sUrl = self.ssUrl
+            if (self.getInfo() == 'on'):
+                if(sUrl==self.sUrl):
+                    print('主线中断，切换备线\n')
+                    sUrl = self.ssUrl
+                else:
+                    print('备线中断，切换主线\n')
+                    sUrl = self.sUrl
+            else:
+                return False
             
         else:
             pass
