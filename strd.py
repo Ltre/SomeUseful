@@ -55,7 +55,7 @@ def main():
                         html = requests.get("http://www.pandatv.com/'{}'".format(room),headers=headers)
                         status = re.findall(r'"status":"\d{1}',html.text)
                         if re.match(r'"status":"2',status[0]):
-                            down = threading.Thread(target=huod,args=(datas[i],room,))
+                            down = threading.Thread(target=huod,args=(datas[i],room,),name=str(room))
                             if down.isAlive():
                                 pass
                             else:
@@ -69,7 +69,7 @@ def main():
                         html = requests.get("http://www.douyu.com/'{}'".format(room),headers=headers)
                         status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
                         if re.match(r"ROOM.show_status = 1",status[0]):
-                            down = threading.Thread(target=youd,args=(datas[i],room,name=str(room)))
+                            down = threading.Thread(target=youd,args=(datas[i],room,),name=str(room))
                             if down.isAlive():
                                 pass
                             else:
