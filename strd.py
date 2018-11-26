@@ -69,78 +69,78 @@ def main():
     datas=input('输入平台 room：').split(' ')
     b = len(datas)
     prepare()
-        for i in range(b):
-            if datas[i].isalpha():
-                ms = datas[i+1].split(',')
+    for i in range(b):
+        if datas[i].isalpha():
+            ms = datas[i+1].split(',')
                 #if datas[i]=='huomao':
                 #    for room in ms:
                 #        down = threading.Thread(target=huod,args=(datas[i],room,))
                 #        down.start()
 
-                if datas[i]=='pandatv':
-                    for a in ms:
-                        room = Room(a)
-                        pRooms.append(room)
-                if datas[i]=='douyu':
-                    for a in ms:
-                        room = Room(a)
-                        dRooms.append(room)
-                else:
-                    for room in ms:
-                        down = threading.Thread(target=youd,args=(datas[i],room,))
-                        down.start()
-                i+=1
-        while True:
-            for room in dRooms:
+            if datas[i]=='pandatv':
+                for a in ms:
+                    room = Room(a)
+                    pRooms.append(room)
+            if datas[i]=='douyu':
+                for a in ms:
+                    room = Room(a)
+                    dRooms.append(room)
+            else:
+                for room in ms:
+                    down = threading.Thread(target=youd,args=(datas[i],room,))
+                    down.start()
+            i+=1
+    while True:
+        for room in dRooms:
+            try:
+                html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
+            except HTTPError as e:
+                print(e)
+                prepare()
                 try:
                     html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
                 except HTTPError as e:
-                    print(e)
                     prepare()
-                    try:
-                        html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
-                    except HTTPError as e:
-                        prepare()
-                        continue
-                status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
-                if re.match(r"ROOM.show_status = 1",status[0]):
-                #特别---
-                    if room.nRoom == '533493' and re.findall(r"Title-headlineH2.*大自然",html.text):
-                        print("Misa在聆听大自然")
-                        continue
-                #-------
-                    if room.thread and room.thread.isAlive():
-                        continue
-                    else:
-                        down = threading.Thread(target=youd,args=(douyu,room.nRoom,),name=str(room.nRoom))
-                        room.thread = down
-                        down.start()
+                    continue
+            status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
+            if re.match(r"ROOM.show_status = 1",status[0]):
+            #特别---
+                if room.nRoom == '533493' and re.findall(r"Title-headlineH2.*大自然",html.text):
+                    print("Misa在聆听大自然")
+                    continue
+            #-------
+                if room.thread and room.thread.isAlive():
+                    continue
                 else:
-                    pass
+                    down = threading.Thread(target=youd,args=(douyu,room.nRoom,),name=str(room.nRoom))
+                    room.thread = down
+                    down.start()
+            else:
+                pass
 
-            for room in pRooms:
-                
+        for room in pRooms:
+            
+            try:
+                html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
+            except HTTPError as e:
+                print(e)
+                prepare()
                 try:
-                    html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
+                    html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)   
                 except HTTPError as e:
-                    print(e)
                     prepare()
-                    try:
-                        html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)   
-                    except HTTPError as e:
-                        prepare()
-                        continue
-                status = re.findall(r'"status":"\d{1}',html.text)
-                if re.match(r'"status":"2',status[0]):                
-                    if room.thread and room.thread.isAlive():
-                        continue
-                    else:
-                        down = threading.Thread(target=huod,args=(pandatv,room.nRoom,),name=str(room.nRoom))
-                        room.thread = down
-                        down.start()
+                    continue
+            status = re.findall(r'"status":"\d{1}',html.text)
+            if re.match(r'"status":"2',status[0]):                
+                if room.thread and room.thread.isAlive():
+                    continue
                 else:
-                    pass
-            time.sleep(20)            
+                    down = threading.Thread(target=huod,args=(pandatv,room.nRoom,),name=str(room.nRoom))
+                    room.thread = down
+                    down.start()
+            else:
+                pass
+        time.sleep(20)
     
 if __name__ =="__main__":
     main()
