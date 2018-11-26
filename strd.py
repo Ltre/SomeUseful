@@ -66,10 +66,14 @@ def main():
 
 
                 if datas[i]=='douyu':
-                    for room in ms:
+                    for room in ms:       
                         html = requests.get("http://www.douyu.com/{}".format(room),headers=headers)
                         status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
                         if re.match(r"ROOM.show_status = 1",status[0]):
+                            #特别---
+                            if room == 533493 and re.findall(r"Title-headlineH2.*大自然",html.text):
+                                print("Misa在聆听大自然")
+                                continue
                             down = threading.Thread(target=youd,args=(datas[i],room,),name=str(room))
                             if down.isAlive():
                                 pass
