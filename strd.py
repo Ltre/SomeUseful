@@ -73,12 +73,12 @@ def main():
                 if datas[i]=='pandatv':
                     for room in ms:
                         try:
-                            html = requests.get("http://www.pandatv.com/{}".format(room),headers=headers)
+                            html = requests.get("http://www.pandatv.com/{}".format(room),headers=headers,proxies = proxies,timeout = 10)
                         except HTTPError as e:
                             print(e)
                             prepare()
                             try:
-                                html = requests.get("http://www.pandatv.com/{}".format(room),headers=headers)   
+                                html = requests.get("http://www.pandatv.com/{}".format(room),headers=headers,proxies = proxies,timeout = 10)   
                             except HTTPError as e:
                                 prepare()
                                 continue
