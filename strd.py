@@ -21,8 +21,14 @@ def prepare():
     print('取用的IP地址：{}\n'.format(proxies))
     
     
-
-
+class Room():
+    def __init__(self,nRoom=None):
+        self.nRoom = init(nRoom or 0)
+        self.thread = None
+        
+    
+    
+    
 def youd(c,m):
     #while True:
         try:
@@ -58,10 +64,11 @@ def main():
     }
     ms = []
     datas = []
+    pRooms = []
+    dRooms = []
     datas=input('输入平台 room：').split(' ')
     b = len(datas)
     prepare()
-    while True:
         for i in range(b):
             if datas[i].isalpha():
                 ms = datas[i+1].split(',')
@@ -71,61 +78,69 @@ def main():
                 #        down.start()
 
                 if datas[i]=='pandatv':
-                    for room in ms:
-                        try:
-                            html = requests.get("http://www.pandatv.com/{}".format(room),headers=headers,proxies = proxies,timeout = 10)
-                        except HTTPError as e:
-                            print(e)
-                            prepare()
-                            try:
-                                html = requests.get("http://www.pandatv.com/{}".format(room),headers=headers,proxies = proxies,timeout = 10)   
-                            except HTTPError as e:
-                                prepare()
-                                continue
-                        status = re.findall(r'"status":"\d{1}',html.text)
-                        if re.match(r'"status":"2',status[0]):
-                            down = threading.Thread(target=huod,args=(datas[i],room,),name=str(room))
-                            if down.isAlive():
-                                pass
-                            else:
-                                down.start()
-                        else:
-                            pass
-
-
+                    for a in ms:
+                        room = Room(a)
+                        pRooms.append(room)
                 if datas[i]=='douyu':
-                    for room in ms: 
-                        try:
-                            html = requests.get("http://www.douyu.com/{}".format(room),headers=headers,proxies = proxies,timeout = 10)
-                        except HTTPError as e:
-                            print(e)
-                            prepare()
-                            try:
-                                html = requests.get("http://www.douyu.com/{}".format(room),headers=headers,proxies = proxies,timeout = 10)
-                            except HTTPError as e:
-                                prepare()
-                                continue
-                        status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
-                        if re.match(r"ROOM.show_status = 1",status[0]):
-                            #特别---
-                            if room == '533493' and re.findall(r"Title-headlineH2.*大自然",html.text):
-                                print("Misa在聆听大自然")
-                                continue
-                            down = threading.Thread(target=youd,args=(datas[i],room,),name=str(room))
-                            if down.isAlive():
-                                pass
-                            else:
-                                down.start()
-                        else:
-                            pass
-
-
+                    for a in ms:
+                        room = Room(a)
+                        dRooms.append(room)
                 else:
                     for room in ms:
                         down = threading.Thread(target=youd,args=(datas[i],room,))
                         down.start()
                 i+=1
-        time.sleep(20)            
+        while True:
+            for room in dRooms:
+                try:
+                    html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
+                except HTTPError as e:
+                    print(e)
+                    prepare()
+                    try:
+                        html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
+                    except HTTPError as e:
+                        prepare()
+                        continue
+                status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
+                if re.match(r"ROOM.show_status = 1",status[0]):
+                #特别---
+                    if room.nRoom == '533493' and re.findall(r"Title-headlineH2.*大自然",html.text):
+                        print("Misa在聆听大自然")
+                        continue
+                #-------
+                    if room.thread and room.thread.isAlive():
+                        continue
+                    else:
+                        down = threading.Thread(target=youd,args=(douyu,room.nRoom,),name=str(room.nRoom))
+                        room.thread = down
+                        down.start()
+                else:
+                    pass
+
+            for room in pRooms:
+                
+                try:
+                    html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
+                except HTTPError as e:
+                    print(e)
+                    prepare()
+                    try:
+                        html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)   
+                    except HTTPError as e:
+                        prepare()
+                        continue
+                status = re.findall(r'"status":"\d{1}',html.text)
+                if re.match(r'"status":"2',status[0]):                
+                    if room.thread and room.thread.isAlive():
+                        continue
+                    else:
+                        down = threading.Thread(target=huod,args=(pandatv,room.nRoom,),name=str(room.nRoom))
+                        room.thread = down
+                        down.start()
+                else:
+                    pass
+            time.sleep(20)            
     
 if __name__ =="__main__":
     main()
