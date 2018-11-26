@@ -22,8 +22,9 @@ def prepare():
     
     
 class Room():
-    def __init__(self,nRoom=None):
-        self.nRoom = init(nRoom or 0)
+    def __init__(self,nRoom=None,nDomain =None):
+        self.nRoom = int(nRoom or 0)
+        self.nDomain = nDomain
         self.thread = None
         
     
@@ -79,11 +80,11 @@ def main():
 
             if datas[i]=='pandatv':
                 for a in ms:
-                    room = Room(a)
+                    room = Room(a,datas[i])
                     pRooms.append(room)
             if datas[i]=='douyu':
                 for a in ms:
-                    room = Room(a)
+                    room = Room(a,datas[i])
                     dRooms.append(room)
             else:
                 for room in ms:
@@ -112,7 +113,7 @@ def main():
                 if room.thread and room.thread.isAlive():
                     continue
                 else:
-                    down = threading.Thread(target=youd,args=(douyu,room.nRoom,),name=str(room.nRoom))
+                    down = threading.Thread(target=youd,args=(room.nDomain,room.nRoom,),name=str(room.nRoom))
                     room.thread = down
                     down.start()
             else:
@@ -135,7 +136,7 @@ def main():
                 if room.thread and room.thread.isAlive():
                     continue
                 else:
-                    down = threading.Thread(target=huod,args=(pandatv,room.nRoom,),name=str(room.nRoom))
+                    down = threading.Thread(target=huod,args=(room.nDomain,room.nRoom,),name=str(room.nRoom))
                     room.thread = down
                     down.start()
             else:
