@@ -119,18 +119,18 @@ def main():
             
             try:
                 json_request_url ="http://www.panda.tv/api_room_v2?roomid={}&__plat=pc_web&_={}".format(room.nRoom, int(time.time()))
-                html = requests.get(json_request_url,headers=headers,proxies,timeout = 10)
+                html = requests.get(json_request_url,headers=headers,proxies=proxies,timeout = 10)
         
             except Exception as e:
                 print(e)
                 prepare()
                 try:
                     json_request_url ="http://www.panda.tv/api_room_v2?roomid={}&__plat=pc_web&_={}".format(room.nRoom, int(time.time()))
-                    html = requests.get(json_request_url,headers=headers,proxies,timeout = 10)    
+                    html = requests.get(json_request_url,headers=headers,proxies=proxies,timeout = 10)    
                 except Exception as e:
                     prepare()
                     continue
-            api_json = json.loads(content)
+            api_json = json.loads(html.text)
             data = api_json["data"]
             status = data["videoinfo"]["status"]
             if status is "2":                
