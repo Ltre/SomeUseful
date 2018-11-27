@@ -132,7 +132,7 @@ def main():
                 if room.thread and room.thread.isAlive():
                     continue
                 else:
-                    down = threading.Thread(target=huod,args=(room.nDomain,room.nRoom,),name=str(room.nRoom),daemon=True)
+                    down = threading.Thread(target=youd,args=(room.nDomain,room.nRoom,),name=str(room.nRoom),daemon=True)
                     room.thread = down
                     down.start()
             else:
