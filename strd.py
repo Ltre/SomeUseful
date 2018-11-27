@@ -33,7 +33,7 @@ class Room():
 def youd(c,m):
     #while True:
     try:
-        os.system('you-get www.{}.com/{} -o /root/b/d'.format(c,m))
+        os.system('you-get www.{}.com/{} -o /root/b/d --debug'.format(c,m))
     except:
         pass
      #   finally:
@@ -91,12 +91,12 @@ def main():
         for room in dRooms:
             try:
                 html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
-            except HTTPError as e:
+            except Exception as e:
                 print(e)
                 prepare()
                 try:
                     html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
-                except HTTPError as e:
+                except Exception as e:
                     prepare()
                     continue
             status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
@@ -118,17 +118,22 @@ def main():
         for room in pRooms:
             
             try:
-                html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
-            except HTTPError as e:
+                json_request_url ="http://www.panda.tv/api_room_v2?roomid={}&__plat=pc_web&_={}".format(room.nRoom, int(time.time()))
+                html = requests.get(json_request_url,headers=headers,proxies,timeout = 10)
+        
+            except Exception as e:
                 print(e)
                 prepare()
                 try:
-                    html = requests.get("http://www.pandatv.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)   
-                except HTTPError as e:
+                    json_request_url ="http://www.panda.tv/api_room_v2?roomid={}&__plat=pc_web&_={}".format(room.nRoom, int(time.time()))
+                    html = requests.get(json_request_url,headers=headers,proxies,timeout = 10)    
+                except Exception as e:
                     prepare()
                     continue
-            status = re.findall(r'"status":"\d{1}',html.text)
-            if re.match(r'"status":"2',status[0]):                
+            api_json = json.loads(content)
+            data = api_json["data"]
+            status = data["videoinfo"]["status"]
+            if status is "2":                
                 if room.thread and room.thread.isAlive():
                     continue
                 else:
