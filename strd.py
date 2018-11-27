@@ -32,30 +32,30 @@ class Room():
     
 def youd(c,m):
     #while True:
-        try:
-            os.system('you-get www.{}.com/{} -o /root/b/d'.format(c,m))
-        except:
-            pass
+    try:
+        os.system('you-get www.{}.com/{} -o /root/b/d'.format(c,m))
+    except:
+        pass
      #   finally:
      #       time.sleep(20)
 
             
 def pandad(c,m):
     #while True:
-        try:
-            os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
-        except:
-            pass
+    try:
+        os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
+    except:
+        pass
     #    finally:
       #      time.sleep(20)
            
         
 def huod(c,m):
    # while True:
-        try:
-            os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
-        except:
-            pass
+    try:
+        os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
+    except:
+        pass
    #     finally:
   #          time.sleep(20)
 
@@ -86,10 +86,6 @@ def main():
                 for a in ms:
                     room = Room(a,datas[i])
                     dRooms.append(room)
-            else:
-                for room in ms:
-                    down = threading.Thread(target=youd,args=(datas[i],room,))
-                    down.start()
             i+=1
     while True:
         for room in dRooms:
@@ -113,7 +109,7 @@ def main():
                 if room.thread and room.thread.isAlive():
                     continue
                 else:
-                    down = threading.Thread(target=youd,args=(room.nDomain,room.nRoom,),name=str(room.nRoom))
+                    down = threading.Thread(target=youd,args=(room.nDomain,room.nRoom,),name=str(room.nRoom),daemon=True)
                     room.thread = down
                     down.start()
             else:
@@ -136,7 +132,7 @@ def main():
                 if room.thread and room.thread.isAlive():
                     continue
                 else:
-                    down = threading.Thread(target=huod,args=(room.nDomain,room.nRoom,),name=str(room.nRoom))
+                    down = threading.Thread(target=huod,args=(room.nDomain,room.nRoom,),name=str(room.nRoom),daemon=True)
                     room.thread = down
                     down.start()
             else:
