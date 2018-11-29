@@ -104,9 +104,14 @@ def main():
                     prepare()
                     continue
             status = re.findall(r"ROOM.show_status =\s+\d{1}",html.text)
-            if re.match(r"ROOM.show_status = 1",status[0]):
-            #特别---
-                if room.nRoom == '533493' and re.findall(r"Title-headlineH2.*大自然",html.text):
+            try:
+                ison = re.match(r"ROOM.show_status = 1",status[0])
+            except Exception as e:
+                print(e)
+                continue
+            if ison:
+                #特别---
+                if room.nRoom == 533493 and re.findall(r"Title-headlineH2.*?大\s*自\s*然",html.text):
                     print("Misa在聆听大自然")
                     continue
             #-------
