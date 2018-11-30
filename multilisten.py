@@ -254,7 +254,17 @@ class Room():
             except urllib.error.HTTPError as e:
                 prepare()
                 return False
-            
+        except socket.timeout as e:
+            print(e)
+            sUrl = self.ssUrl
+            try:
+                r = urlopen(sUrl, timeout=10).getcode()
+            except urllib.error.HTTPError as e:
+                prepare()
+                return False
+            except socket.timeout as e:
+                prepare()
+                return False
         else:
             pass
         
