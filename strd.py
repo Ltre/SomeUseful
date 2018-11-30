@@ -8,6 +8,7 @@ import json
 import sys,configparser
 ii = 0
 proxies = {}
+justone = 1
 def prepare():
     global ii , proxies
     config = configparser.ConfigParser()
@@ -64,6 +65,7 @@ def huod(c,m):
   #          time.sleep(20)
 
 def main():
+    global justone
     headers = {
         'user-agent': 'Mozilla/5.0 (iPad; CPU OS 8_1_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B466 Safari/600.1.4'
     }
@@ -112,7 +114,9 @@ def main():
             if ison:
                 #特别---
                 if room.nRoom == 533493 and re.findall(r"Title-headlineH2.*?大\s*自\s*然",html.text):
-                    print("Misa在聆听大自然")
+                    if justone == 1:
+                        justone = 0
+                        print("Misa在聆听大自然")
                     continue
             #-------
                 if room.thread and room.thread.isAlive():
