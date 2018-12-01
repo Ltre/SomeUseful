@@ -143,7 +143,11 @@ def main():
                 except Exception as e:
                     prepare()
                     continue
-            api_json = json.loads(html.text)
+            try:
+                api_json = json.loads(html.text)
+            except Exception as e:
+                print(e)
+                continue
             data = api_json["data"]
             status = data["videoinfo"]["status"]
             if status is "2":                
