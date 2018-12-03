@@ -351,7 +351,7 @@ cd /root
 rm -rf aria2 aria2-${aria2_new_ver}-linux-gnu-64bit-build1.tar.bz2
 mkdir "/root/.aria2" && cd "/root/.aria2"
 wget "https://raw.githubusercontent.com/Miloxing/SomeUseful/master/dht.dat"
-wget "https://raw.githubusercontent.com/chiakge/Aria2-Rclone-DirectoryLister-Aria2Ng/master/sh/trackers-list-aria2.sh"
+wget "https://raw.githubusercontent.com/Miloxing/Aria2-Rclone-DirectoryLister-Aria2Ng/master/sh/trackers-list-aria2.sh"
 echo '' > /root/.aria2/aria2.session
 chmod +x /root/.aria2/trackers-list-aria2.sh
 chmod 777 /root/.aria2/aria2.session
