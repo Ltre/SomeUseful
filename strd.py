@@ -17,7 +17,20 @@ def prepare():
     r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
     ip_ports = json.loads(r.text)
     print(ip_ports)
-    ip = ip_ports[ii][0]
+    try:
+        ip = ip_ports[ii][0]
+    except Exception as e:
+        print(e)
+        try:
+            r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
+        except Exception as e:
+            ii += 1
+            if(ii>=20):
+                ii=0
+            prepare()
+            return
+        else:
+            ip = ip_ports[ii][0]
     port = ip_ports[ii][1]
     ii += 1
     if(ii>=20):
