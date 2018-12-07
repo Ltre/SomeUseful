@@ -47,7 +47,9 @@ vfs=os.statvfs("/root")
 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 
 import requests
+import random
 ii=0
+upwork=0
 
 def prepare():
     global sHome
@@ -377,10 +379,16 @@ def upload(room,sPath,sName,sDir):
     jishu=0;
     change ='waitting'+sName
     cPath = os.path.join(sDir, change)
+    global upwork
+    while upwork:
+        time.sleep(random.randint(0,20))
+        global upwork
+    upwork = 1
     os.system('ffmpeg -i "{}" -y -vcodec copy -acodec copy "{}"'.format(sPath,cPath))
     os.system('rm -rf "{}"'.format(sPath))
     os.system('yamdi -i "{}" -o "{}"'.format(cPath,sPath))
     os.system('rm -rf "{}"'.format(cPath))
+    upwork = 0
     while True:
         wait(0.5);
         os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
