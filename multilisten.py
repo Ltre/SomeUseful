@@ -51,6 +51,10 @@ import random
 ii=0
 upwork=0
 
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
 def prepare():
     global sHome
     global sSelfDir
