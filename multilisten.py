@@ -250,12 +250,12 @@ class Room():
         sUrl = self.sUrl;
         
         try:
-            r = urlopen(sUrl, timeout=10).getcode()
+            r = urlopen(sUrl, timeout=20).getcode()
         except urllib.error.HTTPError as e:
             print('主线中断，切换备线\n')
             sUrl = self.ssUrl
             try:
-                r = urlopen(sUrl, timeout=10).getcode()
+                r = urlopen(sUrl, timeout=20).getcode()
             except urllib.error.HTTPError as e:
                 prepare()
                 return False
@@ -263,7 +263,7 @@ class Room():
             print(e)
             sUrl = self.ssUrl
             try:
-                r = urlopen(sUrl, timeout=10).getcode()
+                r = urlopen(sUrl, timeout=20).getcode()
             except urllib.error.HTTPError as e:
                 prepare()
                 return False
