@@ -123,6 +123,8 @@ class Room():
         self.nUser= int(nUser or 0);
         self.nId = None;
         self.sUrl = None;
+        self.ssUrl = None;
+        self.s2Url = None;
         self.sTitle = None;
         self.sUser = None;
         self.sStatus = None;
@@ -227,6 +229,7 @@ class Room():
             aUrl = [x['url'] for x in mData['durl']];
             sUrl = self.sUrl = mData['durl'][0]['url'];
             ssUrl = self.ssUrl = mData['durl'][1]['url'];
+            s2Url = self.s2Url = mData['durl'][2]['url'];
         except AttributeError as e:
             log.error('failed to get stream URL: {}'.format(e));
             return False;
@@ -250,20 +253,25 @@ class Room():
         sUrl = self.sUrl;
         
         try:
-            r = urlopen(sUrl, timeout=20).getcode()
+            r = urlopen(sUrl, timeout=10).getcode()
         except Exception as e:
             print('主线中断，切换备线\n')
             sUrl = self.ssUrl
             try:
-                r = urlopen(sUrl, timeout=20).getcode()
+                r = urlopen(sUrl, timeout=10).getcode()
             except Exception as e:
-                prepare()
-                return False
+                print('继续换\n')
+                sUrl = self.s2Url
+                try:
+                    r=urlopen(sUrl,timeout=10).getcode()
+                except Exception as e:
+                    prepare()
+                    return False
         except socket.timeout as e:
             print(e)
             sUrl = self.ssUrl
             try:
-                r = urlopen(sUrl, timeout=20).getcode()
+                r = urlopen(sUrl, timeout=10).getcode()
             except urllib.error.HTTPError as e:
                 prepare()
                 return False
