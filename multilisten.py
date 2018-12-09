@@ -67,7 +67,7 @@ def prepare():
     
     config = configparser.ConfigParser()
     config.read(sys.path[0] + "/proxy.ini")
-    sourceip = config.get('proxy','ip')
+    sourceip = socket.gethostbyname(config.get('proxy','ip'))
     r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
     ip_ports = json.loads(r.text)
     print(ip_ports)
