@@ -392,14 +392,14 @@ def upload(room,sPath,sName,sDir):
     change ='waitting'+sName
     cPath = os.path.join(sDir, change)
     global upwork
-    while upwork:
+    while upwork>1:
         time.sleep(random.randint(0,20))
-    upwork = 1
+    upwork += 1
     os.system('ffmpeg -i "{}" -y -vcodec copy -acodec copy "{}"'.format(sPath,cPath))
     os.system('rm -rf "{}"'.format(sPath))
     os.system('yamdi -i "{}" -o "{}"'.format(cPath,sPath))
     os.system('rm -rf "{}"'.format(cPath))
-    upwork = 0
+    upwork -= 1
     while True:
         wait(0.5);
         os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
