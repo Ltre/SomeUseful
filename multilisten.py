@@ -251,12 +251,12 @@ class Room():
         
         try:
             r = urlopen(sUrl, timeout=20).getcode()
-        except urllib.error.HTTPError as e:
+        except Exception as e:
             print('主线中断，切换备线\n')
             sUrl = self.ssUrl
             try:
                 r = urlopen(sUrl, timeout=20).getcode()
-            except urllib.error.HTTPError as e:
+            except Exception as e:
                 prepare()
                 return False
         except socket.timeout as e:
