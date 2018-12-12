@@ -303,8 +303,8 @@ class Room():
                 if (nVerbose):
                     stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
                 tnumber+=1               
-                if (tnumber>=100):
-                    break
+                if (tnumber>=200):
+                    #break
                     vfs=os.statvfs("/root")
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
