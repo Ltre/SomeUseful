@@ -52,6 +52,7 @@ ii=0
 upwork=0
 
 import ssl
+from multiprocessing import Process
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -438,15 +439,17 @@ def doDownload(room):
             if (isSuccess):
                 log.info('{} downloaded to {}'.format(room.nId, sPath));
                 try:
-                    downThread = threading.Thread(
-                            target=upload,
-                            name=str(room.nId),
-                            args=(room,sPath,sName,sDir,),
-                            daemon=True
-                    );
+                    #downThread = threading.Thread(
+                  #          target=upload,
+                   #         name=str(room.nId),
+                   #         args=(room,sPath,sName,sDir,),
+                   #         daemon=True
+                   # );
 
-                    downThread.start();
-                            
+                   # downThread.start();
+                    p = Process(target=upload, args=(room,sPath,sName,sDir,))
+                    print('Child process will start.')
+                    p.start()
                     doCleanup(room, sPath);
                 except Exception as e:
                     if (sLogDir):
