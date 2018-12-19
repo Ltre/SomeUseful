@@ -13,5 +13,6 @@ do
 	IFS="$OLD_IFS"
 	echo "开始上传${f}至milo:milo/b/${arr[1]}"
 	rclone move "${f}" "milo:milo/b/${arr[1]}"
+	sleep 5
 done
 echo "上传结束"
