@@ -419,6 +419,7 @@ def upload(room,sPath,sName,sDir):
                     break;
             jishu+=1;
             print('存储失败，重新存储..\n')
+            time.sleep(5)
 
 def doDownload(room):
     global FILEDIR, sHome;
