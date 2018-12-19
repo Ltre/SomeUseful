@@ -14,7 +14,18 @@ def prepare():
     config = configparser.ConfigParser()
     config.read(sys.path[0] + "/proxy.ini")
     sourceip = config.get('proxy','ip')
-    r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
+    try:
+        r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout = 10)
+    except Exception as e:
+        print(e)
+        try:
+            r = requests.get('http://127.0.0.1:8765/?types=2&count=20&country=国内',timeout = 10)
+        except Exception as e:
+            print(e)
+            try:
+                raise aerror("22行获取代理ip错误\n")
+            except aerror as e:
+                print(e)
     ip_ports = json.loads(r.text)
     print(ip_ports)
     try:
@@ -22,11 +33,15 @@ def prepare():
     except Exception as e:
         print(e)
         try:
-            r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
+            raise aerror("32行ip列表错误\n")
+        except aerror as e:
+            print(e)
+        try:
+            r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout=10)
             ip = ip_ports[ii][0]
         except Exception as e:
             ii += 1
-            if(ii>=15):
+            if(ii>=20):
                 ii=0
             prepare()
             return
@@ -43,7 +58,9 @@ class Room():
         self.nRoom = int(nRoom or 0)
         self.nDomain = nDomain
         self.thread = None
-        
+
+class aerror(Exception):
+    pass
     
     
     
@@ -111,6 +128,10 @@ def main():
                 html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
             except Exception as e:
                 print(e)
+                try:
+                    raise aerror('128行斗鱼页面获取错误\n')
+                except aerror as e:
+                    print(e)
                 prepare()
                 try:
                     html = requests.get("http://www.douyu.com/{}".format(room.nRoom),headers=headers,proxies = proxies,timeout = 10)
@@ -122,6 +143,12 @@ def main():
                 ison = re.match(r"ROOM.show_status = 1",status[0])
             except Exception as e:
                 print(e)
+                try:
+                    raise aerror('143行直播间信息寻找失败\n')
+                except aerror as e:
+                    print(e)
+                prepare()
+                
                 continue
             if ison:
                 #特别---
@@ -148,6 +175,10 @@ def main():
         
             except Exception as e:
                 print(e)
+                try:
+                    raise aerror('172行熊猫信息出错\n')
+                except aerror as e:
+                    print(e)
                 prepare()
                 try:
                     json_request_url ="http://www.panda.tv/api_room_v2?roomid={}&__plat=pc_web&_={}".format(room.nRoom, int(time.time()))
@@ -157,11 +188,17 @@ def main():
                     continue
             try:
                 api_json = json.loads(html.text)
+                data = api_json["data"]
+                status = data["videoinfo"]["status"]
             except Exception as e:
                 print(e)
+                try:
+                    raise aerror('187行熊猫开播信息提取失败')
+                except aerror as e:
+                    print(e)
                 continue
-            data = api_json["data"]
-            status = data["videoinfo"]["status"]
+            
+            
             if status is "2":                
                 if room.thread and room.thread.isAlive():
                     continue
