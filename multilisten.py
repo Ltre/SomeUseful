@@ -196,7 +196,7 @@ class Room():
         
         try:
             if (self.nId is None): self.getRealId();
-            res = urlopen(sApi5.format(self.nId));
+            res = urlopen(sApi5.format(self.nId),timeout = 10);
             sRoomInfo = res.read().decode('utf-8');
             mData = json.loads(sRoomInfo);
             self.getHost();
@@ -227,8 +227,12 @@ class Room():
         #else:
         #    return False;
         global sApi7
-        with urlopen(sApi7.format(self.nId)) as res:
-            sData = res.read().decode('utf-8');
+        try:
+            with urlopen(sApi7.format(self.nId),timeout=10) as res:
+                sData = res.read().decode('utf-8');
+        except Exception as e:
+            prepare()
+            self.getStream()
         mData = json.loads(sData);
         try:
             aUrl = [x['url'] for x in mData['durl']];
@@ -481,18 +485,20 @@ def checkuser():
     global aRooms
     while True:
         for i in open("user.txt","r").read().splitlines():
-            sameid = 0
-            for room in aRooms:
-                if(int(i) == room.nRoom):
-                    sameid =1
+            if(i):
+                sameid = 0
+                for room in aRooms:
+                    if(i == room.nRoom):
+                        sameid =1
+                        room.sameid = 1
+                        break
+                if(sameid == 1):
+                    continue
+                else:
+                    room = Room(int(i));
                     room.sameid = 1
-                    break
-            if(sameid == 1):
-                continue
-            else:
-                room = Room(int(i));
-                room.getInfo();
-                aRooms.append(room)
+                    room.getInfo();
+                    aRooms.append(room)
         for room in aRooms:
             if(room.sameid == 0):
                 aRooms.remove(room)
