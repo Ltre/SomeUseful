@@ -24,7 +24,7 @@ FILEDIR = '';
 DEBUGLEVEL = logging.DEBUG;
 SCRIPT = '';
 COMMAND = '';
-INTERVAL = 20;
+INTERVAL = 10;
 
 sApi0 = 'http://space.bilibili.com/ajax/live/getLive?mid={}'
 sApi1 = 'http://live.bilibili.com/api/player?id=cid:{}';
@@ -68,7 +68,10 @@ def prepare():
     
     config = configparser.ConfigParser()
     config.read(sys.path[0] + "/proxy.ini")
-    sourceip = socket.gethostbyname(config.get('proxy','ip'))
+    try:
+        sourceip = socket.gethostbyname(config.get('proxy','ip'))
+    except Exception as e:
+        sourceip = "127.0.0.1"
     r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
     ip_ports = json.loads(r.text)
     print(ip_ports)
@@ -132,6 +135,7 @@ class Room():
         self._stream = io.StringIO();
         self.thread = None;
         self.ii = 1;
+        self.sameid = 0;
         #log.debug({key: value for key, value in vars(self).items() if not key.startswith('_') and value});
     def getRoomByUser(self):
         assert self.nUser;
@@ -473,6 +477,27 @@ def doDownload(room):
 
     return True;
 
+def checkuser():
+    global aRooms
+    while True:
+        for i in open("user.txt","r").read().splitlines():
+            sameid = 0
+            for room in aRooms:
+                if(int(i) == room.nRoom):
+                    sameid =1
+                    room.sameid = 1
+                    break
+            if(sameid == 1):
+                continue
+            else:
+                room = Room(int(i));
+                room.getInfo();
+                aRooms.append(room)
+        for room in aRooms:
+            if(room.sameid == 0):
+                aRooms.remove(room)
+        time.sleep(5)
+
 def synMonitor(aIds=None, aUsers=None):
     global log
     global wait
@@ -481,7 +506,32 @@ def synMonitor(aIds=None, aUsers=None):
     if (not aIds): aIds = [];
     if (not aUsers): aUsers = [];
     aRooms = [];
-    for sId in aIds:
+    if (not os.path.exists('user.txt')):
+        with open("user.txt","a") as f:
+            for sId in aIds:
+                sId = sId.strip();
+                if (sId):
+                    f.writelines(sId)
+                    f.write('\n')
+            f.close
+    else:
+        for sId in aIds:
+            sId = sId.strip();
+            if (sId):
+                sameid = 0
+                for i in open("user.txt","r").read().splitlines():
+                    if (i == sId):
+                        sameid = 1
+                        break
+                if(sameid == 1):
+                    continue
+                else:
+                    with open("user.txt","a") as r:
+                        r.writelines(sId)
+                        r.write('\n')
+                        r.close
+            
+    for sId in open("user.txt","r").read().splitlines():
         sId = sId.strip();
         if (sId):
             room = Room(int(sId));
@@ -497,6 +547,8 @@ def synMonitor(aIds=None, aUsers=None):
     for room in aRooms:
         display('id: {}\nUser: {}\nroom: {}\nstatus: {}\n'.format(room.nId, room.sUser, room.sTitle, room.sStatus))
     log.debug('check interval: {}s'.format(INTERVAL));
+    ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
+    ck.start()
     while True:
         for room in aRooms:
             isOn = (room.getInfo() == 'on');
