@@ -68,7 +68,10 @@ def prepare():
     
     config = configparser.ConfigParser()
     config.read(sys.path[0] + "/proxy.ini")
-    sourceip = socket.gethostbyname(config.get('proxy','ip'))
+    try:
+        sourceip = socket.gethostbyname(config.get('proxy','ip'))
+    except Exception as e:
+        sourceip = "127.0.0.1"
     r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
     ip_ports = json.loads(r.text)
     print(ip_ports)
@@ -487,7 +490,7 @@ def checkuser():
             if(sameid == 1):
                 continue
             else:
-                room = Room(int(sId));
+                room = Room(int(i));
                 room.getInfo();
                 aRooms.append(room)
         for room in aRooms:
@@ -503,7 +506,7 @@ def synMonitor(aIds=None, aUsers=None):
     if (not aIds): aIds = [];
     if (not aUsers): aUsers = [];
     aRooms = [];
-    if (not os.path.exists(user.txt)):
+    if (not os.path.exists('user.txt')):
         with open("user.txt","a") as f:
             for sId in aIds:
                 sId = sId.strip();
@@ -544,7 +547,7 @@ def synMonitor(aIds=None, aUsers=None):
     for room in aRooms:
         display('id: {}\nUser: {}\nroom: {}\nstatus: {}\n'.format(room.nId, room.sUser, room.sTitle, room.sStatus))
     log.debug('check interval: {}s'.format(INTERVAL));
-    ck = threading.Thread(target=checkuser,args=(,),name=("check"),daemon=True)
+    ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
     ck.start()
     while True:
         for room in aRooms:
