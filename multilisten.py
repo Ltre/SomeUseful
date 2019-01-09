@@ -70,9 +70,10 @@ def prepare():
     config.read(sys.path[0] + "/proxy.ini")
     try:
         sourceip = socket.gethostbyname(config.get('proxy','ip'))
+        r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout=10)
     except Exception as e:
         sourceip = "127.0.0.1"
-    r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
+        r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout=10)
     ip_ports = json.loads(r.text)
     print(ip_ports)
     try:
@@ -80,7 +81,7 @@ def prepare():
     except Exception as e:
         print(e)
         try:
-            r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip)
+            r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout=10)
             ip = ip_ports[ii][0]
         except Exception as e:
             ii += 1
