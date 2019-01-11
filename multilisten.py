@@ -24,7 +24,7 @@ FILEDIR = '';
 DEBUGLEVEL = logging.DEBUG;
 SCRIPT = '';
 COMMAND = '';
-INTERVAL = 10;
+INTERVAL = 5;
 
 sApi0 = 'http://space.bilibili.com/ajax/live/getLive?mid={}'
 sApi1 = 'http://live.bilibili.com/api/player?id=cid:{}';
@@ -70,22 +70,27 @@ def prepare():
     config.read(sys.path[0] + "/proxy.ini")
     try:
         sourceip = socket.gethostbyname(config.get('proxy','ip'))
-        r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout=10)
+        r = requests.get('http://%s:8765/?types=2&count=30&country=国内' % sourceip,timeout=10)
     except Exception as e:
         sourceip = "127.0.0.1"
-        r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout=10)
-    ip_ports = json.loads(r.text)
+        r = requests.get('http://%s:8765/?types=2&count=30&country=国内' % sourceip,timeout=10)
+    try:
+        ip_ports = json.loads(r.text)
+    except Exception as e:
+        print(e)
+        time.sleep(0.1)
+        prepare()
     print(ip_ports)
     try:
         ip = ip_ports[ii][0]
     except Exception as e:
         print(e)
         try:
-            r = requests.get('http://%s:8765/?types=2&count=20&country=国内' % sourceip,timeout=10)
+            r = requests.get('http://%s:8765/?types=2&count=30&country=国内' % sourceip,timeout=10)
             ip = ip_ports[ii][0]
         except Exception as e:
             ii += 1
-            if(ii>=20):
+            if(ii>=30):
                 ii=0
             prepare()
             return
@@ -197,7 +202,7 @@ class Room():
         
         try:
             if (self.nId is None): self.getRealId();
-            res = urlopen(sApi5.format(self.nId),timeout = 10);
+            res = urlopen(sApi5.format(self.nId),timeout=10);
             sRoomInfo = res.read().decode('utf-8');
             mData = json.loads(sRoomInfo);
             self.getHost();
@@ -485,17 +490,19 @@ def doDownload(room):
 def checkuser():
     global aRooms
     while True:
+        #print('check run')
         for i in open("user.txt","r").read().splitlines():
             if(i):
                 sameid = 0
                 for room in aRooms:
-                    if(i == room.nRoom):
+                    if(int(i) == room.nRoom):
                         sameid =1
                         room.sameid = 1
                         break
                 if(sameid == 1):
                     continue
                 else:
+                    print('find new id:%s.' % i)
                     room = Room(int(i));
                     room.sameid = 1
                     room.getInfo();
