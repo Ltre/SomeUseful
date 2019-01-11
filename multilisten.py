@@ -140,6 +140,7 @@ class Room():
         self.sStatus = None;
         self._stream = io.StringIO();
         self.thread = None;
+        self.checkthread = None;
         self.ii = 1;
         self.sameid = 0;
         #log.debug({key: value for key, value in vars(self).items() if not key.startswith('_') and value});
@@ -565,24 +566,39 @@ def synMonitor(aIds=None, aUsers=None):
     ck.start()
     while True:
         for room in aRooms:
-            isOn = (room.getInfo() == 'on');
-            log.debug('{} {} {}'.format(room.nId, room.sUser, room.sStatus));
-            if (isOn):
-                if (room.thread and room.thread.is_alive()):
-                    sProcess = room._stream.getvalue();
-                    log.debug('{} downloading process: {}'.format(room.nId, sProcess));
-                else:
-                    log.info('{} starting download process...'.format(room.nId));
-                    downThread = threading.Thread(
-                            target=doDownload,
-                            name=str(room.nId),
-                            args=(room,),
-                            daemon=True
-                    );
-                    room.thread = downThread;
-                    downThread.start();
-            else:
+            if(room.checkthread and room.checkthread.is_alive()):
                 pass
+            else:
+                log.info('new checkthread {} running'.format(room.nId))
+                checkThread = threading.Thread(target=checkrun,
+                                               name=str(room.sUser),
+                                               args=(room,),
+                                               daemon=True
+                                              )
+                room.checkthread=checkThread
+                checkThread.start()                
+        wait(INTERVAL);
+
+def checkrun(room):
+    while True:
+        isOn = (room.getInfo() == 'on');
+        log.debug('{} {} {}'.format(room.nId, room.sUser, room.sStatus));
+        if (isOn):
+            if (room.thread and room.thread.is_alive()):
+                sProcess = room._stream.getvalue();
+                log.debug('{} downloading process: {}'.format(room.nId, sProcess));
+            else:
+                log.info('{} starting download process...'.format(room.nId));
+                downThread = threading.Thread(
+                        target=doDownload,
+                        name=str(room.nId),
+                        args=(room,),
+                        daemon=True
+                );
+                room.thread = downThread;
+                downThread.start();
+        else:
+            pass
         wait(INTERVAL);
 
 def run():
