@@ -573,7 +573,7 @@ def synMonitor(aIds=None, aUsers=None):
                 checkThread = threading.Thread(target=checkrun,
                                                name=str(room.sUser),
                                                args=(room,),
-                                               daemon=Truen
+                                               daemon=True
                                               )
                 room.checkthread=checkThread
                 checkThread.start()                
