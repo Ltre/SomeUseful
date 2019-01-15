@@ -9,6 +9,8 @@ import sys,configparser
 ii = 0
 proxies = {}
 justone = 1
+dRooms = []
+dpath = None
 def prepare():
     global ii , proxies
     config = configparser.ConfigParser()
@@ -58,6 +60,8 @@ class Room():
         self.nRoom = int(nRoom or 0)
         self.nDomain = nDomain
         self.thread = None
+        self.sameid = 1
+        self.ex = 0
 
 class aerror(Exception):
     pass
@@ -65,9 +69,10 @@ class aerror(Exception):
     
     
 def youd(c,m):
+    global dpath
     #while True:
     try:
-        os.system('you-get www.{}.com/{} -o /root/b/d --debug'.format(c,m))
+        os.system('you-get www.{}.com/{} -o {} --debug'.format(c,m,dpath))
     except:
         pass
      #   finally:
@@ -75,9 +80,10 @@ def youd(c,m):
 
             
 def pandad(c,m):
+    global dpath
     #while True:
     try:
-        os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
+        os.system('lulu www.{}.com/{} -o {}'.format(c,m,dpath))
     except:
         pass
     #    finally:
@@ -87,14 +93,46 @@ def pandad(c,m):
 def huod(c,m):
    # while True:
     try:
-        os.system('lulu www.{}.com/{} -o /root/b/d'.format(c,m))
+        os.system('lulu www.{}.com/{} -o /root/b/d/d'.format(c,m))
     except:
         pass
    #     finally:
   #          time.sleep(20)
 
+def checkuser():
+    global dRooms
+    while True:
+        #print('check run')
+        for i in open("duser.txt","r").read().splitlines():
+            if(i):
+                sameid = 0 
+                for room in dRooms:
+                    if(int(i) == room.nRoom):
+                        sameid =1
+                        room.ex = 1
+                        #room.sameid = 1
+                        break
+                if(sameid == 1):
+                    continue
+                else:
+                    print('find new id:%s.' % i)
+                    room = Room(int(i));
+                    room.sameid = 1
+                    room.ex = 1
+                    #room.getInfo();
+                    dRooms.append(room)
+        for room in dRooms:
+            if(room.ex == 0):
+                print("{}end".format(room.nRoom))
+                dRooms.remove(room)
+                room.sameid = 0
+            room.ex = 0
+        time.sleep(5)
+        
 def main():
     global justone
+    global dRooms
+    global dpath
     headers = {
         'user-agent': 'Mozilla/5.0 (iPad; CPU OS 8_1_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B466 Safari/600.1.4'
     }
@@ -113,15 +151,45 @@ def main():
                 #        down = threading.Thread(target=huod,args=(datas[i],room,))
                 #        down.start()
 
+            if datas[i]=='d':
+                dpath=datas[i+1]
+                if (not os.path.exists(dpath)):
+                    os.makedirs(dpath)
             if datas[i]=='pandatv':
                 for a in ms:
                     room = Room(a,datas[i])
                     pRooms.append(room)
             if datas[i]=='douyu':
-                for a in ms:
-                    room = Room(a,datas[i])
-                    dRooms.append(room)
+                if (not os.path.exists('duser.txt')):
+                    with open("duser.txt","a") as f:
+                        for a in ms:
+                            a = a.strip();
+                            if (a):
+                                f.writelines(a)
+                                f.write('\n')
+                        f.close
+                else:
+                    for a in ms:
+                        a=a.strip()
+                        if(a):
+                            sameid = 0
+                            for k in open("duser.txt","r").read().splitlines():
+                                if (k == a):
+                                    sameid = 1
+                                    break
+                            if(sameid == 1):
+                                continue
+                            else:
+                                with open("duser.txt","a") as r:
+                                    r.writelines(a)
+                                    r.write('\n')
+                                    r.close
             i+=1
+    for a in open("duser.txt","r").read().splitlines():
+        room = Room(a,'douyu')
+        dRooms.append(room)
+    ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
+    ck.start()  
     while True:
         for room in dRooms:
             try:
