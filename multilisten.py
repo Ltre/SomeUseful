@@ -25,6 +25,7 @@ DEBUGLEVEL = logging.DEBUG;
 SCRIPT = '';
 COMMAND = '';
 INTERVAL = 5;
+ipnum = 0;
 
 sApi0 = 'http://space.bilibili.com/ajax/live/getLive?mid={}'
 sApi1 = 'http://live.bilibili.com/api/player?id=cid:{}';
@@ -56,7 +57,13 @@ from multiprocessing import Process
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-def prepare():
+logging.basicConfig(format='    %(asctime)s %(levelname)-5s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S');
+log = logging.getLogger(__name__);
+log.setLevel(DEBUGLEVEL);
+sleepEvent = threading.Event();
+wait = sleepEvent.wait;
+
+def prepare(room):
     global sHome
     global sSelfDir
     global sLogDir
@@ -65,41 +72,44 @@ def prepare():
     global wait
     
     global ii
-    
+    global ipnum
+
     config = configparser.ConfigParser()
     config.read(sys.path[0] + "/proxy.ini")
     try:
         sourceip = socket.gethostbyname(config.get('proxy','ip'))
-        r = requests.get('http://%s:8765/?types=2&count=30&country=国内' % sourceip,timeout=10)
+        r = requests.get('http://%s:8765/?types=2&count=100' % sourceip,timeout=10)
     except Exception as e:
         sourceip = "127.0.0.1"
-        r = requests.get('http://%s:8765/?types=2&count=30&country=国内' % sourceip,timeout=10)
+        r = requests.get('http://%s:8765/?types=2&count=100' % sourceip,timeout=10)
     try:
         ip_ports = json.loads(r.text)
     except Exception as e:
         print(e)
         time.sleep(0.1)
-        prepare()
-    print(ip_ports)
+        prepare(self)
+    print("数量：")
+    print(len(ip_ports))
+    ipnum=int(len(ip_ports))
     try:
         ip = ip_ports[ii][0]
     except Exception as e:
         print(e)
         try:
-            r = requests.get('http://%s:8765/?types=2&count=30&country=国内' % sourceip,timeout=10)
+            r = requests.get('http://%s:8765/?types=2&count=100' % sourceip,timeout=10)
             ip = ip_ports[ii][0]
         except Exception as e:
             ii += 1
-            if(ii>=30):
+            if(ii>=ipnum):
                 ii=0
-            prepare()
+            prepare(self)
             return
     port = ip_ports[ii][1]    
-    ii += 1
-    if(ii>=20):
-        ii=0
     proxies={'http':'%s:%s'%(ip,port)}
-    print('取用的IP地址：{}\n'.format(proxies))
+    print('取用第{}个IP地址：{}\n'.format(ii+1,proxies))
+    ii += 1
+    if(ii>=ipnum):
+        ii=0
     proxy_support = urllib.request.ProxyHandler(proxies)
     
     sHome = expanduser('~')
@@ -112,9 +122,10 @@ def prepare():
     wait = sleepEvent.wait;
     opener = urllib.request.build_opener(proxy_support);
     opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36')];
-    urllib.request.install_opener(opener);
+    #urllib.request.install_opener(opener);
+    room.urlopen=opener.open
     socket.setdefaulttimeout(30);
-prepare();
+#prepare();
 
 os.system("apt install -y yamdi ffmpeg libffi-dev libssl-dev")
 
@@ -142,12 +153,14 @@ class Room():
         self.thread = None;
         self.checkthread = None;
         self.ii = 1;
-        self.sameid = 0;
+        self.sameid = 1;
+        self.ex = 0;
+        self.urlopen = None;
         #log.debug({key: value for key, value in vars(self).items() if not key.startswith('_') and value});
     def getRoomByUser(self):
         assert self.nUser;
         try:
-            res = urlopen(sApi0.format(self.nUser));
+            res = self.urlopen(sApi0.format(self.nUser));
             sData = res.read().decode('utf-8');
             assert sData;
             mData = json.loads(sData);
@@ -170,7 +183,7 @@ class Room():
             #    nId = int(match.group(1));
             #else:
             #    nId = self.nRoom;
-            res = urlopen(sAPI4.format(self.nRoom));
+            res = self.urlopen(sAPI4.format(self.nRoom));
             bData = res.read();
             mData = json.loads(bData.decode());
             nId = mData['data']['room_id'];
@@ -188,7 +201,7 @@ class Room():
     def getHost(self):
         if (self.sUser is None):
             try:
-                f1 = urllib.request.urlopen(sApi6.format(self.nId));
+                f1 = self.urlopen(sApi6.format(self.nId));
                 bData = f1.read();
                 mData = json.loads(bData.decode());
                 self.sUser = mData['data']['info']['uname'];
@@ -203,7 +216,7 @@ class Room():
         
         try:
             if (self.nId is None): self.getRealId();
-            res = urlopen(sApi5.format(self.nId),timeout=10);
+            res = self.urlopen(sApi5.format(self.nId),timeout=10);
             sRoomInfo = res.read().decode('utf-8');
             mData = json.loads(sRoomInfo);
             self.getHost();
@@ -214,7 +227,7 @@ class Room():
         except Exception as e:
             log.error('failed to get room info: {}'.format(e));
             
-            prepare();
+            prepare(self);
             self.getInfo();
             #raise;
         else:
@@ -235,10 +248,10 @@ class Room():
         #    return False;
         global sApi7
         try:
-            with urlopen(sApi7.format(self.nId),timeout=10) as res:
+            with self.urlopen(sApi7.format(self.nId),timeout=10) as res:
                 sData = res.read().decode('utf-8');
         except Exception as e:
-            prepare()
+            prepare(self)
             self.getStream()
         mData = json.loads(sData);
         try:
@@ -269,19 +282,19 @@ class Room():
         sUrl = self.sUrl;
         
         try:
-            r = urlopen(sUrl, timeout=10).getcode()
+            r = urlopen(sUrl, timeout=10)
         except Exception as e:
             print('主线中断，切换备线\n')
             sUrl = self.ssUrl
             try:
-                r = urlopen(sUrl, timeout=10).getcode()
+                r = urlopen(sUrl, timeout=10)
             except Exception as e:
                 print('继续换\n')
                 sUrl = self.s2Url
                 try:
-                    r=urlopen(sUrl,timeout=10).getcode()
+                    r=urlopen(sUrl,timeout=10)
                 except Exception as e:
-                    prepare()
+                    prepare(self)
                     return False
         except socket.timeout as e:
             print(e)
@@ -289,10 +302,10 @@ class Room():
             try:
                 r = urlopen(sUrl, timeout=10).getcode()
             except urllib.error.HTTPError as e:
-                prepare()
+                prepare(self)
                 return False
             except socket.timeout as e:
-                prepare()
+                prepare(self)
                 return False
         else:
             pass
@@ -302,7 +315,10 @@ class Room():
         #sUrl = next(iUrls);
         try:
             f1 = open(sPath, 'wb');
-            res = urlopen(sUrl, timeout=20);
+            if(r):
+                res = r;
+            else:
+                res = urlopen(sUrl, timeout=20);
             log.info('{} starting download from:\n{}\n    to:\n{}'.format(self.nId, sUrl, sPath));
             if (nVerbose):
                 stream.write('\n');
@@ -418,6 +434,13 @@ def upload(room,sPath,sName,sDir):
     upwork -= 1
     while True:
         wait(0.5);
+        if(not room.sUser):
+            room.getHost()
+            sPaths=re.split(r'[-]{2}',sPath)
+            if(len(sPaths)==2):
+                nPath=sPaths[0]+room.sUser+sPaths[1]
+                os.system('mv sPath nPath')
+                sPath = nPath
         os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
         if(not exists(sPath)):
             log.info('{}存储成功..'.format(sName));
@@ -466,7 +489,7 @@ def doDownload(room):
                     p = Process(target=upload, args=(room,sPath,sName,sDir,))
                     print('Child process will start.')
                     p.start()
-                    doCleanup(room, sPath);
+                    #doCleanup(room, sPath);
                 except Exception as e:
                     if (sLogDir):
                         if (not exists(sLogDir)):
@@ -494,11 +517,12 @@ def checkuser():
         #print('check run')
         for i in open("user.txt","r").read().splitlines():
             if(i):
-                sameid = 0
+                sameid = 0 
                 for room in aRooms:
                     if(int(i) == room.nRoom):
                         sameid =1
-                        room.sameid = 1
+                        room.ex = 1
+                        #room.sameid = 1
                         break
                 if(sameid == 1):
                     continue
@@ -506,11 +530,15 @@ def checkuser():
                     print('find new id:%s.' % i)
                     room = Room(int(i));
                     room.sameid = 1
-                    room.getInfo();
+                    room.ex = 1
+                    #room.getInfo();
                     aRooms.append(room)
         for room in aRooms:
-            if(room.sameid == 0):
+            if(room.ex == 0):
+                print("{}end".format(room.nRoom))
                 aRooms.remove(room)
+                room.sameid = 0
+            room.ex = 0
         time.sleep(5)
 
 def synMonitor(aIds=None, aUsers=None):
@@ -550,7 +578,7 @@ def synMonitor(aIds=None, aUsers=None):
         sId = sId.strip();
         if (sId):
             room = Room(int(sId));
-            room.getInfo();
+            #room.getInfo();
             aRooms.append(room);
     for sUser in aUsers:
         sUser = sUser.strip();
@@ -559,8 +587,8 @@ def synMonitor(aIds=None, aUsers=None):
             if (room.getRoomByUser()):
                 room.getInfo();
                 aRooms.append(room);
-    for room in aRooms:
-        display('id: {}\nUser: {}\nroom: {}\nstatus: {}\n'.format(room.nId, room.sUser, room.sTitle, room.sStatus))
+    #for room in aRooms:
+        #display('id: {}\nUser: {}\nroom: {}\nstatus: {}\n'.format(room.nId, room.sUser, room.sTitle, room.sStatus))
     log.debug('check interval: {}s'.format(INTERVAL));
     ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
     ck.start()
@@ -569,7 +597,7 @@ def synMonitor(aIds=None, aUsers=None):
             if(room.checkthread and room.checkthread.is_alive()):
                 pass
             else:
-                log.info('new checkthread {} running'.format(room.nId))
+                log.info('new checkthread {} running'.format(room.nRoom))
                 checkThread = threading.Thread(target=checkrun,
                                                name=str(room.sUser),
                                                args=(room,),
@@ -580,14 +608,23 @@ def synMonitor(aIds=None, aUsers=None):
         wait(INTERVAL);
 
 def checkrun(room):
+    x = 1
+    prepare(room)
+    isOn = (room.getInfo() == 'on');
+    display('id: {}\nUser: {}\nroom: {}\nstatus: {}\n'.format(room.nId, room.sUser, room.sTitle, room.sStatus))
     while True:
-        isOn = (room.getInfo() == 'on');
-        log.debug('{} {} {}'.format(room.nId, room.sUser, room.sStatus));
-        if (isOn):
-            if (room.thread and room.thread.is_alive()):
-                sProcess = room._stream.getvalue();
-                log.debug('{} downloading process: {}'.format(room.nId, sProcess));
+        if (room.thread and room.thread.is_alive()):
+            sProcess = room._stream.getvalue();
+            log.debug('{} downloading process: {}'.format(room.nId, sProcess));
+        else:
+            if(room.sameid == 0):
+                break
+            if(isOn and x==1):
+                x=0
             else:
+                isOn = (room.getInfo() == 'on');
+            log.debug('{} {} {}'.format(room.nId, room.sUser, room.sStatus));
+            if(isOn):
                 log.info('{} starting download process...'.format(room.nId));
                 downThread = threading.Thread(
                         target=doDownload,
@@ -597,8 +634,8 @@ def checkrun(room):
                 );
                 room.thread = downThread;
                 downThread.start();
-        else:
-            pass
+            else:
+                pass
         wait(INTERVAL);
 
 def run():
@@ -644,7 +681,7 @@ def parseArg():
     if (args.verbose):
         DEBUGLEVEL = logging.DEBUG;
     else:
-        DEBUGLEVEL = logging.INFO;
+        DEBUGLEVEL = logging.INFO; 
     log.setLevel(DEBUGLEVEL);
     SCRIPT = args.script or SCRIPT or '';
     COMMAND = args.command or COMMAND or '';
