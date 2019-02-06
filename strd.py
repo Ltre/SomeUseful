@@ -10,6 +10,7 @@ ii = 0
 proxies = {}
 justone = 1
 dRooms = []
+hRooms = []
 dpath = None
 def prepare():
     global ii , proxies
@@ -67,6 +68,11 @@ class aerror(Exception):
     pass
     
     
+def huyad(c,m):
+    try:
+        os.system('ykdl www.{}.com/{} -o /root/b/d/huya'.format(c,m))
+    except:
+        pass
     
 def youd(c,m):
     global dpath
@@ -100,7 +106,7 @@ def huod(c,m):
   #          time.sleep(20)
 
 def checkuser():
-    global dRooms
+    global dRooms,hRooms
     while True:
         #print('check run')
         for i in open("duser.txt","r").read().splitlines():
@@ -125,6 +131,31 @@ def checkuser():
             if(room.ex == 0):
                 print("{}end".format(room.nRoom))
                 dRooms.remove(room)
+                room.sameid = 0
+            room.ex = 0
+            
+        for i in open("huser.txt","r").read().splitlines():
+            if(i):
+                sameid = 0 
+                for room in hRooms:
+                    if(int(i) == room.nRoom):
+                        sameid =1
+                        room.ex = 1
+                        #room.sameid = 1
+                        break
+                if(sameid == 1):
+                    continue
+                else:
+                    print('find new id:%s.' % i)
+                    room = Room(int(i));
+                    room.sameid = 1
+                    room.ex = 1
+                    #room.getInfo();
+                    hRooms.append(room)
+        for room in hRooms:
+            if(room.ex == 0):
+                print("{}end".format(room.nRoom))
+                hRooms.remove(room)
                 room.sameid = 0
             room.ex = 0
         time.sleep(5)
@@ -159,6 +190,33 @@ def main():
                 for a in ms:
                     room = Room(a,datas[i])
                     pRooms.append(room)
+                    
+            if datas[i]=='huya':
+                if (not os.path.exists('huser.txt')):
+                    with open("huser.txt","a") as f:
+                        for a in ms:
+                            a = a.strip();
+                            if (a):
+                                f.writelines(a)
+                                f.write('\n')
+                        f.close
+                else:
+                    for a in ms:
+                        a=a.strip()
+                        if(a):
+                            sameid = 0
+                            for k in open("huser.txt","r").read().splitlines():
+                                if (k == a):
+                                    sameid = 1
+                                    break
+                            if(sameid == 1):
+                                continue
+                            else:
+                                with open("huser.txt","a") as r:
+                                    r.writelines(a)
+                                    r.write('\n')
+                                    r.close
+                                    
             if datas[i]=='douyu':
                 if (not os.path.exists('duser.txt')):
                     with open("duser.txt","a") as f:
@@ -188,6 +246,11 @@ def main():
     for a in open("duser.txt","r").read().splitlines():
         room = Room(a,'douyu')
         dRooms.append(room)
+        
+    for a in open("huser.txt","r").read().splitlines():
+        room = Room(a,'douyu')
+        hRooms.append(room)
+    
     ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
     ck.start()  
     while True:
@@ -234,6 +297,15 @@ def main():
                     down.start()
             else:
                 pass
+            
+        for room in hRooms:
+            if room.thread and room.thread.isAlive():
+                continue
+            else:
+                down = threading.Thread(target=youd,args=(room.nDomain,room.nRoom,),name=str(room.nRoom),daemon=True)
+                room.thread = down
+                down.start()
+                
 
         for room in pRooms:
             
