@@ -248,7 +248,7 @@ def main():
         dRooms.append(room)
         
     for a in open("huser.txt","r").read().splitlines():
-        room = Room(a,'douyu')
+        room = Room(a,'huya')
         hRooms.append(room)
     
     ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
