@@ -122,7 +122,7 @@ def checkuser():
                     continue
                 else:
                     print('find new id:%s.' % i)
-                    room = Room(int(i));
+                    room = Room(int(i),'douyu');
                     room.sameid = 1
                     room.ex = 1
                     #room.getInfo();
@@ -147,7 +147,7 @@ def checkuser():
                     continue
                 else:
                     print('find new id:%s.' % i)
-                    room = Room(int(i));
+                    room = Room(int(i),'huya');
                     room.sameid = 1
                     room.ex = 1
                     #room.getInfo();
