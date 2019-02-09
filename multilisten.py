@@ -50,10 +50,11 @@ available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
 import requests
 import random
 ii=0
-upwork=0
+
 
 import ssl
-from multiprocessing import Process
+from multiprocessing import Process, Value
+upwork = Value("d",0)
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -87,7 +88,7 @@ def prepare(room):
     except Exception as e:
         print(e)
         time.sleep(0.1)
-        prepare(self)
+        prepare(room)
     print("数量：")
     print(len(ip_ports))
     ipnum=int(len(ip_ports))
@@ -102,7 +103,7 @@ def prepare(room):
             ii += 1
             if(ii>=ipnum):
                 ii=0
-            prepare(self)
+            prepare(room)
             return
     port = ip_ports[ii][1]    
     proxies={'http':'%s:%s'%(ip,port)}
@@ -419,19 +420,19 @@ def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
     return True;
 
 
-def upload(room,sPath,sName,sDir):
+def upload(room,sPath,sName,sDir,upwork):
     jishu=0;
     change ='waitting'+sName
     cPath = os.path.join(sDir, change)
-    global upwork
-    while upwork>1:
+    #global upwork
+    while upwork.value>1:
         time.sleep(random.randint(0,20))
-    upwork += 1
+    upwork.value += 1
     os.system('ffmpeg -i "{}" -y -vcodec copy -acodec copy "{}"'.format(sPath,cPath))
     os.system('rm -rf "{}"'.format(sPath))
     os.system('yamdi -i "{}" -o "{}"'.format(cPath,sPath))
     os.system('rm -rf "{}"'.format(cPath))
-    upwork -= 1
+    upwork.value -= 1
     while True:
         wait(0.5);
         if(not room.sUser):
@@ -439,7 +440,7 @@ def upload(room,sPath,sName,sDir):
             sPaths=re.split(r'[-]{2}',sPath)
             if(len(sPaths)==2):
                 nPath=sPaths[0]+room.sUser+sPaths[1]
-                os.system('mv sPath nPath')
+                os.system('mv "{}" "{}"'.format(sPath,nPath))
                 sPath = nPath
         os.system('rclone move "{}" milo:milo/b/"{}"'.format(sPath,room.sUser));
         if(not exists(sPath)):
@@ -486,7 +487,7 @@ def doDownload(room):
                    # );
 
                    # downThread.start();
-                    p = Process(target=upload, args=(room,sPath,sName,sDir,))
+                    p = Process(target=upload, args=(room,sPath,sName,sDir,upwork,))
                     print('Child process will start.')
                     p.start()
                     #doCleanup(room, sPath);
