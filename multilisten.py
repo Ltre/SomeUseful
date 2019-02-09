@@ -205,7 +205,9 @@ class Room():
                 f1 = self.urlopen(sApi6.format(self.nId));
                 bData = f1.read();
                 mData = json.loads(bData.decode());
-                self.sUser = mData['data']['info']['uname'];
+                Username = mData['data']['info']['uname'];
+                rstr = r"[\/\\\:\*\?\"\<\>\|\- ]"
+                self.sUser = re.sub(rstr,"_",Username)
             except Exception as e:
                 display('获取播主失败: ', e);
                 self.sUser = '';
