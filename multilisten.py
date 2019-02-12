@@ -345,6 +345,7 @@ class Room():
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
                     tnumber = 0
+		
 		if (nSize/n >= 1500 and self.nId != 151159):
 			print('%s 大小到达限制，进行存储\n' % sPath)
 			break
