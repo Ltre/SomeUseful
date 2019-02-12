@@ -223,7 +223,9 @@ class Room():
             sRoomInfo = res.read().decode('utf-8');
             mData = json.loads(sRoomInfo);
             self.getHost();
+            rstr = r"[\/\\\:\*\?\"\<\>\|\- ]"
             self.sTitle = sTitle = mData['data']['title'];
+            self.sTitle = re.sub(rstr,"_",self.sTitle)
             nStatus = mData['data']['live_status'];
             _status = 'on' if nStatus == 1 else 'off';
             self.sStatus = _status;
@@ -343,7 +345,12 @@ class Room():
                     available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
                     print('剩余空间%.2f\n' % (available))
                     tnumber = 0
-                if (available<8.8 and (self.ii == 1 and self.nId !=151159)):
+				if (nSize/n >= 1500 and self.nId != 151159):
+					print('%s 大小到达限制，进行存储\n' % sPath)
+					break
+                if (self.ii == 0 and available>25):
+                    self.ii = 1
+                if (available<15 and (self.ii == 1 and self.nId !=151159)):
                     self.ii = 0
                     print('剩余空间不足，进行存储\n')
                     break
@@ -434,7 +441,7 @@ def upload(room,sPath,sName,sDir,upwork):
     os.system('rm -rf "{}"'.format(sPath))
     os.system('yamdi -i "{}" -o "{}"'.format(cPath,sPath))
     os.system('rm -rf "{}"'.format(cPath))
-    upwork.value -= 1
+    #upwork.value -= 1
     while True:
         wait(0.5);
         if(not room.sUser):
@@ -461,6 +468,7 @@ def upload(room,sPath,sName,sDir,upwork):
             jishu+=1;
             print('存储失败，重新存储..\n')
             time.sleep(5)
+    upwork.value -= 1
 
 def doDownload(room):
     global FILEDIR, sHome;
