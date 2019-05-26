@@ -1,28 +1,22 @@
-import os,random,functools,concurrent,uvloop,asyncio
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-os.system("cd /root/b/d/d;mv *flv /root/b;cd /root/b/d/huya;mv *mp4 /root/b")
+import os,random
 import time
 import re
 import requests
 import threading
-import sys
+from requests.exceptions import HTTPError
+import json
+import sys,configparser
+from multiprocessing import Process
+import aiohttp,asyncio
 import nest_asyncio
+nest_asyncio.apply()
 proxies = {}
 justone = 1
 dRooms = []
 hRooms = []
-hrecording = []
-drecording = []
 dpath = None
 
-ss = requests.session()
-ss.keep_alive = False
-
-def delete_proxy(proxy):
-    return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
-
-def get_proxy():
-    return requests.get("http://127.0.0.1:5010/get").text
+    
     
 class Room():
     def __init__(self,nRoom=None,nDomain =None):
@@ -38,34 +32,31 @@ class aerror(Exception):
     
 def huyad(c,m):
     try:
-        if m in hrecording:
-            return
-        else:
-            hrecording.append(m)
         os.system('ykdl www.{}.com/{} -o /root/b/d/huya'.format(c,m))
     except:
         pass
-    finally:
-        if m in hrecording:
-            hrecording.remove(m)
     
 def youd(c,m):
     global dpath
     #while True:
     print('www.%s.com/%s -o %s' % (c,m,dpath))
     try:
-        if m in drecording:
-            return
-        else:
-            drecording.append(m)
         os.system('ykdl www.{}.com/{} -o {} -t 20'.format(c,m,dpath))
     except:
         pass
-    finally:
-        if m in drecording:
-            drecording.remove(m)
      #   finally:
      #       time.sleep(20)
+
+            
+def pandad(c,m):
+    global dpath
+    #while True:
+    try:
+        os.system('lulu www.{}.com/{} -o {}'.format(c,m,dpath))
+    except:
+        pass
+    #    finally:
+      #      time.sleep(20)
            
         
 def huod(c,m):
@@ -139,43 +130,20 @@ def checkuser():
             room.ex = 0
         time.sleep(5)
 
-def gethtml(s,url):
-    '''
+async def gethtml(room):
     headers = {
         'user-agent': 'Mozilla/5.0 (iPad; CPU OS 8_1_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B466 Safari/600.1.4'
     }
     async with aiohttp.ClientSession() as session:
-3        async with session.get("http://m.douyu.com/{}".format(room.nRoom),headers=headers,timeout = 10) as res:
+        async with session.get("http://m.douyu.com/{}".format(room.nRoom),headers=headers,timeout = 10) as res:
             assert res.status == 200
-            return await res.json()
-    '''
-    res = s.get(url)
-    res.close()
-    return res.json()
-        
-async def huyastatus(loop,hs,thread_pool):
-    url = 'https://fw.huya.com/dispatch?do=subscribeList&uid=1199513272235&page=1&pageSize=1000'
-    try:
-        json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,hs,url))
-        data = json['result']
-        dlist = data['list']
-        liveCount = data['liveCount']
-        livecheck = 0
-        for i in dlist:
-            if i['isLive']:
-                livecheck+=1
-                if i['profileRoom'] not in hrecording:
-                    down = threading.Thread(target=huyad,args=('huya',i['profileRoom'],),name=str(i['nick']),daemon=True)
-                    down.start()
-                if livecheck>=liveCount:
-                    break
-    except:
-        print(json)
-    '''
+            return await res.text()
+
+async def huyastatus(room):
     if room.thread and room.thread.isAlive():
         return
     try:
-        json = await gethtml(room)
+        html = await gethtml(room)
     except Exception as e:
         print(e)
         return
@@ -190,25 +158,10 @@ async def huyastatus(loop,hs,thread_pool):
             down = threading.Thread(target=huyad,args=(room.nDomain,room.nRoom,),name=str(room.nRoom),daemon=True)
             room.thread = down
             down.start()
-    '''
 
-async def douyustatus(loop,ds,thread_pool):
-    global dRooms
+async def douyustatus(room):
     global justone
     #print('run')
-    url = 'https://www.douyu.com/wgapi/livenc/liveweb/followlist/0?sort=0'
-    try:
-        json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,ds,url))
-        data = json['data']
-        dlist = data['list']
-        for i in dlist:
-            if i['show_status'] == 1:
-                if i['room_id'] not in drecording:
-                    down = threading.Thread(target=youd,args=('douyu',i['room_id'],),name=str(i['nickname']),daemon=True)
-                    down.start()
-    except:
-        print(json)
-    """
     if room.thread and room.thread.isAlive():
         return
     try:
@@ -248,13 +201,15 @@ async def douyustatus(loop,ds,thread_pool):
             down.start()
     else:
         pass
-    """
 
 def main():
     global justone
     global dRooms
     global dpath
     global hRooms
+    headers = {
+        'user-agent': 'Mozilla/5.0 (iPad; CPU OS 8_1_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B466 Safari/600.1.4'
+    }
     ms = []
     datas = []
     pRooms = []
@@ -273,7 +228,11 @@ def main():
                 dpath=datas[i+1]
                 if (not os.path.exists(dpath)):
                     os.makedirs(dpath)
-            '''        
+            if datas[i]=='pandatv':
+                for a in ms:
+                    room = Room(a,datas[i])
+                    pRooms.append(room)
+                    
             if datas[i]=='huya':
                 if (not os.path.exists('huser.txt')):
                     with open("huser.txt","a") as f:
@@ -325,59 +284,69 @@ def main():
                                     r.writelines(a)
                                     r.write('\n')
                                     r.close
-            '''
             i+=1
-    #for a in open("duser.txt","r").read().splitlines():
-    #    room = Room(a,'douyu')
-    #    dRooms.append(room)
+    for a in open("duser.txt","r").read().splitlines():
+        room = Room(a,'douyu')
+        dRooms.append(room)
         
-    #for b in open("huser.txt","r").read().splitlines():
-    #    print(b)
-    #    room = Room(b,'huya')
-    #    hRooms.append(room)
+    for b in open("huser.txt","r").read().splitlines():
+        print(b)
+        room = Room(b,'huya')
+        hRooms.append(room)
     
-    #ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
-    #ck.start()
+    ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
+    ck.start()
     loop = asyncio.get_event_loop()
-    thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=10)
-    dheaders = {
-        "Connection":"keep-alive",
-        "Accept":"application/json, text/plain, */*",
-        "X-Requested-With":"XMLHttpRequest",
-        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36",
-        "Referer":"https://www.douyu.com/directory/myFollow",
-        "Accept-Encoding":"gzip, deflate, br",
-        "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
-    dcookies = {
-        "Cookie":"dy_did=8242408a3b65feb390623d6c00081501; acf_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_ltkid=46925279; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1558100570; acf_auth=bdb0sBzWgzqfPuURyNW3mTa7i3HERlcUKAl6WKslveW34qZybM8Gbbhhz9ZWByISmwIAdFS%2F1%2B2Dal6ER4R6JRSiXGpto5Tv2zjQRWUESJg8iq14I7inGpEBYnn0; wan_auth37wan=1eb9a8799181jRM9X2xqFMMzznNpumlkMHuMA0lXHL9JD%2F2e7jeC4GOQpQMPOdgTKMfVnHkN%2BlC1Ne9hBmjm47isk6CwHmz5T%2BqQP135H4P%2BvjIO; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_biz=1; acf_stk=bedd5aac4e68a028; acf_avatar=//apic.douyucdn.cn/upload/avatar/005/55/00/12_avatar_"
-    }
-    ds = requests.session()
-    ds.headers.update(dheaders)
-    ds.cookies.update(dcookies)
-    hheaders={
-            "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
-            "Accept":"*/*",
-            "Referer":"https://i.huya.com/",
-            "Accept-Encoding":"gzip, deflate, br",
-            "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
-    hcookies={
-            "Cookie":"SoundValue=0.50; alphaValue=0.80; guid=b73e698cbb9bde5c8cecb6feb7fe2c4e; isInLiveRoom=; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; udb_accdata=15671674441; __yasmid=0.5630173980060627; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1558668913; udb_passdata=3; web_qrlogin_confirm_id=8ecfa1a2-f261-4242-98be-994875e59c6d; udb_biztoken=AQC8g2G8Fq7-0DgdvbgEZso7gNA2db2Tm0Zv-jrFrr_MM2PCpgB5MZC5SlSbmAv1sy_cVGyPsdRDW8tSMw1fUkcJ3O4roY9E1ElOl0IEGIgDmHwa7DNOyADbDGo9cBNcdo45zhMEkso9VCo-njOJveei7n-wrxJIWTHdsn1MNcfU9GlN0pheZKbY6YWGblxAKZtPQedagRBC_dFVHjWvi8ZySgq08bllxuXB2HChtxDGVTDMUkz62GIPmzbf8nKi_YaFkRYiVae22AVBwWn54u48jyiZ6p3ue-p-Euvg1qvPB_AlwDUui5cBSrw6qUOddX7pSvYg7xEk7Z6FE-eMHC42; udb_origin=1; udb_other=%7B%22lt%22%3A%221558668917088%22%2C%22isRem%22%3A%220%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; __yaoldyyuid=1199513272235; _yasids=__rootsid%3DC87509B2685000014EAE9FF081501461; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1558668921; h_unt=1558668920"
-            }
-    hs = requests.session()
-    hs.headers.update(hheaders)
-    hs.cookies.update(hcookies)
     while True:
-        #tasks1 = [douyustatus(room) for room in dRooms]
-        #tasks2 = [huyastatus(room) for room in hRooms]
-        tasks1 = [douyustatus(loop,ds,thread_pool)]
-        tasks2 = [huyastatus(loop,hs,thread_pool)]
+        tasks1 = [douyustatus(room) for room in dRooms]
+        tasks2 = [huyastatus(room) for room in hRooms]
         tasks = tasks1+tasks2
         #loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.wait(tasks)) 
         #loop.close()
 
-
-        time.sleep(random.randint(0,5))
+        for room in pRooms:
+            
+            try:
+                json_request_url ="http://www.panda.tv/api_room_v2?roomid={}&__plat=pc_web&_={}".format(room.nRoom, int(time.time()))
+                html = requests.get(json_request_url,headers=headers,proxies=proxies,timeout = 10)
+        
+            except Exception as e:
+                print(e)
+                try:
+                    raise aerror('172行熊猫信息出错\n')
+                except aerror as e:
+                    print(e)
+                #proxies = getip()
+                try:
+                    json_request_url ="http://www.panda.tv/api_room_v2?roomid={}&__plat=pc_web&_={}".format(room.nRoom, int(time.time()))
+                    html = requests.get(json_request_url,headers=headers,proxies=proxies,timeout = 10)    
+                except Exception as e:
+                    #proxies = getip()
+                    continue
+            try:
+                api_json = json.loads(html.text)
+                data = api_json["data"]
+                status = data["videoinfo"]["status"]
+            except Exception as e:
+                print(e)
+                try:
+                    raise aerror('187行熊猫开播信息提取失败')
+                except aerror as e:
+                    print(e)
+                continue
+            
+            
+            if status is "2":                
+                if room.thread and room.thread.isAlive():
+                    continue
+                else:
+                    down = threading.Thread(target=youd,args=(room.nDomain,room.nRoom,),name=str(room.nRoom),daemon=True)
+                    room.thread = down
+                    down.start()
+            else:
+                pass
+        time.sleep(random.randint(10,22))
     
 if __name__ =="__main__":
     main()
