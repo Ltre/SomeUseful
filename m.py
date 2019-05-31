@@ -88,7 +88,10 @@ def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
 
 def get_proxy():
-    return ss.get("http://127.0.0.1:5010/get").text
+    try:
+        return ss.get("http://127.0.0.1:5010/get",timeout=20).text
+    except:
+        return None
 
 proxyg={'http':get_proxy()}#getip('国内')
 def prepare(room,s=None):
@@ -177,7 +180,7 @@ def prepare(room,s=None):
     socket.setdefaulttimeout(30);
 #prepare();
 
-os.system("apt install -y yamdi ffmpeg libffi-dev libssl-dev")
+#os.system("apt install -y yamdi ffmpeg libffi-dev libssl-dev")
 
 def display(*args, **kargs):
     try:
