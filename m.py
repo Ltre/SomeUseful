@@ -19,7 +19,9 @@ import subprocess
 import argparse
 import http.client
 import configparser,traceback
+from mail import send_mail
 
+password = input('password:')
 ROOMS = '';
 USERS = '';
 FILEDIR = '';
@@ -779,7 +781,7 @@ def newgetonline():
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
     cookies={
-            "Cookie":"buvid3=DF8F84B3-B90F-4D48-AF16-6ECF24C8BAA540777infoc; LIVE_BUVID=AUTO2015577399215380; sid=6znidvkl; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=34f5f194%2C1560331941%2C35fcf151; bili_jct=9c0eebb9461bc14a8c855818a27b48c6; _dfcaptcha=b761810cd8d5d6835ab4d99a536ac018"
+            "Cookie":"LIVE_BUVID=AUTO2015577399215380; _uuid=003D718E-277A-FAB3-5203-993F231E6C6F15160infoc; buvid3=9B4EDB2B-D9C3-45D3-AA7B-C35D7177165B110268infoc; sid=m4qt099w; CURRENT_FNVAL=16; fts=1557823132; UM_distinctid=16ab622c915172-0928c3f320cea4-3b654406-144000-16ab622c916554; rpdid=|(uYmYu|m~~J0J'ull~)RumlY; finger=b3372c5f; im_notify_type_1836737=0; stardustvideo=1; stardustpgcv=0606; flash_player_gray=false; html5_player_gray=false; CURRENT_QUALITY=116; bp_t_offset_1836737=264342399414166141; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=3057d1d9%2C1562988984%2Cc504ef61; bili_jct=0446467c8311da20ce5a0189052271f6; _dfcaptcha=c81043276b4af48a154a1f3eb8462a5b"
             }
     s.headers.update(headers)
     s.cookies.update(cookies)
@@ -789,9 +791,16 @@ def newgetonline():
         try:
             t=1
             url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
-            data = s.get(url,proxies=proxies,timeout=10).json().get('data')
+            res= s.get(url,proxies=proxies,timeout=10).json()
+            data=res.get('data')
             online= []
             infos={}
+            if not data:
+                contents = 'bilibili cookies 失效'
+                print(res)
+                subject = 'bilibili'
+                send_mail(subject,contents,password)
+                time.sleep(60)
             while data.get('list'):
                 #online.extend([str(m['roomid']) if str(m['roomid']) == m['link'].split('/')[-1] else m['link'].split('/')[-1] for m in data['list']])
                 #online.extend([m['link'].split('/')[-1] for m in data['list']])
@@ -817,8 +826,8 @@ def newgetonline():
                     thread.start()
             f.close()
         except Exception as e:
-            proxies = {'http':get_proxy()}#getip('国内')
-            print(e)
+            proxies = {'http':get_proxy()}
+            traceback.print_exc()#getip('国内')
         yy = time.time()
         print('')
         sys.stdout.write('\033[K')
@@ -837,7 +846,7 @@ def getfollow():
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
     cookies={
-            "Cookie":"buvid3=DF8F84B3-B90F-4D48-AF16-6ECF24C8BAA540777infoc; LIVE_BUVID=AUTO2015577399215380; sid=6znidvkl; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=34f5f194%2C1560331941%2C35fcf151; bili_jct=9c0eebb9461bc14a8c855818a27b48c6; _dfcaptcha=b761810cd8d5d6835ab4d99a536ac018"
+            "Cookie":"LIVE_BUVID=AUTO2015577399215380; _uuid=003D718E-277A-FAB3-5203-993F231E6C6F15160infoc; buvid3=9B4EDB2B-D9C3-45D3-AA7B-C35D7177165B110268infoc; sid=m4qt099w; CURRENT_FNVAL=16; fts=1557823132; UM_distinctid=16ab622c915172-0928c3f320cea4-3b654406-144000-16ab622c916554; rpdid=|(uYmYu|m~~J0J'ull~)RumlY; finger=b3372c5f; im_notify_type_1836737=0; stardustvideo=1; stardustpgcv=0606; flash_player_gray=false; html5_player_gray=false; CURRENT_QUALITY=116; bp_t_offset_1836737=264342399414166141; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=3057d1d9%2C1562988984%2Cc504ef61; bili_jct=0446467c8311da20ce5a0189052271f6; _dfcaptcha=c81043276b4af48a154a1f3eb8462a5b"
             }
     s = requests.session()
     s.keep_alive = False
@@ -888,7 +897,8 @@ def getfollow():
             traceback.print_exc()
             proxies ={'http':get_proxy()}#getip('国内')
             #print(e)
-        f2.close()
+        if 'f2' in locals():
+            f2.close()
         loop.close()
         thread_pool.shutdown()
         _process_pool.shutdown()

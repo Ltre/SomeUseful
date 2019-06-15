@@ -1,4 +1,4 @@
-import os,sys
+import os,sys,subprocess,shutil
 from threading import Thread
 from concurrent.futures import ThreadPoolExecutor, wait
 milo = input('输入文件夹：')
@@ -8,7 +8,7 @@ elif milo == '2':
     milo = 'milo2'
 elif milo == '3':
     milo ='milo3'
-filepath = '/home/{}/b/MFC'.format(milo)
+filepath = '/home/{}/b/Twitch'.format(milo)
 files = os.listdir(filepath)
 di = 0
 executor = ThreadPoolExecutor(20)
@@ -28,7 +28,8 @@ def dojob(f):
             di +=1
             sys.stdout.write('\r \033[K'+f+' 大小 '+str(fsize)+'m---已删除 '+str(di))
             sys.stdout.flush()
-
+        else:
+            shutil.move(f,'/root/b/d/Twitch')
 for f in files:
     f =filepath+'/'+f
     if os.path.isfile(f):
