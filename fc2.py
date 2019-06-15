@@ -289,6 +289,8 @@ def main(test=None):
             fav.keep_alive = False
             fav.cookies = cj.LWPCookieJar(filename='cookies.txt')
             fav.cookies.load(filename='cookies.txt',ignore_discard=True)
+            allres = fav.post('https://live.fc2.com/adult/contents/allchannellist.php').json()
+            channel = allres['channel']
             res = fav.post('https://live.fc2.com/adult/contents/favorite.php').json()
             if res['status'] == 0:
                 aa = requests.session()
@@ -302,8 +304,13 @@ def main(test=None):
                 data = res['data']
                 for i in data:
                     if(i):
-                        a=FC2(int(i),r)
-                        users.append(a)
+                        for ii in channel:
+                            if ii['id'] == str(i):
+                                if not ii['pay']:
+                                    a=FC2(int(i),r)
+                                    users.append(a)
+                                break
+
                 #u =Thread(target=upload,name='fc2upload',daemon = False)
                 #u.start()
                 #fo = Thread(target=getfollow,daemon = True)
