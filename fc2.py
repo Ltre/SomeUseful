@@ -6,7 +6,7 @@ from datetime import datetime
 from requests.utils import dict_from_cookiejar
 from streamlink.stream import RTMPStream
 import http.cookiejar as cj
-import streamlink
+import livestreamer
 os.system('cd /root/u;bash fct.sh')
 
 users = []
@@ -29,6 +29,7 @@ class FC2():
         self.url = 'https://live.fc2.com/'+str(userid)+'/'
         self.sameid = 1
         self.ex = 1
+        self.end = False
 
     def login(self,relogin = 0):
         if os.path.exists('cookies.txt') and not relogin:
@@ -84,7 +85,7 @@ class FC2():
             return 'login'
 
         if channel_data['fee'] != 0:
-            sys.stdout.write('\rOnly streams without a fee are supported.')
+            sys.stdout.write('\rOnly streams without a fee are supported.'+str(self.user_id))
             return False
 
         version = channel_data['version']
@@ -167,9 +168,10 @@ class FC2():
                         self.count = 30
                     if data.get('arguments').get('code') == 4512:
                         sys.stdout.write('\rDisconnected from Server')
-                    break
+                        break
                 elif data['name'] == 'publish_stop':
                     print('Stream ended')
+                    break
                 elif data['name'] == 'channel_information':
                     if data['arguments'].get('fee') != 0:
                         print('Stream requires a fee now.'.format(
@@ -179,9 +181,11 @@ class FC2():
                     if data.get('arguments').get('code') == 104:
                         print('Disconnected. '
                                     'Multiple connections has been detected.')
+                        break
                     elif data.get('arguments').get('code'):
                         print('error code {0}'.format(
                             data['arguments']['code']))
+                        break
 
             ws.close()
 
@@ -257,7 +261,7 @@ class FC2():
         if(version and version !='login'):
             ws_url = self.get_ws_url(user_id, version)
             if self.get_ws_data(ws_url):
-                sys.stdout.write('\r\033[K ok')
+                sys.stdout.write('\r \033[K ok')
                 return True
         return False
             #return self.get_rtmp(self.host_data['arguments'])
@@ -275,9 +279,9 @@ def main(test=None):
         x.login()
     
                 
-    r = requests.session()
-    r.keep_alive=False
     if test:
+        r = requests.session()
+        r.keep_alive=False
         a = FC2(int(test),r)
         dodownload(a)
     else:
@@ -285,6 +289,7 @@ def main(test=None):
         #    r.cookies = cj.LWPCookieJar(filename='cookies.txt')
         #    r.cookies.load(filename='cookies.txt', ignore_discard=True)
         while True:
+            users=[]
             fav = requests.session()
             fav.keep_alive = False
             fav.cookies = cj.LWPCookieJar(filename='cookies.txt')
@@ -307,6 +312,8 @@ def main(test=None):
                         for ii in channel:
                             if ii['id'] == str(i):
                                 if not ii['pay']:
+                                    r =requests.session()
+                                    r.keep_alive = False
                                     a=FC2(int(i),r)
                                     users.append(a)
                                 break
@@ -397,20 +404,20 @@ def upload():
         time.sleep(10)
 
 def dodownload(a):
-    print(a.user_id,'start')
     if a.sameid == 0:
         pass
     if a.user_id in recording:
         return
     recording.append(a.user_id)
+    print(a.user_id,'start')
     live=a.get_streams()
     if live:
         master=a.host_data['arguments']['playlists_middle_latency'][0]['url']
-        session = streamlink.Streamlink()
+        session = livestreamer.Livestreamer()
         #session.set_option('http-headers','User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36')
         #cmd = ['streamlink','hls://{}'.format(master),'best','-o','/root/te/t.ts']
         #subprocess.call(cmd)
-        streams = session.streams('hls://'+master)
+        streams = session.streams('hlsvariant://'+master)
         stream = streams["best"]
         error = 0
         rstr = r"[\/\\\:\*\?\"\<\>\|\- \n]"
@@ -431,17 +438,19 @@ def dodownload(a):
             error=subprocess.call(cmd)
             '''
             fs = 0
-            fd = stream.open()
             try:
+                fd = stream.open()
                 f = open(filename,'wb')
+                readbuffer=1024*8
+                desize = 1024*1024/8
                 while True:
-                    ddata = fd.read(1024)
+                    ddata = fd.read(readbuffer)
                     if ddata:
                         f.write(ddata)
                         fs+=1
                         if fs % 100 == 0:
                             sys.stdout.write('\r\033[K'+name+'---'+str(fs/1024)+'m')
-                        if fs>=1024*1024:
+                        if fs>=desize:
                             fs=0
                             f.close()
                             print(filename,'文件大小达到限制，切割')
@@ -467,7 +476,9 @@ def dodownload(a):
                         #error=subprocess.call(cmd)
 
                     shutil.move(filename,'/root/b/d/fc2')
+                os.removedirs(path)
                 break
+    a.end = True
     if a.user_id in recording:
         recording.remove(a.user_id)
 
