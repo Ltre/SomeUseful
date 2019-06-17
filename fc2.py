@@ -150,10 +150,10 @@ class FC2():
                 self.count += 1
                 data = json.loads(ws.recv())
                 time_utc = datetime.utcnow().strftime('%H:%M:%S UTC')
-                if data['name'] not in ['comment', 'ng_commentq',
-                                        'user_count', 'ng_comment']:
-                    print('{0} - {1} - {2}'.format(
-                        time_utc, self.count, data['name']))
+                #if data['name'] not in ['comment', 'ng_commentq',
+                #                        'user_count', 'ng_comment']:
+                #    print('{0} - {1} - {2}'.format(
+                #        time_utc, self.count, data['name']))
 
                 if (data['name'] == '_response_'
                         and data['arguments'].get('playlists')):
@@ -449,7 +449,7 @@ def dodownload(a):
                         f.write(ddata)
                         fs+=1
                         if fs % 100 == 0:
-                            sys.stdout.write('\r\033[K'+name+'---'+str(fs/1024)+'m')
+                            sys.stdout.write('\r\033[K'+name+'---'+str(fs*8/1024)+'m')
                         if fs>=desize:
                             fs=0
                             f.close()
@@ -457,7 +457,7 @@ def dodownload(a):
                             shutil.move(filename,'/root/b/d/fc2')
                             filename = path+'/'+str(a.user_id)+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
                             f = open(filename,'wb')
-                        ddata=fd.read(1024)
+                        ddata=fd.read(readbuffer)
                     else:
                         break
 
