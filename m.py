@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-import os, sys,asyncio,uvloop,concurrent,functools
+import os, sys,asyncio,uvloop,concurrent,functools,shutil
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 os.system('cd /root/b/d;mv *.flv /root/b/d/bu/')
 from os.path import split, join, exists, abspath, isdir, expanduser
@@ -313,21 +313,24 @@ class Room():
         #else:
         #    return False;
         global sApi7
-        ip = get_proxy()
-        proxies={'http':ip}#getip('国内')
-        print(proxies)
-        try:
-            res = ss.get(sApi7.format(self.nId),headers=headers,timeout=10,proxies=proxies)# as res:
-            sData=res.text
-            mData = json.loads(sData);
+        trytimes = 5
+        while trytimes:
+            ip = get_proxy()
+            proxies={'http':ip}#getip('国内')
+            print(proxies)
+            try:
+                res = ss.get(sApi7.format(self.nId),headers=headers,timeout=10,proxies=proxies)# as res:
+                sData=res.text
+                mData = json.loads(sData);
+                break
                 #sData = res.read().decode('utf-8');
-        except Exception as e:
-            traceback.print_exc()
-            print(self.sUser,'获取url失败',e)
-            time.sleep(2)
-            #prepare(self,'国内')
-            return self.getStream()
-        #mData = json.loads(sData);
+            except Exception as e:
+                traceback.print_exc()
+                delete_proxy(ip)
+                print(self.sUser,'获取url失败',e)
+                trytimes -=1
+                #prepare(self,'国内')
+            #mData = json.loads(sData);
         try:
             aUrl = [x['url'] for x in mData['durl']];
             sUrl = self.sUrl = mData['durl'][0]['url'];
@@ -341,8 +344,9 @@ class Room():
             res.close()
             return sUrl;
 
-    def download(self, sPath, stream=sys.stdout, nVerbose=1,stillrec=0,res=None):
-        global log, available,vfs
+    def download(self, sPath, stream=sys.stdout, nVerbose=1):
+        global log, available,vfs 
+        sDir = expanduser(FILEDIR) or sHome;
         def adaptName(sPath):
             if (os.path.exists(sPath)):
                 sName, sExt = os.path.splitext(sPath)
@@ -356,7 +360,7 @@ class Room():
             return sOutPath;
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
-        if not res:
+        if True:
             try:
                 r = urlopen(sUrl, timeout=25)
             except Exception as e:
@@ -370,13 +374,12 @@ class Room():
                     try:
                         r=urlopen(sUrl,timeout=25)
                     except Exception as e:
-                        return False,0,None
+                        return False,sPath
             except socket.timeout as e:
                 print(e)
-                return False,0,None
+                return False,sPath
             else:
                 pass
-        
         sPath = adaptName(sPath);
         #iUrls = iter(aUrls);
         #sUrl = next(iUrls);
@@ -392,26 +395,33 @@ class Room():
                 stream.write('\n');
             nSize = 0;
             n = 1024*1024;
-            bBuffer = res.read(1024 * 128);
+            readbuffer = 1024*8
+            bBuffer = res.read(readbuffer);
             tnumber = 0
-            vfs=os.statvfs("/root")
-            available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
-            stream.write('\r剩余空间%.2f\n' % (available))
+            #vfs=os.statvfs("/root")
+            #available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
+            #stream.write('\r剩余空间%.2f\n' % (available))
             while bBuffer:
                 nSize += f1.write(bBuffer);
-                if (nVerbose):
-                    stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
-                tnumber+=1               
-                if (tnumber>=200):
+                #if (nVerbose):
+                    #stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
+                #tnumber+=1               
+                #if (tnumber>=200):
                     #break
-                    vfs=os.statvfs("/root")
-                    available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
-                    stream.write('剩余空间%.2f\n' % (available))
-                    tnumber = 0
+                    #vfs=os.statvfs("/root")
+                    #available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
+                    #stream.write('剩余空间%.2f\n' % (available))
+                    #tnumber = 0
                 if (nSize/n >= 1024 and self.nId != 151159):
                     print('%s 大小到达限制，进行存储\n' % sPath)
-                    stillrec = 1
-                    break
+                    nSize = 0
+                    f1.close()
+                    upload(sPath)
+                    sTime = time.strftime('%y%m%d_%H%M%S');
+                    sName = '{}-{}-{}.flv'.format(sTime, room.sUser, room.sTitle);
+                    sName = re.sub(r'[^\w_\-.()]', '_', sName);
+                    sPath = os.path.join(sDir,sName)
+                    f1 = open(sPath,'wb')
                 #if (self.ii == 0 and available>25):
                 #    self.ii = 1
                 #if (available<15 and (self.ii == 1 and self.nId !=151159)):
@@ -419,7 +429,7 @@ class Room():
                 #    print('剩余空间不足，进行存储\n')
                 #    stillrec = 1
                 #    break
-                bBuffer = res.read(1024*128);
+                bBuffer = res.read(readbuffer);
                 trytry=0
                 waittime = 0.2
                 while not bBuffer and trytry <3:
@@ -432,8 +442,8 @@ class Room():
                     trytry+=1
                     waittime+=0.1
 
-            if (nVerbose):
-                stream.write('\n');
+            #if (nVerbose):
+                #stream.write('\n');
         except socket.timeout as e:
             print('{} donwloading timeout'.format(self.nId));
         except ConnectionResetError as e:
@@ -441,13 +451,13 @@ class Room():
         except http.client.IncompleteRead as e:
             print('downloading break:{}'.format(e));
         finally:
-            if (not stillrec and 'res' in locals()): 
+            if ('res' in locals()): 
                 res.close();
             if ('f1' in locals()): f1.close();
             if (os.path.isfile(sPath) and os.path.getsize(sPath) == 0):
                 os.remove(sPath);
-                return False,stillrec,None;
-        return True,stillrec,res;
+                return False,None;
+        return True,sPath;
 
 def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
     # execute external script
@@ -507,21 +517,21 @@ def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
     return True;
 
 
-def upload(room,sPath,sName,sDir,upwork):
+def upload(sPath):
     global mvselect
     
     if(not os.path.exists('/root/b/d/bu')):
         os.makedirs('/root/b/d/bu')
-    if x==1:
-        os.system('mv "{}" /root/b/d/bu/'.format(sPath))
-        x+=1
-    elif x==2:
-        os.system('mv "{}" /root/b/d/bu/bt'.format(sPath))
-        x+=1
-    elif x==3:
-        os.system('mv "{}" /root/b'.format(sPath))
-        x=1
-    return#exit()
+    if mvselect==1:
+        shutil.move(sPath,'/root/b/d/bu')
+        mvselect+=1
+    elif mvselect==2:
+        shutil.move(sPath,'/root/b/d/bu/bt')
+        mvselect+=1
+    elif mvselect>=3:
+        shutil.move(sPath,'/root/b')
+        mvselect=1
+    #exit()
     '''
     jishu=0;
     change ='waitting'+sName
@@ -570,10 +580,7 @@ def doDownload(room):
     global wait;
     global sLogDir;
     sDir = expanduser(FILEDIR) or sHome;
-    stillrec=0
-    firstrec=1
-    res = None
-    while (firstrec == 1 or stillrec==1 ):
+    while True:
         sTime = time.strftime('%y%m%d_%H%M%S');
         sName = '{}-{}-{}.flv'.format(sTime, room.sUser, room.sTitle);
         sName = re.sub(r'[^\w_\-.()]', '_', sName);
@@ -581,11 +588,9 @@ def doDownload(room):
             os.makedirs(sDir);
         assert isdir(sDir);
         sPath = os.path.join(sDir, sName);
-        if(stillrec == 0):
-            firstrec=0
-            isSuccess = room.getStream();
+        isSuccess = room.getStream();
         if (isSuccess):
-            isSuccess,stillrec,res = room.download(sPath, room._stream, 1,res=res)
+            isSuccess,sPath = room.download(sPath, room._stream)
             if (isSuccess):
                 print('{} downloaded to {}'.format(room.nId, sPath));
                 try:
