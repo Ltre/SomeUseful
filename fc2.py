@@ -432,6 +432,9 @@ def dodownload(a):
             if a.sameid == 0:
                 break
             filename = path+'/'+str(a.user_id)+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
+            if len(filename) >=130:
+                title = '_'
+                filename = path+'/'+str(a.user_id)+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
             '''
             #cmd = ['ffmpeg','-loglevel','quiet','-y','-i',master,'-c','copy','-fs','1073741824',filename]
             cmd = ['ffmpeg','-y','-i',master,'-c','copy','-fs','1073741824',filename,'-loglevel','debug']

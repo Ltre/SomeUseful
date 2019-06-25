@@ -59,6 +59,7 @@ sLogDir = '';
 log = None;
 sleepEvent = None;
 wait = None;
+selectip = None
 
 vfs=os.statvfs("/root")
 available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
@@ -259,6 +260,7 @@ class Room():
     def getHost(self):
         if (self.sUser is None):
             try:
+                print(self.nId,"getHost")
                 f11 = self.urlopen(sApi6.format(self.nId));
                 bData = f11.read();
                 mData = json.loads(bData.decode());
@@ -281,6 +283,7 @@ class Room():
             try:
                 if (self.nId is None): self.getRealId();
                 if not self.sTitle or g:
+                    print(self.nId,"getInfo")
                     res2 = self.urlopen(sApi5.format(self.nId),timeout=10);
                     sRoomInfo = res2.read().decode('utf-8');
                     mData = json.loads(sRoomInfo);
@@ -313,12 +316,16 @@ class Room():
         #    return sUrl;
         #else:
         #    return False;
-        global sApi7
+        global sApi7,selectip
         trytimes = 5
+        if self.nId == 151159:
+            proxies = None
+        else:
+            if not selectip:
+                selectip = get_proxy()
+            proxies={'http':selectip}#getip('国内')
+        print(self.nRoom,'getStream',proxies)
         while trytimes:
-            ip = get_proxy()
-            proxies={'http':ip}#getip('国内')
-            print(self.nRoom,'getStream',proxies)
             try:
                 res = ss.get(sApi7.format(self.nId),headers=headers,timeout=5,proxies=proxies)# as res:
                 sData=res.json()
@@ -332,9 +339,12 @@ class Room():
                 return sUrl;
                 #sData = res.read().decode('utf-8');
             except Exception as e:
-                delete_proxy(ip)
+                #delete_proxy(ip)
                 print(self.sUser,'获取url失败',e)
                 trytimes -=1
+                selectip = get_proxy()
+                proxies = {'http':selectip}
+                print(self.nRoom,'getStream',proxies)
                 time.sleep(2)
                 #prepare(self,'国内')
             #mData = json.loads(sData);
@@ -413,7 +423,7 @@ class Room():
                     f1.close()
                     upload(sPath)
                     sTime = time.strftime('%y%m%d_%H%M%S');
-                    sName = '{}-{}-{}.flv'.format(sTime, room.sUser, room.sTitle);
+                    sName = '{}-{}-{}.flv'.format(sTime, self.sUser, self.sTitle);
                     sName = re.sub(r'[^\w_\-.()]', '_', sName);
                     sPath = os.path.join(sDir,sName)
                     f1 = open(sPath,'wb')
@@ -786,7 +796,8 @@ def newgetonline():
             }
     s.headers.update(headers)
     s.cookies.update(cookies)
-    proxies = None#getip('国内')
+    #proxies = None#getip('国内')
+    proxies = {'https':get_proxy()}
     while True:
         xx = time.time()
         try:
@@ -829,8 +840,9 @@ def newgetonline():
                         thread.join()
             f.close()
         except Exception as e:
-            proxies = {'http':get_proxy()}
+            proxies = {'https':get_proxy()}
             traceback.print_exc()#getip('国内')
+            print(e)
         yy = time.time()
         print('')
         sys.stdout.write('\033[K')
@@ -838,7 +850,7 @@ def newgetonline():
         print('\nrec updated',yy-xx,'s')
         sys.stdout.write('\033[F')
         sys.stdout.write('\033[F')
-        time.sleep(random.randint(0,5))
+        time.sleep(random.randint(0,2))
     
 def getfollow():
     headers ={

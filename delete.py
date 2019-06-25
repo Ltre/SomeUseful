@@ -8,7 +8,7 @@ elif milo == '2':
     milo = 'milo2'
 elif milo == '3':
     milo ='milo3'
-filepath = '/home/{}/b/MFC'.format(milo)
+filepath = '/home/{}/b/Twitch'.format(milo)
 files = os.listdir(filepath)
 di = 0
 executor = ThreadPoolExecutor(20)
