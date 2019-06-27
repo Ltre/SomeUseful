@@ -20,19 +20,21 @@ do
                 then mkdir -p "/home/milo/b/${arr[1]}"
                 fi
                 #mv  "${f}" "/home/milo/b/${arr[1]}"
-		rclone move "${f}" "milo:milo/b/${arr[1]}" --buffer-size 32M --transfers 4 
+		rclone move "${f}" "milo:milo/b/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1 
 		if [ -f $f ]
 		then if [ ! -d "/home/milo2/b/${arr[1]}" ]
                 	then mkdir -p "/home/milo2/b/${arr[1]}"
                 	fi
                 	#mv  "${f}" "/home/milo2/b/${arr[1]}"
-                	rclone move "${f}" "milo2:milo/b/${arr[1]}" --buffer-size 32M --transfers 4
+                	echo "开始上传${f}至milo2:milo/b/${arr[1]}"
+			rclone move "${f}" "milo2:milo/b/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
 			if [ -f $f ]
                 	then if [ ! -d "/home/milo3/b/${arr[1]}" ]
                     	then mkdir -p "/home/milo3/b/${arr[1]}"
                     	fi
 			#mv  "${f}" "/home/milo3/b/${arr[1]}"
-			rclone move "${f}" "milo3:milo/b/${arr[1]}" --buffer-size 32M --transfers 4
+			echo "开始上传${f}至milo3:milo/b/${arr[1]}"
+			rclone move "${f}" "milo3:milo/b/${arr[1]}" --buffer-size 32M --transfers 4  -P --low-level-retries 1
                     fi
 		fi
 			#rclone copy "${f}" "milo:milo/b/${arr[1]}" --bwlimit 10M
@@ -56,19 +58,22 @@ do
                 then mkdir -p "/home/milo/b/huya/${arr[1]}"
                 fi
                 #mv  "${f}" "/home/milo/b/huya/${arr[1]}"
-		rclone move "${f}" "milo:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4
+		echo "开始上传${f}至milo:milo/b/huya/${arr[1]}"
+		rclone move "${f}" "milo:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
 		if [ -f $f ]
 		then if [ ! -d "/home/milo2/b/huya/${arr[1]}" ]
                 	then mkdir -p "/home/milo2/b/huya/${arr[1]}"
                 	fi
                 	#mv  "${f}" "/home/milo2/b/huya/${arr[1]}"
-                	rclone move "${f}" "milo2:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4
+                	echo "开始上传${f}至milo2:milo/b/${arr[1]}"
+			rclone move "${f}" "milo2:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
 			if [ -f $f ]
                 	then if [ ! -d "/home/milo3/b/huya/${arr[1]}" ]
                     	then mkdir -p "/home/milo3/b/huya/${arr[1]}"
                     	fi
                     	#mv  "${f}" "/home/milo3/b/huya/${arr[1]}"
-			rclone move "${f}" "milo3:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4
+			echo "开始上传${f}至milo3:milo/b/${arr[1]}"
+			rclone move "${f}" "milo3:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
                     fi
 		fi
                 echo "${f}上传成功"
