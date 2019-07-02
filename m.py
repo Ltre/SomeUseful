@@ -43,7 +43,7 @@ sApi5 = 'http://api.live.bilibili.com/room/v1/Room/get_info?room_id={}'
 sApi6 = 'http://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid={}'
 sApi7 = 'http://api.live.bilibili.com/api/playurl?cid={}&otype=json&quality=0&platform=web'
 headers={
-        "Connection":"keep-alive",
+        "Connection":"close",
         "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36",
         "Accept":"*/*",
         "Referer":"https://space.bilibili.com/1836737/fans/follow",
@@ -784,25 +784,30 @@ def newgetonline():
     firstnew=1
     s=requests.session()
     s.keep_alive = False
+    headers = {"APP-KEY": "iphone","Accept": "*/*","Accept-Encoding": "gzip","Accept-Language": "zh-cn","Buvid": "a3ed675c322d0d658f8a0e69711fb011","Connection": "close","Display-ID": "1836737-1562074723","ENV": "prod","Host": "api.live.bilibili.com","User-Agent": "bili-universal/8680 CFNetwork/976 Darwin/18.2.0",}
+    '''
     headers={
-            "Connection":"keep-alive",
+            "Connection":"close",
             "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36",
             "Accept":"*/*",
             "Referer":"https://space.bilibili.com/1836737/fans/follow",
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
+    '''
     cookies={
-            "Cookie":"LIVE_BUVID=AUTO2015577399215380; _uuid=003D718E-277A-FAB3-5203-993F231E6C6F15160infoc; buvid3=9B4EDB2B-D9C3-45D3-AA7B-C35D7177165B110268infoc; sid=m4qt099w; CURRENT_FNVAL=16; fts=1557823132; UM_distinctid=16ab622c915172-0928c3f320cea4-3b654406-144000-16ab622c916554; rpdid=|(uYmYu|m~~J0J'ull~)RumlY; finger=b3372c5f; im_notify_type_1836737=0; stardustvideo=1; stardustpgcv=0606; flash_player_gray=false; html5_player_gray=false; CURRENT_QUALITY=116; bp_t_offset_1836737=264342399414166141; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=3057d1d9%2C1562988984%2Cc504ef61; bili_jct=0446467c8311da20ce5a0189052271f6; _dfcaptcha=c81043276b4af48a154a1f3eb8462a5b"
+            "Cookie": "DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=2276995d%2C1563721786%2C6361bf61; bili_jct=9c75b24ac2de9f94d95a080a23f43b88; sid=hzky8615; LIVE_BUVID=AUTO1915506501046439; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; Buvid=a3ed675c322d0d658f8a0e69711fb011; Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02=1557239028"
             }
     s.headers.update(headers)
     s.cookies.update(cookies)
     #proxies = None#getip('国内')
     proxies = {'https':get_proxy()}
+    print("getrec",proxies)
     while True:
         xx = time.time()
         try:
             t=1
-            url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
+            #url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
+            url = 'http://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key=bbde2f971cdb113ac9cab91d12a13561&actionKey=appkey&appkey=27eb53fc9058f8c3&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=9f94e7fbbcbbdb375d75d631512ad5ba&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562074989'
             res= s.get(url,proxies=proxies,timeout=10).json()
             data=res.get('data')
             online= []
@@ -813,6 +818,11 @@ def newgetonline():
                 subject = 'bilibili'
                 send_mail(subject,contents,password)
                 time.sleep(60)
+            else:
+                online.extend(str(m['roomid']) for m in data['rooms'])
+                for m in data['rooms']:
+                    infos.update({str(m['roomid']):{'uname':m['uname'],'title':m['title']}})
+            '''
             while data.get('list'):
                 #online.extend([str(m['roomid']) if str(m['roomid']) == m['link'].split('/')[-1] else m['link'].split('/')[-1] for m in data['list']])
                 #online.extend([m['link'].split('/')[-1] for m in data['list']])
@@ -822,6 +832,7 @@ def newgetonline():
                 t+=1
                 url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
                 data = s.get(url,proxies=proxies,timeout=10).json().get('data')
+            '''
             f=open('/root/u/user.txt','r')
             uids=list(set(f.read().splitlines()))
             wanted = [m for m in list(set(online)) if (m in uids and m not in recording)]
@@ -843,7 +854,10 @@ def newgetonline():
             proxies = {'https':get_proxy()}
             traceback.print_exc()#getip('国内')
             print(e)
+            print("getrec",proxies)
         yy = time.time()
+        if 'f' in locals():
+            f.close()
         print('')
         sys.stdout.write('\033[K')
         sys.stdout.write('\033[F')
@@ -854,21 +868,19 @@ def newgetonline():
     
 def getfollow():
     headers ={
-            "Connection":"keep-alive",
+            "Connection":"close",
             "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36",
             "Accept":"*/*",
             "Referer":"https://space.bilibili.com/1836737/fans/follow",
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
     cookies={
-            "Cookie":"LIVE_BUVID=AUTO2015577399215380; _uuid=003D718E-277A-FAB3-5203-993F231E6C6F15160infoc; buvid3=9B4EDB2B-D9C3-45D3-AA7B-C35D7177165B110268infoc; sid=m4qt099w; CURRENT_FNVAL=16; fts=1557823132; UM_distinctid=16ab622c915172-0928c3f320cea4-3b654406-144000-16ab622c916554; rpdid=|(uYmYu|m~~J0J'ull~)RumlY; finger=b3372c5f; im_notify_type_1836737=0; stardustvideo=1; stardustpgcv=0606; flash_player_gray=false; html5_player_gray=false; CURRENT_QUALITY=116; bp_t_offset_1836737=264342399414166141; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=3057d1d9%2C1562988984%2Cc504ef61; bili_jct=0446467c8311da20ce5a0189052271f6; _dfcaptcha=c81043276b4af48a154a1f3eb8462a5b"
-            }
+            "Cookie": "Buvid=a3ed675c322d0d658f8a0e69711fb011; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; LIVE_BUVID=AUTO1915506501046439; bili_jct=9c75b24ac2de9f94d95a080a23f43b88; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; sid=hzky8615; SESSDATA=2276995d%2C1563721786%2C6361bf61"}
     s = requests.session()
     s.keep_alive = False
     s.headers.update(headers)
     s.cookies.update(cookies)
     proxies = None
-    global proxyg
     while True:
         try:
             curl='http://api.bilibili.com/x/relation/tags'
@@ -910,8 +922,9 @@ def getfollow():
             sys.stdout.write('\033[F')
         except Exception as e:
             traceback.print_exc()
-            proxies ={'http':get_proxy()}#getip('国内')
+            proxies ={'https':get_proxy()}#getip('国内')
             #print(e)
+            print('getfollow',proxies)
         if 'f2' in locals():
             f2.close()
         loop.close()
@@ -931,7 +944,8 @@ def _request(rurl,s):
         try:
             return s.get(rurl,proxies=proxyg,allow_redirects=False,timeout=5).json()['data']
         except:
-            proxyg={'http':get_proxy()}#getip('国内')
+            proxyg={'https':get_proxy()}#getip('国内')
+            print('get loopreq',proxyg)
 def get_header(data,f2,uids):
     if data:
         roomid = str(data['roomid'])

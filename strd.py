@@ -16,7 +16,7 @@ hRooms = []
 hrecording = []
 drecording = []
 dpath = None
-
+status = []
 ss = requests.session()
 ss.keep_alive = False
 
@@ -155,14 +155,15 @@ def gethtml(s,url):
     res.close()
     return res.json()
         
-async def huyastatus(loop,hs,thread_pool):
+def huyastatus(hs,thread_pool=None):
     url = 'https://fw.huya.com/dispatch?do=subscribeList&uid=1199513272235&page=1&pageSize=1000'
     hcookies={
             "Cookie":"SoundValue=0.50; alphaValue=0.80; guid=b73e698cbb9bde5c8cecb6feb7fe2c4e; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; udb_accdata=15671674441; first_username_flag=35184377273454hy_first_1; isInLiveRoom=; PHPSESSID=cr8rh0j89b8unuckhi91pbm8d4; __yasmid=0.5630173980060627; _yasids=__rootsid%3DC87F7C7E48B0000133EA13D01B00D4B0; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1560257308,1560510903,1560867442,1561473648; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1561473648; udb_passdata=3; udb_biztoken=AQArObe2qzTZ3gwbqCneNlhWN17v4CzAsxU_pqNqhzyi2q32FHN_Cf1QOMbGCZGtTHHo9Z01C_3H8hbD39LFNmSuRHbRI6kTAOz4JDC-c2DTIQ74CYVoZW30IxMCoPGstuTkbSFZ7yIENSsXWJTGrEuPnMRRf8lBJzfJzBGkozxIZj6j5PF3PwiHNneraHjT4EuBlO1Qb0YAjsbN8ao2WUXS7wVeBrGXqKWJZU0zhrbZ2S4OGdbdC_IRJngW4vq5VzteDMTs1kzgnItoYWDFVgJzoYGBsT83fPYx2TXeIKRKV_gOI-O5QHBqDHoijATRV4hj-5idhlxKnZYkRVpueQ1j; udb_origin=1; udb_other=%7B%22lt%22%3A%221561473656125%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235"
             }
     hs.cookies.update(hcookies)
     try:
-        json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,hs,url))
+        #json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,hs,url))
+        json = gethtml(hs,url)
         data = json['result']
         dlist = data['list']
         liveCount = data['liveCount']
@@ -182,6 +183,9 @@ async def huyastatus(loop,hs,thread_pool):
             send_mail(subject,contents,password)
             time.sleep(600)
         print(json)
+    finally:
+        if "huya" in status:
+            status.remove("huya")
     '''
     if room.thread and room.thread.isAlive():
         return
@@ -203,7 +207,7 @@ async def huyastatus(loop,hs,thread_pool):
             down.start()
     '''
 
-async def douyustatus(loop,ds,thread_pool):
+def douyustatus(ds,thread_pool=None):
     global dRooms
     global justone
     #print('run')
@@ -213,7 +217,8 @@ async def douyustatus(loop,ds,thread_pool):
     }
     ds.cookies.update(dcookies)
     try:
-        json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,ds,url))
+        #json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,ds,url))
+        json = gethtml(ds,url)
         data = json['data']
         dlist = data['list']
         for i in dlist:
@@ -228,6 +233,8 @@ async def douyustatus(loop,ds,thread_pool):
             contents = '斗鱼登录过期'
             send_mail(subject,contents,password)
             time.sleep(300)
+    if "douyu" in status:
+        status.remove("douyu")
     """
     if room.thread and room.thread.isAlive():
         return
@@ -358,8 +365,8 @@ def main():
     
     #ck = threading.Thread(target=checkuser,name=("check"),daemon=True)
     #ck.start()
-    loop = asyncio.get_event_loop()
-    thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=10)
+    #loop = asyncio.get_event_loop()
+    #thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=10)
     dheaders = {
         "Connection":"keep-alive",
         "Accept":"application/json, text/plain, */*",
@@ -387,16 +394,19 @@ def main():
     hs.headers.update(hheaders)
     hs.cookies.update(hcookies)
     while True:
-        #tasks1 = [douyustatus(room) for room in dRooms]
-        #tasks2 = [huyastatus(room) for room in hRooms]
-        tasks1 = [douyustatus(loop,ds,thread_pool)]
-        tasks2 = [huyastatus(loop,hs,thread_pool)]
-        tasks = tasks1+tasks2
-        #loop = asyncio.get_event_loop()
-        loop.run_until_complete(asyncio.wait(tasks)) 
-        #loop.close()
-
-
+        #tasks1 = [douyustatus(loop,ds,thread_pool)]
+        #tasks2 = [huyastatus(loop,hs,thread_pool)]
+        #tasks = tasks1+tasks2
+        #loop.run_until_complete(asyncio.wait(tasks)) 
+        if 'douyu' not in status:
+            status.append("douyu")
+            douyu_status = threading.Thread(target=douyustatus,args=(ds,),name=douyustatus)
+            douyu_status.start()
+        if 'huya' not in status:
+            status.append("huya")
+            huya_status = threading.Thread(target=huyastatus,args=(hs,),name=huyastatus)
+            huya_status.start()
+        sys.stdout.write("\r  update") 
         time.sleep(random.randint(0,5))
     
 if __name__ =="__main__":
