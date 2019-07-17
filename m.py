@@ -318,12 +318,15 @@ class Room():
         #    return False;
         global sApi7,selectip
         trytimes = 5
+        '''
         if self.nId == 151159:
             proxies = None
         else:
-            if not selectip:
-                selectip = get_proxy()
-            proxies={'http':selectip}#getip('国内')
+        '''
+        if not selectip:
+            selectip = get_proxy()
+        proxies={'https':selectip}#getip('国内')
+
         print(self.nRoom,'getStream',proxies)
         while trytimes:
             try:
@@ -343,7 +346,7 @@ class Room():
                 print(self.sUser,'获取url失败',e)
                 trytimes -=1
                 selectip = get_proxy()
-                proxies = {'http':selectip}
+                proxies = {'https':selectip}
                 print(self.nRoom,'getStream',proxies)
                 time.sleep(2)
                 #prepare(self,'国内')
@@ -795,8 +798,7 @@ def newgetonline():
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
     '''
     cookies={
-            "Cookie": "DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=2276995d%2C1563721786%2C6361bf61; bili_jct=9c75b24ac2de9f94d95a080a23f43b88; sid=hzky8615; LIVE_BUVID=AUTO1915506501046439; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; Buvid=a3ed675c322d0d658f8a0e69711fb011; Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02=1557239028"
-            }
+            "Cookie": "Buvid=a3ed675c322d0d658f8a0e69711fb011; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; LIVE_BUVID=AUTO1915506501046439; bili_jct=1ea48f4416327c59fd6a2773b709b502; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; sid=60pq5e2u; SESSDATA=0fb5cd4a%2C1565059481%2Cfa3c1471"}
     s.headers.update(headers)
     s.cookies.update(cookies)
     #proxies = None#getip('国内')
@@ -807,7 +809,7 @@ def newgetonline():
         try:
             t=1
             #url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
-            url = 'http://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key=bbde2f971cdb113ac9cab91d12a13561&actionKey=appkey&appkey=27eb53fc9058f8c3&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=9f94e7fbbcbbdb375d75d631512ad5ba&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562074989'
+            url = "http://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key=13150eb4f25c5b8d42638b21edaf0371&actionKey=appkey&appkey=27eb53fc9058f8c3&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=5349e5bd7a9febd7b6fe9c3da8a4fc82&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562505359"
             res= s.get(url,proxies=proxies,timeout=10).json()
             data=res.get('data')
             online= []
@@ -875,7 +877,7 @@ def getfollow():
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
     cookies={
-            "Cookie": "Buvid=a3ed675c322d0d658f8a0e69711fb011; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; LIVE_BUVID=AUTO1915506501046439; bili_jct=9c75b24ac2de9f94d95a080a23f43b88; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; sid=hzky8615; SESSDATA=2276995d%2C1563721786%2C6361bf61"}
+            "Cookie": "Buvid=a3ed675c322d0d658f8a0e69711fb011; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; LIVE_BUVID=AUTO1915506501046439; bili_jct=1ea48f4416327c59fd6a2773b709b502; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; sid=60pq5e2u; SESSDATA=0fb5cd4a%2C1565059481%2Cfa3c1471"}
     s = requests.session()
     s.keep_alive = False
     s.headers.update(headers)

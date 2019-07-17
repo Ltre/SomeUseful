@@ -296,7 +296,12 @@ def main(test=None):
             fav.cookies.load(filename='cookies.txt',ignore_discard=True)
             allres = fav.post('https://live.fc2.com/adult/contents/allchannellist.php').json()
             channel = allres['channel']
-            res = fav.post('https://live.fc2.com/adult/contents/favorite.php').json()
+            try:
+                res = fav.post('https://live.fc2.com/adult/contents/favorite.php').json()
+            except:
+                traceback.print_exc()
+                time.sleep(10)
+                continue
             if res['status'] == 0:
                 aa = requests.session()
                 aa.keep_alive = False

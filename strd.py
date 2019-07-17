@@ -19,6 +19,7 @@ dpath = None
 status = []
 ss = requests.session()
 ss.keep_alive = False
+dcookies = {"Cookie":"dy_did=8242408a3b65feb390623d6c00081501; acf_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; LTP0=08c61eOsNwt8VxCVIvZKYIqm%2F2urjT6iZEXqm91v0z5LtqbTvSqzp%2F9TaPVO279uij1ksb%2FOp3pMUPtwmXhI%2B40PQ1zAmd24rbm16as5p%2BgIrxjhx1b2ejIX4Am5pMRg4MsqAdFd8IYv%2BRNbgtMdfOsLBVKJbg03YhON1Gui7vq30gB9Kvj%2F8YZUjkXBR%2F5HYh; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1561024467,1561637166,1562247731,1562249683"}
 
 def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
@@ -158,7 +159,7 @@ def gethtml(s,url):
 def huyastatus(hs,thread_pool=None):
     url = 'https://fw.huya.com/dispatch?do=subscribeList&uid=1199513272235&page=1&pageSize=1000'
     hcookies={
-            "Cookie":"SoundValue=0.50; alphaValue=0.80; guid=b73e698cbb9bde5c8cecb6feb7fe2c4e; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; udb_accdata=15671674441; first_username_flag=35184377273454hy_first_1; isInLiveRoom=; PHPSESSID=cr8rh0j89b8unuckhi91pbm8d4; __yasmid=0.5630173980060627; _yasids=__rootsid%3DC87F7C7E48B0000133EA13D01B00D4B0; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1560257308,1560510903,1560867442,1561473648; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1561473648; udb_passdata=3; udb_biztoken=AQArObe2qzTZ3gwbqCneNlhWN17v4CzAsxU_pqNqhzyi2q32FHN_Cf1QOMbGCZGtTHHo9Z01C_3H8hbD39LFNmSuRHbRI6kTAOz4JDC-c2DTIQ74CYVoZW30IxMCoPGstuTkbSFZ7yIENSsXWJTGrEuPnMRRf8lBJzfJzBGkozxIZj6j5PF3PwiHNneraHjT4EuBlO1Qb0YAjsbN8ao2WUXS7wVeBrGXqKWJZU0zhrbZ2S4OGdbdC_IRJngW4vq5VzteDMTs1kzgnItoYWDFVgJzoYGBsT83fPYx2TXeIKRKV_gOI-O5QHBqDHoijATRV4hj-5idhlxKnZYkRVpueQ1j; udb_origin=1; udb_other=%7B%22lt%22%3A%221561473656125%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235"
+            "Cookie":"SoundValue=0.50; alphaValue=0.80; guid=b73e698cbb9bde5c8cecb6feb7fe2c4e; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; udb_accdata=15671674441; first_username_flag=35184377273454hy_first_1; isInLiveRoom=; PHPSESSID=maoikeqfcf1ma3rjikvhi3nfo7; __yasmid=0.5630173980060627; _yasids=__rootsid%3DC884C68B1B100001AEDD8D151D098270; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1560867442,1561473648,1562247805,1562893472; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1562893472; udb_passdata=3; udb_biztoken=AQA_q3ECVi6Y_-imzsGuui5UPeCTY47_s5LGGeuBaDQfIRyQTjs_MW598fj-9flRikGHwLLdmE499JR-U9nHU2ZAacydvx5YizCmYoLxu31J_cTS3_z48rjn8W3ar7L_sO_2Z0IytUDCdpjujSPuMqJ0pxhml0hoNrU0PcC3ygexziYDuhOwJ1000hQAqxGwh2cwMfwuZFjstpGeD3I4uJhQ8dVwL1SKMR_H5y4bbEmQ1lElnJl6JHfeWHqoNZgc8drCIp2IxkYM5eXxQcGTqmZ7OvroSrHtiWeriMEXABUe_mp1RHlbBFb_xf3y8FUvjEyW5b4sXlR8MtGnCTyr9NOZ; udb_origin=1; udb_other=%7B%22lt%22%3A%221562893480678%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235"
             }
     hs.cookies.update(hcookies)
     try:
@@ -177,12 +178,15 @@ def huyastatus(hs,thread_pool=None):
                 if livecheck>=liveCount:
                     break
     except:
-        if '未登录' in str(json):
-            subject = '虎牙出错'
-            contents='虎牙登录过期'
-            send_mail(subject,contents,password)
-            time.sleep(600)
-        print(json)
+        try:
+            if '未登录' in str(json):
+                subject = '虎牙出错'
+                contents='虎牙登录过期'
+                send_mail(subject,contents,password)
+                time.sleep(600)
+            print(json)
+        except:
+            pass
     finally:
         if "huya" in status:
             status.remove("huya")
@@ -210,11 +214,12 @@ def huyastatus(hs,thread_pool=None):
 def douyustatus(ds,thread_pool=None):
     global dRooms
     global justone
+    global dcookies
     #print('run')
+    sys.stdout.write("\rdouyustatus")
     url = 'https://www.douyu.com/wgapi/livenc/liveweb/followlist/0?sort=0'
     dcookies = {
-        "Cookie":"dy_did=8242408a3b65feb390623d6c00081501; acf_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_ltkid=46925279; PHPSESSID=g6urt56t68qgutnupnd6amqmd4; acf_auth=8622NUs7s4JahBtZpeWC4TqzgHxFQuTHoKTh96G%2FVA%2B2tu9lR3dBAMGaWqDtnoMyp7z%2FkCb%2BYkDEBFfF%2BUvezEquvqkQbZxDbfh4cNhpRmBodd94jCzhHiOedrcQ; wan_auth37wan=12b171a92387xF2aRZmGQrHLDydxOfk4AzwqMSQJbsE1FZvUijqqAnSQ%2FGF8kPK0Q2GxAydUAcukUkMxIBl09Yj%2BEp2J%2F3mdQlG5RInnl%2F8aTtgO; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_biz=1; acf_stk=d78e94dbf40f8055; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1560485262,1560676567,1561024467,1561637166; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1561637173"
-    }
+    "Cookie": "dy_did=8242408a3b65feb390623d6c00081501; acf_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_ltkid=46925279; acf_auth=01659v8Y8ALzRVVdllbh7j9%2FvhkjFMOvZMeiw4rwC%2FMnD9wkbNRflH605lDvPDyCy2kVMTv%2FW0PutFfpeDDuB9x2TZxQzTuZYbdYvFM9g090s7oYsjZqqJM5oOQ%2B; wan_auth37wan=26d4f8fa4beadIrIDnDgqOprYwhcHCevT%2B5J6uqtahUKuHdNCTHxTuu3mp1EQqBX5Ct1vlPS2CtQkiiGhfPzYhxYurbhbsMD82mlrigdjFL80bZK; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_biz=1; acf_stk=5eb97efe94734365; acf_avatar=//apic.douyucdn.cn/upload/avatar/005/55/00/12_avatar_; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1562247731,1562249683,1562855261,1562857618; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1562857618"}
     ds.cookies.update(dcookies)
     try:
         #json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,ds,url))
@@ -227,12 +232,15 @@ def douyustatus(ds,thread_pool=None):
                     down = threading.Thread(target=youd,args=('douyu',i['room_id'],),name=str(i['nickname']),daemon=True)
                     down.start()
     except:
-        print(json)
-        if '过期' in str(json):
-            subject = '斗鱼出错'
-            contents = '斗鱼登录过期'
-            send_mail(subject,contents,password)
-            time.sleep(300)
+        try:
+            print(json)
+            if '过期' in str(json):
+                subject = '斗鱼出错'
+                contents = '斗鱼登录过期'
+                send_mail(subject,contents,password)
+                time.sleep(300)
+        except:
+            pass
     if "douyu" in status:
         status.remove("douyu")
     """
@@ -368,7 +376,7 @@ def main():
     #loop = asyncio.get_event_loop()
     #thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=10)
     dheaders = {
-        "Connection":"keep-alive",
+        "Connection":"close",
         "Accept":"application/json, text/plain, */*",
         "X-Requested-With":"XMLHttpRequest",
         "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36",
@@ -382,6 +390,7 @@ def main():
     ds.headers.update(dheaders)
     ds.cookies.update(dcookies)
     hheaders={
+            "Connection":"close",
             "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
             "Accept":"*/*",
             "Referer":"https://i.huya.com/",
