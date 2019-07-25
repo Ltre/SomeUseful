@@ -1,0 +1,165 @@
+# 全局设置
+[global]
+https = true # 使用HTTPS协议
+process = 4 # 进程数
+
+# 代理设置
+[proxy]
+enable = true # 开关
+pool = "proxy.txt" # 代理池
+
+# 用户设置
+[user]
+update = true # 自动更新凭据
+account = """
+username=1650658858@qq.com;password=zongqian12345;access_token=55c178221e01f0ad64f58ed3605aa571;refresh_token=d109fcf518c6cf490d6273f35f725271;DedeUserID=1836737;DedeUserID__ckMd5=326caeb00bc9daa3;SESSDATA=d7a0feb0%2C1566636335%2C7bb6f171;bili_jct=537821baeb266b648ff64fe2ae4bec98;sid=7ys2h9bc;
+"""
+# 请在上方填写您的账号凭据, 每一条凭据应至少包含下述三种身份校验方式之一的完整键值对:
+# Password: username=...;password=...;
+# Token: access_token=...;refresh_token=...;
+# Cookie: bili_jct=...;DedeUserID=...;DedeUserID__ckMd5=...;sid=...;SESSDATA=...;
+
+# 获取用户信息
+[get_user_info]
+enable = true # 开关
+
+# 修改隐私设置
+[set_privacy]
+enable = false # 开关
+show_favourite = false # 展示[我的收藏夹]
+show_bangumi = false # 展示[订阅番剧]
+show_tag = false # 展示[订阅标签]
+show_reward = false # 展示[最近投币的视频]
+show_info = false # 展示[个人资料]
+show_game = false # 展示[最近玩过的游戏]
+
+# 银瓜子兑换硬币
+[silver_to_coin]
+enable = false # 开关
+
+# 观看
+[watch]
+enable = false # 开关
+aid = [120040, 21322566] # 稿件av号
+
+# 点赞
+[like]
+enable = false # 开关
+aid = [120040, 21322566] # 稿件av号
+
+# 投币
+[reward]
+enable = false # 开关
+aid = [120040, 21322566] # 稿件av号
+double = [false, true] # 双倍投币
+
+# 收藏
+[favour]
+enable = false # 开关
+aid = [120040, 21322566] # 稿件av号
+
+# 三连推荐
+[combo]
+enable = false # 开关
+aid = [120040, 21322566] # 稿件av号
+
+# 分享
+[share]
+enable = false # 开关
+aid = [120040, 21322566] # 稿件av号
+
+# 关注
+[follow]
+enable = false # 开关
+mid = [2, 208259] # 被关注用户UID
+secret = [true, false] # 悄悄关注
+
+# 弹幕发送
+[danmaku_post]
+enable = false # 开关
+aid = [120040, 21322566] # 稿件av号
+message = ["哔哩哔哩 (゜-゜)つロ 干杯~", "哔哩哔哩 (゜-゜)つロ 干杯~"] # 弹幕内容
+page = [1, 1] # 分P
+moment = [-1, -1] # 弹幕发送时间(为-1则随机选择发送时间)
+
+# 评论点赞
+[comment_like]
+enable = false # 开关
+otype = ["video", "article"] # 作品类型(视频video; 活动activity; 相簿gallery; 文章article)
+oid = [120040, 328714] # 作品ID
+rpid = [45737039, 704676668] # 评论ID
+
+# 评论发表
+[comment_post]
+enable = false # 开关
+otype = ["video", "article"] # 作品类型(视频video; 活动activity; 相簿gallery; 文章article)
+oid = [120040, 328714] # 作品ID
+message = ["哔哩哔哩 (゜-゜)つロ 干杯~", "哔哩哔哩 (゜-゜)つロ 干杯~"] # 评论内容
+floor = [0, 0] # 目标楼层(为0则直接发表一条评论)
+critical = [3, 3] # 临界范围
+
+# 动态点赞
+[dynamic_like]
+enable = false # 开关
+did = [2701535477760, 30764064763443574] # 动态ID
+
+# 动态转发
+[dynamic_repost]
+enable = false # 开关
+did = [2701535477760, 30764064763443574] # 动态ID
+message = ["转发动态", "转发动态"] # 转发内容
+ats = [[2, 208259], [208259, 2]] # 被@用户UID列表
+
+# 动态清理
+[dynamic_purge]
+enable = false # 开关
+
+# 会员购抢购
+[mall_rush]
+enable = false # 开关
+item_id = [10000890, 10008264] # 商品ID
+thread = [2, 2] # 线程数
+headless = true # 隐藏窗口
+timeout = 10 # 超时刷新
+
+# 会员购优惠卷领取
+[mall_coupon]
+enable = false # 开关
+coupon_id = ["df73652b539b1c6c", "f2a4f59ad6a1682f"] # 优惠券ID
+thread = [8, 8] # 线程数
+
+# 会员购周年庆活动签到
+[mall_sign]
+enable = false # 开关
+
+# 会员购周年庆活动扭蛋
+[mall_lottery]
+enable = false # 开关
+
+# 会员购周年庆活动中奖查询
+[mall_prize]
+enable = false # 开关
+
+# 直播助手
+[live_tool]
+enable = false # 开关
+auto_update = true # 自动更新
+print_danmaku = false # 显示弹幕
+daily_silver_to_coin = false # 每日银瓜子兑换硬币
+
+# 每日自动投币
+[live_tool.daily_reward]
+number = 0 # 总投币枚数(为0则关闭该组件)
+specific_up = [] # 投给特定Up主(列表为空则随机投给排行榜上的Up主)
+
+# 投满当前佩戴勋章的亲密度
+[live_tool.gain_intimacy]
+enable = false # 开关
+other_room = [] # 其余勋章对应房间
+
+# 自动送出即将过期的直播礼物
+[live_tool.give_expiring_gifts]
+enable = false # 开关
+expiring_time = 0 # 过期倒计时
+to_medal = false # 投喂给勋章
+to_room = 5551309 # 投喂给房间

@@ -20,6 +20,7 @@ import argparse
 import http.client
 import configparser,traceback
 from mail import send_mail
+import toml
 
 password = input('password:')
 testt = input('test?')
@@ -33,6 +34,8 @@ INTERVAL = 5;
 ipnum = 0;
 recording = []
 mvselect=1
+cookies = {}
+access_key = ''
 
 sApi0 = 'http://space.bilibili.com/ajax/live/getLive?mid={}'
 sApi1 = 'http://live.bilibili.com/api/player?id=cid:{}';
@@ -784,10 +787,11 @@ def checkrun(room):
         pass
 
 def newgetonline():
+    global cookies
     firstnew=1
     s=requests.session()
     s.keep_alive = False
-    headers = {"APP-KEY": "iphone","Accept": "*/*","Accept-Encoding": "gzip","Accept-Language": "zh-cn","Buvid": "a3ed675c322d0d658f8a0e69711fb011","Connection": "close","Display-ID": "1836737-1562074723","ENV": "prod","Host": "api.live.bilibili.com","User-Agent": "bili-universal/8680 CFNetwork/976 Darwin/18.2.0",}
+    headers={"APP-KEY": "iphone","Accept": "*/*","Accept-Encoding": "gzip","Accept-Language": "zh-cn","Buvid": "a3ed675c322d0d658f8a0e69711fb011","Display-ID": "1836737-1562074723","ENV": "prod","User-Agent": "bili-universal/8680 CFNetwork/976 Darwin/18.2.0",}
     '''
     headers={
             "Connection":"close",
@@ -796,9 +800,11 @@ def newgetonline():
             "Referer":"https://space.bilibili.com/1836737/fans/follow",
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
-    '''
+
     cookies={
-            "Cookie": "Buvid=a3ed675c322d0d658f8a0e69711fb011; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; LIVE_BUVID=AUTO1915506501046439; bili_jct=1ea48f4416327c59fd6a2773b709b502; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; sid=60pq5e2u; SESSDATA=0fb5cd4a%2C1565059481%2Cfa3c1471"}
+            "Cookie": "DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=20accd85%2C1566356211%2C0d93fe71; bili_jct=f10fa7a864b930767ec42e4f42968c4a; sid=4hbm9tko; Buvid=a3ed675c322d0d658f8a0e69711fb011; LIVE_BUVID=AUTO1915506501046439; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02=1557239028"
+            }
+    '''
     s.headers.update(headers)
     s.cookies.update(cookies)
     #proxies = None#getip('国内')
@@ -809,8 +815,10 @@ def newgetonline():
         try:
             t=1
             #url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
-            url = "http://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key=13150eb4f25c5b8d42638b21edaf0371&actionKey=appkey&appkey=27eb53fc9058f8c3&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=5349e5bd7a9febd7b6fe9c3da8a4fc82&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562505359"
-            res= s.get(url,proxies=proxies,timeout=10).json()
+            #url = f"https://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key={access_key}&&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=9f94e7fbbcbbdb375d75d631512ad5ba&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562074989"
+            url = f"http://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key={access_key}&actionKey=appkey&appkey=1d8b6e7d45233436&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=9f94e7fbbcbbdb375d75d631512ad5ba&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562074989"
+            req= s.get(url,proxies=proxies,timeout=10)
+            res=req.json()
             data=res.get('data')
             online= []
             infos={}
@@ -820,6 +828,7 @@ def newgetonline():
                 subject = 'bilibili'
                 send_mail(subject,contents,password)
                 time.sleep(60)
+            
             else:
                 online.extend(str(m['roomid']) for m in data['rooms'])
                 for m in data['rooms']:
@@ -834,7 +843,7 @@ def newgetonline():
                 t+=1
                 url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
                 data = s.get(url,proxies=proxies,timeout=10).json().get('data')
-            '''
+            ''' 
             f=open('/root/u/user.txt','r')
             uids=list(set(f.read().splitlines()))
             wanted = [m for m in list(set(online)) if (m in uids and m not in recording)]
@@ -855,8 +864,9 @@ def newgetonline():
         except Exception as e:
             proxies = {'https':get_proxy()}
             traceback.print_exc()#getip('国内')
-            print(e)
+            #print(req)
             print("getrec",proxies)
+            getcookies()
         yy = time.time()
         if 'f' in locals():
             f.close()
@@ -869,6 +879,7 @@ def newgetonline():
         time.sleep(random.randint(0,2))
     
 def getfollow():
+    global cookies
     headers ={
             "Connection":"close",
             "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36",
@@ -876,8 +887,11 @@ def getfollow():
             "Referer":"https://space.bilibili.com/1836737/fans/follow",
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
+    '''
     cookies={
-            "Cookie": "Buvid=a3ed675c322d0d658f8a0e69711fb011; DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; LIVE_BUVID=AUTO1915506501046439; bili_jct=1ea48f4416327c59fd6a2773b709b502; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; sid=60pq5e2u; SESSDATA=0fb5cd4a%2C1565059481%2Cfa3c1471"}
+            "Cookie": "DedeUserID=1836737; DedeUserID__ckMd5=326caeb00bc9daa3; SESSDATA=20accd85%2C1566356211%2C0d93fe71; bili_jct=f10fa7a864b930767ec42e4f42968c4a; sid=4hbm9tko; Buvid=a3ed675c322d0d658f8a0e69711fb011; LIVE_BUVID=AUTO1915506501046439; buvid3=FC7A064A-214F-42CD-A34B-E62B8E670B1248780infoc; finger=50e304e7; Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02=1557239028"
+            }
+    '''
     s = requests.session()
     s.keep_alive = False
     s.headers.update(headers)
@@ -1027,9 +1041,31 @@ def parseArg():
     ));
     return True;
 
+def getcookies():
+    global cookies
+    global access_key
+    os.system("python3.6 bilibili.py")
+    try:
+        config = toml.load('config.toml')
+    except:
+        print("无法加载config")
+        return
+    line = config['user']['account'].splitlines()[0]
+    pairs={}
+    for pair in line.strip(";").split(";"):
+        if len(pair.split("=")) == 2:
+            key, value = pair.split("=")
+            pairs[key] = value
+    cookie = all(key in pairs for key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])
+    cookies={'cookie':";".join(f"{key}={value}" for key, value in pairs.items() if key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])}
+    access_key = pairs['access_token']
+    return cookies
+
+
 def main():
     try:
         parseArg();
+        getcookies()
         run();
     except KeyboardInterrupt as e:
         display('\nexiting...');
