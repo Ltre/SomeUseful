@@ -19,7 +19,7 @@ dpath = None
 status = []
 ss = requests.session()
 ss.keep_alive = False
-dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; acf_did=8242408a3b65feb390623d6c00081501; acf_ccn=ce62eabad15a859c27b0d6b9ff24d5f3; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; PHPSESSID=j7fnm1n4i89pceqdvf8c51p1d2; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1565405110; LTP0=08c61eOsNwt8VxCVIvZKYIqm%2F2urjT6iZEXqm91v0z5LtqbTvSqzp%2F9TaPVO279uij1ksb%2FOp3pMUPtwmXhI%2B40PQ1zAmd24rbm16as5p%2BgIrxjhx1b2ejIX4Am5pMRg4MsqAdFd8IYv%2BRNbgtMdfOsLBVKJbg03YhON1Gui7vq30gB9Kvj%2F8YZUjkXBR%2F5HYh;"}
+dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; acf_did=8242408a3b65feb390623d6c00081501; LTP0=08c61eOsNwt8VxCVIvZKYIqm%2F2urjT6iZEXqm91v0z5LtqbTvSqzp%2F9TaPVO279uij1ksb%2FOp3pMUPtwmXhI%2B40PQ1zAmd24rbm16as5p%2BgIrxjhx1b2ejIX4Am5pMRg4MsqAdFd8IYv%2BRNbgtMdfOsLBVKJbg03YhON1Gui7vq30gB9Kvj%2F8YZUjkXBR%2F5HYh;"}
 
 def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
@@ -231,9 +231,9 @@ def douyustatus(ds,thread_pool=None):
                     down.start()
     except:
         try:
-            dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; acf_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1563461663,1563461713,1564538384,1564670718; PHPSESSID=a8q2qaeap0h3qfjansbgg7sip5; acf_auth=40c9INYR0erT%2B21YOp5PRRFWPQDsmRzDAJuu06Oqn0EW9xgxO3WsdGHvBjuoDBgNP5YCjDRM%2FmK%2FJ2fj3UYmA6k%2BPjtPFnPATsEtOVFem7DGNiZaTciYZ5tQyMK%2B; wan_auth37wan=536ef9429184EbqMprTp0mKYy4fPsmDfDRIVRdO8N5lqDWw0TBdPPq9I7U1raGkR8puuGCb4xiIigAGdcVGjWdnof2oV8PAGzRRZT1jQKuiZGL%2Fv; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=46925279; acf_biz=1; acf_stk=d28ce3ffacfe9270; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1564670730;LTP0=08c61eOsNwt8VxCVIvZKYIqm%2F2urjT6iZEXqm91v0z5LtqbTvSqzp%2F9TaPVO279uij1ksb%2FOp3pMUPtwmXhI%2B40PQ1zAmd24rbm16as5p%2BgIrxjhx1b2ejIX4Am5pMRg4MsqAdFd8IYv%2BRNbgtMdfOsLBVKJbg03YhON1Gui7vq30gB9Kvj%2F8YZUjkXBR%2F5HYh;"}
-            s = requests.session()
-            s.keep_alive=False
+            #dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; acf_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1563461663,1563461713,1564538384,1564670718; PHPSESSID=a8q2qaeap0h3qfjansbgg7sip5; acf_auth=40c9INYR0erT%2B21YOp5PRRFWPQDsmRzDAJuu06Oqn0EW9xgxO3WsdGHvBjuoDBgNP5YCjDRM%2FmK%2FJ2fj3UYmA6k%2BPjtPFnPATsEtOVFem7DGNiZaTciYZ5tQyMK%2B; wan_auth37wan=536ef9429184EbqMprTp0mKYy4fPsmDfDRIVRdO8N5lqDWw0TBdPPq9I7U1raGkR8puuGCb4xiIigAGdcVGjWdnof2oV8PAGzRRZT1jQKuiZGL%2Fv; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=46925279; acf_biz=1; acf_stk=d28ce3ffacfe9270; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1564670730;LTP0=08c61eOsNwt8VxCVIvZKYIqm%2F2urjT6iZEXqm91v0z5LtqbTvSqzp%2F9TaPVO279uij1ksb%2FOp3pMUPtwmXhI%2B40PQ1zAmd24rbm16as5p%2BgIrxjhx1b2ejIX4Am5pMRg4MsqAdFd8IYv%2BRNbgtMdfOsLBVKJbg03YhON1Gui7vq30gB9Kvj%2F8YZUjkXBR%2F5HYh;"}
+            #s = requests.session()
+            #s.keep_alive=False
             print(json)
             #headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36","Referer":"https://www.douyu.com/directory/myFollow"}
             #url = 'https://passport.douyu.com/lapi/passport/iframe/safeAuth?client_id=1&t={t}&_={t}'.format(t=int(time.time()*1000))
@@ -244,7 +244,7 @@ def douyustatus(ds,thread_pool=None):
             #url = 'https:'+res.headers['Location']
             #res = s.get(url,headers=headers,cookies=dcookies,allow_redirects=False)
             #ds.cookies=dcookies = s.cookies
-            #print(dcookies)
+            print(dcookies)
             #douyustatus(ds)
             
             if '过期' in str(json):

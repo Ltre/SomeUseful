@@ -370,21 +370,27 @@ class Room():
             else:
                 sOutPath = sPath;
             return sOutPath;
+        def newName():
+            sTime = time.strftime('%y%m%d_%H%M%S');
+            sName = '{}-{}-{}.flv'.format(sTime, self.sUser, self.sTitle);
+            sName = re.sub(r'[^\w_\-.()]', '_', sName);
+            sPath = os.path.join(sDir,sName)
+            return sPath
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
         if True:
             try:
-                r = urlopen(sUrl, timeout=25)
+                r = urlopen(sUrl, timeout=4)
             except Exception as e:
-                print('主线中断，切换备线\n')
+                print(self.sUser,'主线中断，切换备线\n')
                 sUrl = self.ssUrl
                 try:
-                    r = urlopen(sUrl, timeout=25)
+                    r = urlopen(sUrl, timeout=4)
                 except Exception as e:
-                    print('继续换\n')
+                    print(self.sUser,'继续换\n')
                     sUrl = self.s2Url
                     try:
-                        r=urlopen(sUrl,timeout=25)
+                        r=urlopen(sUrl,timeout=4)
                     except Exception as e:
                         return False,sPath
             except socket.timeout as e:
@@ -392,6 +398,7 @@ class Room():
                 return False,sPath
             else:
                 pass
+        sPath = newName();
         sPath = adaptName(sPath);
         #iUrls = iter(aUrls);
         #sUrl = next(iUrls);
@@ -400,7 +407,7 @@ class Room():
             if(r):
                 res = r;
             else:
-                res = urlopen(sUrl, timeout=25);
+                res = urlopen(sUrl, timeout=10);
             print('{} starting download from:\n{}\n    to:\n{}'.format(self.nId, sUrl, sPath));
             if (nVerbose):
                 stream.write('\n');
@@ -428,10 +435,13 @@ class Room():
                     nSize = 0
                     f1.close()
                     upload(sPath)
+                    '''
                     sTime = time.strftime('%y%m%d_%H%M%S');
                     sName = '{}-{}-{}.flv'.format(sTime, self.sUser, self.sTitle);
                     sName = re.sub(r'[^\w_\-.()]', '_', sName);
                     sPath = os.path.join(sDir,sName)
+                    '''
+                    sPath = newName()
                     f1 = open(sPath,'wb')
                 #if (self.ii == 0 and available>25):
                 #    self.ii = 1
@@ -816,7 +826,7 @@ def newgetonline():
             t=1
             #url = 'http://api.live.bilibili.com/relation/v1/feed/feed_list?page={}&pagesize=30'.format(t)
             #url = f"https://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key={access_key}&&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=9f94e7fbbcbbdb375d75d631512ad5ba&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562074989"
-            url = f"http://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key={access_key}&actionKey=appkey&appkey=1d8b6e7d45233436&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=9f94e7fbbcbbdb375d75d631512ad5ba&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts=1562074989"
+            url = f"http://api.live.bilibili.com/xlive/app-interface/v1/relation/liveAnchor?access_key={access_key}&actionKey=appkey&appkey=1d8b6e7d45233436&build=8680&device=phone&device_name=iPhone%208&filterRule=0&mobi_app=iphone&platform=ios&qn=0&sign=9f94e7fbbcbbdb375d75d631512ad5ba&sortRule=1&statistics=%7B%22appId%22%3A1%2C%22version%22%3A%225.44.1%22%2C%22abtest%22%3A%22716%22%2C%22platform%22%3A1%7D&ts={int(time.time())}"#1562074989"
             req= s.get(url,proxies=proxies,timeout=10)
             res=req.json()
             data=res.get('data')
