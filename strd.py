@@ -19,7 +19,7 @@ dpath = None
 status = []
 ss = requests.session()
 ss.keep_alive = False
-dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; acf_did=8242408a3b65feb390623d6c00081501; LTP0=08c61eOsNwt8VxCVIvZKYIqm%2F2urjT6iZEXqm91v0z5LtqbTvSqzp%2F9TaPVO279uij1ksb%2FOp3pMUPtwmXhI%2B40PQ1zAmd24rbm16as5p%2BgIrxjhx1b2ejIX4Am5pMRg4MsqAdFd8IYv%2BRNbgtMdfOsLBVKJbg03YhON1Gui7vq30gB9Kvj%2F8YZUjkXBR%2F5HYh;"}
+dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; acf_did=8242408a3b65feb390623d6c00081501; LTP0=e2a80bQ27D8KOPuMC5Srmv%2BTxqRuLwfxlwiQKAA4ewn8CpS0pxkXMSdZgDFV6O0dwR%2FOChGNxyhAY1LV%2Fj%2FxPDm9cHmHQB8mhzSbykqF%2B6TYJOECK81CJb%2FkzuyTkGKeyL5dOxmk2L8aAPqHkVjEq5U0drFRQiQvw7mRcakxdoGeb7NR4Ter6jPNI0I6RgjRY%2FV9k;"}
 
 def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
@@ -152,14 +152,15 @@ def gethtml(s,url):
             assert res.status == 200
             return await res.json()
     '''
-    res = s.get(url)
+    res = s.get(url,timeout=10)
     res.close()
     return res.json()
         
 def huyastatus(hs,thread_pool=None):
     url = 'https://fw.huya.com/dispatch?do=subscribeList&uid=1199513272235&page=1&pageSize=1000'
     hcookies={
-            "Cookie":"SoundValue=0.50; alphaValue=0.80; guid=b73e698cbb9bde5c8cecb6feb7fe2c4e; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; udb_accdata=15671674441; first_username_flag=35184377273454hy_first_1; isInLiveRoom=; udb_passdata=3; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1564569133,1564735412,1564738824,1565341228; __yasmid=0.5630173980060627; udb_biztoken=AQBsA79YsNvFzT5pfDSPHf2YStjv10Vby-c0kpXGe87vBtVSgG-UO867o-irszJM-XuIgE18P_FUQB9p-1y1dodK86rEVfEowZ7C7GIm6OPR8wjfXfgqhJg27SPJL4BX_sYh4nS-ry9NcmpeNCJ6PNG9H8OrqKBcn_e7mQ2Vmtdn69lceiJvPmpVWYHGgQs-pG0MNYbok3EVJvLlIKI1nUFyUW7BI83CflAx6cdoLBOVWvLqLuBzQMp3q6pqLkCaq2v55w84uhE-A_wCztm6vd6jDfJJDrN7gCN4XKRwaVsceXIJ5M8Ix9pfhDfEkzdHa8xyj91QHL8oOXSeeWkjtB0i; udb_origin=1; udb_other=%7B%22lt%22%3A%221565341240195%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; PHPSESSID=pnambeoa69r8q1he88d2febcm3; __yaoldyyuid=1199513272235; _yasids=__rootsid%3DC88DE4EB8ED00001127617E06E001808; undefined=undefined; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1565341244; h_unt=1565341245"
+            'Cookie': 
+            '__yaoldyyuid=1199513272235; _yasids=__rootsid%3DC8974FE151100001F5BC5CE021CE8530; undefined=undefined; udb_accdata=15671674441; udb_biztoken=AQAE1MwneVM1gFBX2rT5xIArj05wUcCZogFkV-0O2OC6AhRZjf420byWLTlZjtls3oBLTax_r1zlXgroGYC6mYMjkdYQ3jo2AE8Ejc2Zy7ifF_57kHxpHuZXikRyXdsXc-1i1rlehnzvDHo8YYkrpvwJLzZ6kr2ujdvfAY_ut8p2ZTxMkxJNdgeah-7ImxNPnAqSkfcx2-hjWJ9eIKjhRJNswE0sWoEJuRu9MFA19YwXRgUha0o9X39H_GVofCNEngnlC7tmbsPAmzfrDurUEqsPIlhTgujTNfdZLslXGlYX37Jo5enp_QnAZXw_UEPRMbmoDtbl5blUfme7dW9E_0oM; udb_origin=1; udb_other=%7B%22lt%22%3A%221567869658681%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1567869606; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606; __yasmid=0.16792272486884974; udb_passdata=3; PHPSESSID=afs88vfr8coe6led6cajbl67k7; first_username_flag=35184377273454hy_first_1; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974'
             }
     hs.cookies.update(hcookies)
     try:
@@ -186,10 +187,11 @@ def huyastatus(hs,thread_pool=None):
                 time.sleep(600)
             print(json)
         except:
-            pass
+            print('虎牙错误检测出错')
     finally:
         if "huya" in status:
             status.remove("huya")
+        sys.stdout.write('\rhuya刷新\n')
     '''
     if room.thread and room.thread.isAlive():
         return
@@ -231,23 +233,23 @@ def douyustatus(ds,thread_pool=None):
                     down.start()
     except:
         try:
-            #dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; acf_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1563461663,1563461713,1564538384,1564670718; PHPSESSID=a8q2qaeap0h3qfjansbgg7sip5; acf_auth=40c9INYR0erT%2B21YOp5PRRFWPQDsmRzDAJuu06Oqn0EW9xgxO3WsdGHvBjuoDBgNP5YCjDRM%2FmK%2FJ2fj3UYmA6k%2BPjtPFnPATsEtOVFem7DGNiZaTciYZ5tQyMK%2B; wan_auth37wan=536ef9429184EbqMprTp0mKYy4fPsmDfDRIVRdO8N5lqDWw0TBdPPq9I7U1raGkR8puuGCb4xiIigAGdcVGjWdnof2oV8PAGzRRZT1jQKuiZGL%2Fv; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=46925279; acf_biz=1; acf_stk=d28ce3ffacfe9270; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1564670730;LTP0=08c61eOsNwt8VxCVIvZKYIqm%2F2urjT6iZEXqm91v0z5LtqbTvSqzp%2F9TaPVO279uij1ksb%2FOp3pMUPtwmXhI%2B40PQ1zAmd24rbm16as5p%2BgIrxjhx1b2ejIX4Am5pMRg4MsqAdFd8IYv%2BRNbgtMdfOsLBVKJbg03YhON1Gui7vq30gB9Kvj%2F8YZUjkXBR%2F5HYh;"}
-            #s = requests.session()
-            #s.keep_alive=False
+            dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; acf_did=8242408a3b65feb390623d6c00081501; LTP0=e2a80bQ27D8KOPuMC5Srmv%2BTxqRuLwfxlwiQKAA4ewn8CpS0pxkXMSdZgDFV6O0dwR%2FOChGNxyhAY1LV%2Fj%2FxPDm9cHmHQB8mhzSbykqF%2B6TYJOECK81CJb%2FkzuyTkGKeyL5dOxmk2L8aAPqHkVjEq5U0drFRQiQvw7mRcakxdoGeb7NR4Ter6jPNI0I6RgjRY%2FV9k;"}
+            s = requests.session()
+            s.keep_alive=False
             print(json)
-            #headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36","Referer":"https://www.douyu.com/directory/myFollow"}
-            #url = 'https://passport.douyu.com/lapi/passport/iframe/safeAuth?client_id=1&t={t}&_={t}'.format(t=int(time.time()*1000))
-            #res = requests.get(url,headers=headers,cookies=dcookies,allow_redirects=False)
-            #if res.headers['Set-Cookie']:
-            #    dcookies={"Cookie":"{}".format(dcookies['Cookie'].split("LTP0")[0]+res.headers['Set-Cookie'])}
-            #print(dcookies)
-            #url = 'https:'+res.headers['Location']
-            #res = s.get(url,headers=headers,cookies=dcookies,allow_redirects=False)
-            #ds.cookies=dcookies = s.cookies
+            headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36","Referer":"https://www.douyu.com/directory/myFollow"}
+            url = 'https://passport.douyu.com/lapi/passport/iframe/safeAuth?client_id=1&t={t}&_={t}'.format(t=int(time.time()*1000))
+            res = requests.get(url,headers=headers,cookies=dcookies,allow_redirects=False)
+            if res.headers.get('Set-Cookie'):
+                dcookies={"Cookie":"{}".format(dcookies['Cookie'].split("LTP0")[0]+res.headers['Set-Cookie'])}
             print(dcookies)
-            #douyustatus(ds)
-            
-            if '过期' in str(json):
+            if res.headers.get('Location'):
+                url = 'https:'+res.headers['Location']
+                res = s.get(url,headers=headers,cookies=dcookies,allow_redirects=False)
+                ds.cookies=dcookies = s.cookies
+                print(dcookies)
+                douyustatus(ds)
+            elif '过期' in str(json):
                 subject = '斗鱼出错'
                 contents = '斗鱼登录过期'
                 send_mail(subject,contents,password)

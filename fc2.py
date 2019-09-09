@@ -329,6 +329,16 @@ def main(test=None):
                 #fo.start()
                 #ck = Thread(target=checkuser,daemon = True)
                 #ck.start()
+                if os.path.exists('fuser.txt'):
+                    rr=open('fuser.txt','r')
+                    for i in rr.readlines():
+                        i=i.strip()
+                        if i:
+                            r =requests.session()
+                            r.keep_alive = False
+                            a=FC2(int(i),r)
+                            users.append(a)
+                    rr.close()
                 for a in users:
                     #if(a.thread and a.thread.is_alive()):
                     if a.user_id in recording:

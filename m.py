@@ -198,12 +198,12 @@ def display(*args, **kargs):
         print(*args, **kargs);
 
 class Room():
-    def __init__(self, nRoom=None, nUser=None,sUser=None,sTitle=None):
+    def __init__(self, nRoom=None, nUser=None,sUser=None,sTitle=None,sUrl=None):
         global log
         self.nRoom = int(nRoom or 0);
         self.nUser= int(nUser or 0);
         self.nId = int(nRoom or 0);
-        self.sUrl = None;
+        self.sUrl = sUrl;
         self.ssUrl = None;
         self.s2Url = None;
         self.sTitle = sTitle;
@@ -339,14 +339,15 @@ class Room():
                 #mData = json.loads(sData);
                 aUrl = [x['url'] for x in mData['durl']];
                 sUrl = self.sUrl = mData['durl'][0]['url'];
-                ssUrl = self.ssUrl = mData['durl'][1]['url'];
+                ssUrl = self.ssUrl = mData['durl'][-1]['url'];
                 s2Url = self.s2Url = mData['durl'][2]['url'];
                 res.close()
                 return sUrl;
                 #sData = res.read().decode('utf-8');
             except Exception as e:
                 #delete_proxy(ip)
-                print(self.sUser,'获取url失败',e)
+                print(self.sUser,'获取url失败',e,res.text)
+                traceback.print_exc()
                 trytimes -=1
                 selectip = get_proxy()
                 proxies = {'https':selectip}
@@ -376,23 +377,63 @@ class Room():
             sName = re.sub(r'[^\w_\-.()]', '_', sName);
             sPath = os.path.join(sDir,sName)
             return sPath
+        def newdown():
+            proxyg={'http':get_proxy()}
+            r = requests.get(sUrl,stream = True,timeout = 10,headers=headers,proxies=proxyg)
+            if r.status_code !=200:
+                return False
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    yield chunk
         assert self.sUrl or self.aUrls;
         sUrl = self.sUrl;
+        bBuffer = ''
+        data = ''
         if True:
             try:
-                r = urlopen(sUrl, timeout=4)
+                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0'}
+                raise Exception('403')
+                req=urllib.request.Request(sUrl,headers=headers)
+                r=urlopen(req)
+                #r = urlopen(sUrl, timeout=4)
             except Exception as e:
-                print(self.sUser,'主线中断，切换备线\n')
-                sUrl = self.ssUrl
-                try:
-                    r = urlopen(sUrl, timeout=4)
-                except Exception as e:
-                    print(self.sUser,'继续换\n')
-                    sUrl = self.s2Url
+                print(self.sUser,e,'主线中断，切换备线\n')
+                #aaaa=self.getStream()
+                #if aaaa:
+                #    sUrl = self.ssUrl
+                #else:
+                #    return False,sPath
+                '''
+                while True:
                     try:
-                        r=urlopen(sUrl,timeout=4)
+                        r = urlopen(sUrl, timeout=20)
                     except Exception as e:
+                        print(e)
+                        if "403" in str(e):
+                            print(self.sUser,'被拒，继续尝试')
+                        else:
+                            break
+                '''
+                try:
+                    if '4' in str(e):
+                        data = newdown()
+                        if data:
+                            bBuffer = data.__next__()
+                        else:
+                            return False,sPath
+                    else:
+                        r = urlopen(sUrl, timeout=5)
+                except Exception as e:
+                    print(self.sUser,e,'失败\n')
+                    return False,sPath
+                '''
+                    sUrl = self.ssUrl
+                    try:
+                        r=urlopen(sUrl,timeout=5)
+                    except Exception as e:
+                        print(e)
                         return False,sPath
+                '''
             except socket.timeout as e:
                 print(e)
                 return False,sPath
@@ -404,17 +445,19 @@ class Room():
         #sUrl = next(iUrls);
         try:
             f1 = open(sPath, 'wb');
-            if(r):
-                res = r;
-            else:
-                res = urlopen(sUrl, timeout=10);
+            if not bBuffer:
+                if(r):
+                    res = r;
+                else:
+                    res = urlopen(sUrl, timeout=10);
             print('{} starting download from:\n{}\n    to:\n{}'.format(self.nId, sUrl, sPath));
             if (nVerbose):
                 stream.write('\n');
             nSize = 0;
             n = 1024*1024;
             readbuffer = 1024*8
-            bBuffer = res.read(readbuffer);
+            if not bBuffer:
+                bBuffer = res.read(readbuffer);
             tnumber = 0
             #vfs=os.statvfs("/root")
             #available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
@@ -450,16 +493,21 @@ class Room():
                 #    print('剩余空间不足，进行存储\n')
                 #    stillrec = 1
                 #    break
-                bBuffer = res.read(readbuffer);
+                if data:
+                    bBuffer = data.__next__()
+                else:
+                    bBuffer = res.read(readbuffer);
                 trytry=0
                 waittime = 0.2
-                while not bBuffer and trytry <3:
+                while not bBuffer and trytry <2:
                     time.sleep(waittime)
                     try:
-                        res = urlopen(sUrl, timeout=25);
+                        #res = urlopen(sUrl, timeout=25);
+                        data=newdown()
                     except:
                         break
-                    bBuffer = res.read(1024*128);
+                    bBuffer = data.__next__()
+                    #bBuffer = res.read(1024*128);
                     trytry+=1
                     waittime+=0.1
 
@@ -476,6 +524,8 @@ class Room():
         finally:
             if ('res' in locals()): 
                 res.close();
+            if ('r' in locals()): 
+                r.close();
             if ('f1' in locals()): f1.close();
             if (os.path.isfile(sPath) and os.path.getsize(sPath) == 0):
                 os.remove(sPath);
@@ -610,7 +660,7 @@ def doDownload(room):
         os.makedirs(sDir);
     assert isdir(sDir);
     sPath = os.path.join(sDir, sName);
-    isSuccess = room.getStream();
+    isSuccess = room.sUrl#room.getStream();
     if (isSuccess):
         isSuccess,sPath = room.download(sPath, room._stream)
         if (isSuccess):
@@ -842,7 +892,7 @@ def newgetonline():
             else:
                 online.extend(str(m['roomid']) for m in data['rooms'])
                 for m in data['rooms']:
-                    infos.update({str(m['roomid']):{'uname':m['uname'],'title':m['title']}})
+                    infos.update({str(m['roomid']):{'uname':m['uname'],'title':m['title'],'playurl':m['playurl']}})
             '''
             while data.get('list'):
                 #online.extend([str(m['roomid']) if str(m['roomid']) == m['link'].split('/')[-1] else m['link'].split('/')[-1] for m in data['list']])
@@ -865,7 +915,7 @@ def newgetonline():
                 sys.stdout.write("\033[K")
                 print('rec',len(wanted),wanted)
                 for user in wanted:
-                    room = Room(int(user),sUser=infos[user]['uname'],sTitle=infos[user]['title'])
+                    room = Room(int(user),sUser=infos[user]['uname'],sTitle=infos[user]['title'],sUrl=infos[user]['playurl'])
                     thread = threading.Thread(target = checkrun,args = (room,))
                     thread.start()
                     if testt == '1':
