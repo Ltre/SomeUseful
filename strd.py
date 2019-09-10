@@ -1,4 +1,4 @@
-import os,random,functools,concurrent,uvloop,asyncio
+import os,random,functools,concurrent,uvloop,asyncio,traceback
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 os.system("cd /root/b/d/d;mv *flv /root/b;cd /root/b/d/huya;mv *mp4 /root/b")
 import time
@@ -162,38 +162,47 @@ def gethtml(s,url):
 def huyastatus(hs,thread_pool=None):
     global islogin
     global hcookies
-    if not islogin:
-        check_url = 'http://i.huya.com/udb_web/udbport2.php?m=HuyaHome&do=checkLogin'
-        check_headers = {"Accept":"application/json, text/javascript, */*; q=0.01","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"http//i.huya.com/","Accept-Language":"zh-cn"}
-        r = requests.get(check_url,headers=check_headers,cookies = hcookies)
-        r.close()
-        result = r.json()
-        check = result['isLogined']
-        if not check:
-            login_url = 'https://udblgn.huya.com/web/v2/passwordLogin'
-            headers = {"reqid":"71806290","Accept":"*/*","uri":"30001","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","lcid":"2052","Accept-Language":"zh-cn","Accept-Encoding":"br, gzip, deflate","Content-Type":"application/json;charset=UTF-8","Origin":"https//udblgn.huya.com","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"https//udblgn.huya.com/web/middle/2.4/71782117/https/0bbad9f2e2cf4e1a991053879674cda8","Content-Length":"572","Connection":"close"}
-            pas ={"uri":"30001","version":"2.4","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","appId":"5002","smid":"","lcid":"2052","byPass":"3","sdid":"71782117","requestId":"71806290","data":{"userName":"15671674441","password":"0e1227966b501baf9c03cb7269f2492d5de60202","domainList":"","remember":"1","behavior":"%5B%7B%22page.login%22%3A%220.028%22%7D%2C%7B%22input.l.account%22%3A%222.625%22%7D%2C%7B%22input.l.passwd%22%3A%2212.949%22%7D%2C%7B%22button.UDBSdkLogin%22%3A%2224.181%2C170%2C228%22%7D%5D","randomStr":"","page":"http://i.huya.com/"}}
-            data = json.dumps(pas)
-            se = requests.session()
-            se.headers.update(headers)
-            r = se.post(login_url,data = data)
-            r.close()
-            se.close()
-            islogin = 1
-            hcookies = se.cookies
-
-    url = 'https://fw.huya.com/dispatch?do=subscribeList&uid=1199513272235&page=1&pageSize=1000'
-    '''
-    hcookies={
-            'Cookie': 
-            'udb_passdata=3; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1568030182; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606,1567927137,1568029853; __yaoldyyuid=; _yasids=__rootsid%3DC897E8EEA9100001AC58140969401BD9; h_unt=1568029853; __yasmid=0.16792272486884974; udb_accdata=15671674441; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974'
-            #'__yaoldyyuid=1199513272235; _yasids=__rootsid%3DC8974FE151100001F5BC5CE021CE8530; undefined=undefined; udb_accdata=15671674441; udb_biztoken=AQAE1MwneVM1gFBX2rT5xIArj05wUcCZogFkV-0O2OC6AhRZjf420byWLTlZjtls3oBLTax_r1zlXgroGYC6mYMjkdYQ3jo2AE8Ejc2Zy7ifF_57kHxpHuZXikRyXdsXc-1i1rlehnzvDHo8YYkrpvwJLzZ6kr2ujdvfAY_ut8p2ZTxMkxJNdgeah-7ImxNPnAqSkfcx2-hjWJ9eIKjhRJNswE0sWoEJuRu9MFA19YwXRgUha0o9X39H_GVofCNEngnlC7tmbsPAmzfrDurUEqsPIlhTgujTNfdZLslXGlYX37Jo5enp_QnAZXw_UEPRMbmoDtbl5blUfme7dW9E_0oM; udb_origin=1; udb_other=%7B%22lt%22%3A%221567869658681%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1567869606; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606; __yasmid=0.16792272486884974; udb_passdata=3; PHPSESSID=afs88vfr8coe6led6cajbl67k7; first_username_flag=35184377273454hy_first_1; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974'
-            }
-    '''
-    hs.cookies.update(hcookies)
     try:
+        if not islogin:
+            check_url = 'http://i.huya.com/udb_web/udbport2.php?m=HuyaHome&do=checkLogin'
+            check_headers = {"Accept":"application/json, text/javascript, */*; q=0.01","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"http//i.huya.com/","Accept-Language":"zh-cn"}
+            r = requests.get(check_url,headers=check_headers,cookies = hcookies,timeout = 10)
+            r.close()
+            result = r.json()
+            check = result['isLogined']
+            if not check:
+                login_url = 'https://udblgn.huya.com/web/v2/passwordLogin'
+                headers = {"reqid":"71806290","Accept":"*/*","uri":"30001","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","lcid":"2052","Accept-Language":"zh-cn","Accept-Encoding":"br, gzip, deflate","Content-Type":"application/json;charset=UTF-8","Origin":"https//udblgn.huya.com","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"https//udblgn.huya.com/web/middle/2.4/71782117/https/0bbad9f2e2cf4e1a991053879674cda8","Content-Length":"572","Connection":"close"}
+                pas ={"uri":"30001","version":"2.4","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","appId":"5002","smid":"","lcid":"2052","byPass":"3","sdid":"71782117","requestId":"71806290","data":{"userName":"15671674441","password":"0e1227966b501baf9c03cb7269f2492d5de60202","domainList":"","remember":"1","behavior":"%5B%7B%22page.login%22%3A%220.028%22%7D%2C%7B%22input.l.account%22%3A%222.625%22%7D%2C%7B%22input.l.passwd%22%3A%2212.949%22%7D%2C%7B%22button.UDBSdkLogin%22%3A%2224.181%2C170%2C228%22%7D%5D","randomStr":"","page":"http://i.huya.com/"}}
+                data = json.dumps(pas)
+                se = requests.session()
+                se.headers.update(headers)
+                r = se.post(login_url,data = data,timeout = 10)
+                r.close()
+                se.close()
+                if '进一步验证' in r.text:
+                    subject = '虎牙需要验证'
+                    contents='虎牙登录过期'
+                    send_mail(subject,contents,password)
+                    time.sleep(600)
+                    raise Exception
+                islogin = 1
+                hcookies = se.cookies
+
+        url = 'https://fw.huya.com/dispatch?do=subscribeList&uid=1199513272235&page=1&pageSize=1000'
+        '''
+        hcookies={
+                'Cookie': 
+                'udb_passdata=3; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1568030182; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606,1567927137,1568029853; __yaoldyyuid=; _yasids=__rootsid%3DC897E8EEA9100001AC58140969401BD9; h_unt=1568029853; __yasmid=0.16792272486884974; udb_accdata=15671674441; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974'
+                #'__yaoldyyuid=1199513272235; _yasids=__rootsid%3DC8974FE151100001F5BC5CE021CE8530; undefined=undefined; udb_accdata=15671674441; udb_biztoken=AQAE1MwneVM1gFBX2rT5xIArj05wUcCZogFkV-0O2OC6AhRZjf420byWLTlZjtls3oBLTax_r1zlXgroGYC6mYMjkdYQ3jo2AE8Ejc2Zy7ifF_57kHxpHuZXikRyXdsXc-1i1rlehnzvDHo8YYkrpvwJLzZ6kr2ujdvfAY_ut8p2ZTxMkxJNdgeah-7ImxNPnAqSkfcx2-hjWJ9eIKjhRJNswE0sWoEJuRu9MFA19YwXRgUha0o9X39H_GVofCNEngnlC7tmbsPAmzfrDurUEqsPIlhTgujTNfdZLslXGlYX37Jo5enp_QnAZXw_UEPRMbmoDtbl5blUfme7dW9E_0oM; udb_origin=1; udb_other=%7B%22lt%22%3A%221567869658681%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1567869606; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606; __yasmid=0.16792272486884974; udb_passdata=3; PHPSESSID=afs88vfr8coe6led6cajbl67k7; first_username_flag=35184377273454hy_first_1; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974'
+                }
+        '''
+        hs.cookies.update(hcookies)
+
         #json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,hs,url))
         rjson = gethtml(hs,url)
+        if not rjson.get('result'):
+            print(rjson)
         data = rjson['result']
         dlist = data['list']
         liveCount = data['liveCount']
@@ -207,6 +216,7 @@ def huyastatus(hs,thread_pool=None):
                 if livecheck>=liveCount:
                     break
     except:
+        traceback.print_exc()
         islogin = 0
         print('虎牙登录结束')
         '''
