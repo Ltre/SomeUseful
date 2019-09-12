@@ -190,7 +190,10 @@ class FC2():
             ws.close()
 
         # WebSocket background process
-        ws_ping()
+        try:
+            ws_ping()
+        except:
+            print('ws_ping 出错')
         t2 = Thread(target=ws_recv)
         t2.daemon = True
         t2.start()

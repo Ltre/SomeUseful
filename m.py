@@ -980,7 +980,10 @@ def getfollow():
             for i in flist:
                 t=1
                 furl = 'http://api.bilibili.com/x/relation/tag?mid=1836737&tagid={}&pn={}&ps=50'.format(i,t)
-                fdata = s.get(furl,proxies=proxies,timeout=10).json()['data']
+                res= s.get(furl,proxies=proxies,timeout=10)
+                fdata = res.json()
+                res.close()
+                fdata = fdata['data']
                 while fdata:
                     fmid.extend([m['mid'] for m in fdata])
                     t+=1
@@ -997,6 +1000,7 @@ def getfollow():
             print('follow update',y-x,'s')
             sys.stdout.write('\033[F')
         except Exception as e:
+            print(fdata)
             traceback.print_exc()
             proxies ={'https':get_proxy()}#getip('国内')
             #print(e)
