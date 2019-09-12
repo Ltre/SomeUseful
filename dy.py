@@ -39,7 +39,8 @@ def download(room):
         print(e)
     finally:
         names.remove(room.nickname)
-        r.close()
+        if 'r' in locals():
+            r.close()
         f.close()
         if (os.path.isfile(filepath) and os.path.getsize(filepath) < 1024*1024):
             os.remove(filepath);
