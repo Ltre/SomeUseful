@@ -45,7 +45,8 @@ def download(room):
         if (os.path.isfile(filepath) and os.path.getsize(filepath) < 1024*1024):
             os.remove(filepath);
         else:
-            shutil.move(filepath,'/root/b/d/bu/bt')
+            if os.path.isfile(filepath):
+                shutil.move(filepath,'/root/b/d/bu/bt')
 while True:
     try:
         r = requests.get(url,headers= headers,timeout = 10)
