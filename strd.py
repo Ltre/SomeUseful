@@ -21,6 +21,7 @@ status = []
 ss = requests.session()
 ss.keep_alive = False
 islogin = 0
+sended = 0
 dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; acf_did=8242408a3b65feb390623d6c00081501; LTP0=e2a80bQ27D8KOPuMC5Srmv%2BTxqRuLwfxlwiQKAA4ewn8CpS0pxkXMSdZgDFV6O0dwR%2FOChGNxyhAY1LV%2Fj%2FxPDm9cHmHQB8mhzSbykqF%2B6TYJOECK81CJb%2FkzuyTkGKeyL5dOxmk2L8aAPqHkVjEq5U0drFRQiQvw7mRcakxdoGeb7NR4Ter6jPNI0I6RgjRY%2FV9k;"}
 hcookies = {"Cookie":"udb_passdata=3; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1568030182; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606,1567927137,1568029853; __yaoldyyuid=; _yasids=__rootsid%3DC897E8EEA9100001AC58140969401BD9; h_unt=1568029853; __yasmid=0.16792272486884974; udb_accdata=15671674441; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974"}
 
@@ -162,6 +163,7 @@ def gethtml(s,url):
 def huyastatus(hs,thread_pool=None):
     global islogin
     global hcookies
+    global sended
     try:
         if not islogin:
             check_url = 'http://i.huya.com/udb_web/udbport2.php?m=HuyaHome&do=checkLogin'
@@ -180,12 +182,15 @@ def huyastatus(hs,thread_pool=None):
                 r = se.post(login_url,data = data,timeout = 10)
                 r.close()
                 se.close()
-                if '进一步验证' in r.text:
-                    subject = '虎牙需要验证'
-                    contents='虎牙登录过期'
-                    send_mail(subject,contents,password)
-                    time.sleep(600)
+                if '进一步认证' in r.text:
+                    if not sended:
+                        subject = '虎牙需要验证'
+                        contents=r.json()['data']['strategys'][0]['data']
+                        send_mail(subject,contents,password)
+                        sended = 1
+                    time.sleep(10)
                     raise Exception
+                sended = 0
                 islogin = 1
                 hcookies = se.cookies
 
