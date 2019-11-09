@@ -148,7 +148,12 @@ class FC2():
             ''' print WebSocket messages '''
             while True:
                 self.count += 1
-                data = json.loads(ws.recv())
+                try:
+                    rdata = ws.recv()
+                    data = json.loads(rdata)
+                except:
+                    print(rdata)
+                    break
                 time_utc = datetime.utcnow().strftime('%H:%M:%S UTC')
                 #if data['name'] not in ['comment', 'ng_commentq',
                 #                        'user_count', 'ng_comment']:

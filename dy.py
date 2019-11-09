@@ -12,7 +12,7 @@ headers = {"x-Tt-Token":"009eb6296810343ae341cb7841294dabcad389438632df3ac5d994b
 if not os.path.exists('/root/b/d/dy'):
     os.makedirs('/root/b/d/dy')
 else:
-    os.system('cd /root/b/d/dy;mv *flv /root/b/d/bu/bt')
+    os.system('cd /root/b/d/dy;mv *flv /root/b/d/bu')
 class room():
     def __init__(self,nickname,url):
         self.nickname = nickname

@@ -22,15 +22,14 @@ ss = requests.session()
 ss.keep_alive = False
 islogin = 0
 sended = 0
-dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; acf_did=8242408a3b65feb390623d6c00081501; LTP0=e2a80bQ27D8KOPuMC5Srmv%2BTxqRuLwfxlwiQKAA4ewn8CpS0pxkXMSdZgDFV6O0dwR%2FOChGNxyhAY1LV%2Fj%2FxPDm9cHmHQB8mhzSbykqF%2B6TYJOECK81CJb%2FkzuyTkGKeyL5dOxmk2L8aAPqHkVjEq5U0drFRQiQvw7mRcakxdoGeb7NR4Ter6jPNI0I6RgjRY%2FV9k;"}
+dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_did=8242408a3b65feb390623d6c00081501; PHPSESSID=tgvun5c1ci6c3ltnt7s1okkgc4; acf_auth=a3ecVlfGOE71GvSS26fxTjpC0g2rpMvwCuyrPEAy%2BfoWUaTL6sDxmROq3AFY3NzP5hPaMctHzoVucMxtZwx1I2vjdCExw7r7IzfyTMh8VGMldrKDfVhJVfseCuuM; wan_auth37wan=e055eff5b144Id8mxDNxZ5PDOrybYQkr8CSHWmP92V%2FtpUNgjRRfcXeR4YInW2os3cNzjH04cZNauAFh9dyNkHcfE1HV%2FKP64R05tCA8uXzxrIZz; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=45649574; acf_biz=1; acf_stk=68f690a62d404465; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1569768125,1569768354,1570418236,1570418291; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570418291"}
 hcookies = {"Cookie":"udb_passdata=3; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1568030182; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606,1567927137,1568029853; __yaoldyyuid=; _yasids=__rootsid%3DC897E8EEA9100001AC58140969401BD9; h_unt=1568029853; __yasmid=0.16792272486884974; udb_accdata=15671674441; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974"}
 
 def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
 
 def get_proxy():
-    return requests.get("http://127.0.0.1:5010/get").text
-    
+    return requests.get("http://127.0.0.1:5010/get").json().get("proxy")
 class Room():
     def __init__(self,nRoom=None,nDomain =None):
         self.nRoom = int(nRoom or 0)
@@ -171,7 +170,7 @@ def huyastatus(hs,thread_pool=None):
             r = requests.get(check_url,headers=check_headers,cookies = hcookies,timeout = 10)
             r.close()
             result = r.json()
-            check = result['isLogined']
+            check = 0#result['isLogined']
             if not check:
                 login_url = 'https://udblgn.huya.com/web/v2/passwordLogin'
                 headers = {"reqid":"71806290","Accept":"*/*","uri":"30001","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","lcid":"2052","Accept-Language":"zh-cn","Accept-Encoding":"br, gzip, deflate","Content-Type":"application/json;charset=UTF-8","Origin":"https//udblgn.huya.com","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"https//udblgn.huya.com/web/middle/2.4/71782117/https/0bbad9f2e2cf4e1a991053879674cda8","Content-Length":"572","Connection":"close"}
@@ -182,14 +181,14 @@ def huyastatus(hs,thread_pool=None):
                 r = se.post(login_url,data = data,timeout = 10)
                 r.close()
                 se.close()
-                if '进一步认证' in r.text:
+                if '进一步认证' in r.text or "未登录" in r.text:
                     if not sended:
                         subject = '虎牙需要验证'
                         contents=r.json()['data']['strategys'][0]['data']
                         send_mail(subject,contents,password)
                         sended = 1
                     time.sleep(10)
-                    raise Exception
+                    raise Exception("error")
                 sended = 0
                 islogin = 1
                 hcookies = se.cookies
@@ -208,18 +207,19 @@ def huyastatus(hs,thread_pool=None):
         rjson = gethtml(hs,url)
         if not rjson.get('result'):
             print(rjson)
-        data = rjson['result']
-        dlist = data['list']
-        liveCount = data['liveCount']
-        livecheck = 0
-        for i in dlist:
-            if i['isLive']:
-                livecheck+=1
-                if i['profileRoom'] not in hrecording:
-                    down = threading.Thread(target=huyad,args=('huya',i['profileRoom'],),name=str(i['nick']),daemon=True)
-                    down.start()
-                if livecheck>=liveCount:
-                    break
+        else:
+            data = rjson['result']
+            dlist = data['list']
+            liveCount = data['liveCount']
+            livecheck = 0
+            for i in dlist:
+                if i['isLive']:
+                    livecheck+=1
+                    if i['profileRoom'] not in hrecording:
+                        down = threading.Thread(target=huyad,args=('huya',i['profileRoom'],),name=str(i['nick']),daemon=True)
+                        down.start()
+                    if livecheck>=liveCount:
+                        break
     except:
         traceback.print_exc()
         islogin = 0
@@ -280,7 +280,7 @@ def douyustatus(ds,thread_pool=None):
                     down.start()
     except:
         try:
-            dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; _dys_refer_action_code=init_page_author; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1565337319,1565345238,1565399909,1565402312; acf_auth=8098pNG6AjBMqfcS7TrkfX1dIKjpp6tT2kXdLka2ulVhCI%2BAruOEfMJ4Zpw6OVp2Pg2FpbL94ZTQzLxUhxCcQ0v08fp0uUnb6hVu75kGUUUA8yqaDDK0zMsmPAIW; wan_auth37wan=ad6d52926d1dGrpl5zqSwjb%2FLECNu1bdNqsNKPbIvAHpUDD4rNRgjZM8P1NFkubgW8qKTarSS68805tkxZ6EYboo3yWe5W%2FP822Op0BbDEJKtbJh; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_ct=0; acf_ltkid=46925293; acf_biz=1; acf_stk=a44a3deba8913c64; acf_did=8242408a3b65feb390623d6c00081501; LTP0=e2a80bQ27D8KOPuMC5Srmv%2BTxqRuLwfxlwiQKAA4ewn8CpS0pxkXMSdZgDFV6O0dwR%2FOChGNxyhAY1LV%2Fj%2FxPDm9cHmHQB8mhzSbykqF%2B6TYJOECK81CJb%2FkzuyTkGKeyL5dOxmk2L8aAPqHkVjEq5U0drFRQiQvw7mRcakxdoGeb7NR4Ter6jPNI0I6RgjRY%2FV9k;"}
+            dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_did=8242408a3b65feb390623d6c00081501; PHPSESSID=tgvun5c1ci6c3ltnt7s1okkgc4; acf_auth=a3ecVlfGOE71GvSS26fxTjpC0g2rpMvwCuyrPEAy%2BfoWUaTL6sDxmROq3AFY3NzP5hPaMctHzoVucMxtZwx1I2vjdCExw7r7IzfyTMh8VGMldrKDfVhJVfseCuuM; wan_auth37wan=e055eff5b144Id8mxDNxZ5PDOrybYQkr8CSHWmP92V%2FtpUNgjRRfcXeR4YInW2os3cNzjH04cZNauAFh9dyNkHcfE1HV%2FKP64R05tCA8uXzxrIZz; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=45649574; acf_biz=1; acf_stk=68f690a62d404465; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1569768125,1569768354,1570418236,1570418291; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570418291; LTP0=f59ad3EDaPuUGY1EQxElM%2BObWmUwxNR09ZsFcIg980X5xWYI3rNT6FiIYMerOsRDHPowpPivNRJ7vPzLQY4mHZHRMlJ5u0nk87P8NcX6xcwgEdL1Ygb8EpANCS6wWAQ4BFfimXYD5ZNNsyjdaGE4xoyb%2BNzKKLB3kiIeEhjpwM2zWlOz2NjBBMMx1m3VRJ7AQuKGk"}
             s = requests.session()
             s.keep_alive=False
             print(rjson)

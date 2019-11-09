@@ -16,24 +16,24 @@ do
                 then mkdir -p "/home/milo/b/fc2/${arr[0]}"
                 fi
                 #mv  "${f}" "/home/milo/b/fc2/${arr[0]}"
-		rclone move "${f}" "milo:milo/b/fc2/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
+		rclone move "${f}" "milo:milo/b/fc2/${arr[0]}" -P --low-level-retries 1
 		if [ -f $f ]
 		then if [ ! -d "/home/milo2/b/fc2/${arr[0]}" ]
                 	then mkdir -p "/home/milo2/b/fc2/${arr[0]}"
                 	fi
                 	#mv  "${f}" "/home/milo2/b/fc2/${arr[0]}"
-                	rclone move "${f}" "milo2:milo/b/fc2/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
+                	rclone move "${f}" "milo2:milo/b/fc2/${arr[0]}" -P --low-level-retries 1
 			if [ -f $f ]
                 	then if [ ! -d "/home/milo3/b/fc2/${arr[0]}" ]
                     	then mkdir -p "/home/milo3/b/fc2/${arr[0]}"
                     	fi
                     	#mv  "${f}" "/home/milo3/b/fc2/${arr[0]}"
-			rclone move "${f}" "milo3:milo/b/fc2/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
+			rclone move "${f}" "milo3:milo/b/fc2/${arr[0]}" -P --low-level-retries 1
 			if [ -f $f ]
                 	then if [ ! -d "/home/milo4/b/fc2/${arr[0]}" ]
                     	then mkdir -p "/home/milo4/b/fc2/${arr[0]}"
                     	fi
-			rclone move "${f}" "milo4:milo/b/fc2/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
+			rclone move "${f}" "milo4:milo/b/fc2/${arr[0]}" -P --low-level-retries 1
                     fi
                     fi
 		fi
