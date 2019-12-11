@@ -9,7 +9,6 @@ from multiprocessing import Process
 import requests,re,shutil
 from traceback import print_exc
 import subprocess
-import objgraph
 import gc
 #import tracemalloc
 #tracemalloc.start()
@@ -47,30 +46,31 @@ def is_streaming(names):
             if 'title' in locals() and title in streaming:
                 streaming.remove(title)
                 del title
+            if names in streaming:
+                streaming.remove(names)
             sleep(randint(0,5))
 def stream_download(names,title,data):
     name=names.split('/')[-1]
     try:
-        '''
+        
         s = Streamlink()
         s.set_option('hls-live-restart',True)
         s.set_option('--hls-segment-threads',5)
-        '''
+        
         if data:
             url = 'https://www.youtube.com'+data
         else:
             url = "https://www.youtube.com/{}".format(names)
-        '''
         astreams = s.streams(url)
         stream = astreams['best']
         fd = stream.open()
-        '''
+        
         filename = title + '-'+time.strftime('%y%m%d_%H%M%S')+'_.ts'
         sPath = '/root/b/d/youtube/{}/'.format(title)
         if not os.path.exists(sPath):
             os.makedirs(sPath)
-        subprocess.run(['newstreamlink','--hls-live-restart','-o','{}'.format(sPath+filename),url,'best'])
-        '''
+        #subprocess.run(['newstreamlink','--hls-live-restart','-o','{}'.format(sPath+filename),url,'best'])
+        
         f = open(sPath+filename,'wb+')
         sums = 0
         normal = 1024*1024*1024
@@ -81,7 +81,7 @@ def stream_download(names,title,data):
                 #if sums >= normal:
             else:
                 break
-        '''
+        
     except Exception as e:
         print_exc()
         #print('发生错误',e)
@@ -113,8 +113,7 @@ def main():
             #for stat in top_stats[:5]:
             #        print(stat)
             gc.collect()
-            objgraph.show_most_common_types(5)
-            sys.stdout.write('\033[7A')
+            sys.stdout.write('\033[2A')
         sys.stdout.flush()
         sleep(5)
     
