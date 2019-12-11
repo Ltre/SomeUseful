@@ -23,8 +23,7 @@ ss.keep_alive = False
 islogin = 0
 sended = 0
 dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_did=8242408a3b65feb390623d6c00081501; PHPSESSID=tgvun5c1ci6c3ltnt7s1okkgc4; acf_auth=a3ecVlfGOE71GvSS26fxTjpC0g2rpMvwCuyrPEAy%2BfoWUaTL6sDxmROq3AFY3NzP5hPaMctHzoVucMxtZwx1I2vjdCExw7r7IzfyTMh8VGMldrKDfVhJVfseCuuM; wan_auth37wan=e055eff5b144Id8mxDNxZ5PDOrybYQkr8CSHWmP92V%2FtpUNgjRRfcXeR4YInW2os3cNzjH04cZNauAFh9dyNkHcfE1HV%2FKP64R05tCA8uXzxrIZz; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=45649574; acf_biz=1; acf_stk=68f690a62d404465; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1569768125,1569768354,1570418236,1570418291; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570418291"}
-hcookies = {"Cookie":"udb_passdata=3; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1568030182; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606,1567927137,1568029853; __yaoldyyuid=; _yasids=__rootsid%3DC897E8EEA9100001AC58140969401BD9; h_unt=1568029853; __yasmid=0.16792272486884974; udb_accdata=15671674441; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974"}
-
+hcookies = {"Cookie":"SoundValue=0.50; alphaValue=0.80; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; first_username_flag=35184377273454hy_first_1; isInLiveRoom=; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1575110230,1575110641,1575112884,1575720496; sdid=; udb_origin=1; udb_other=%7B%22lt%22%3A%221575720558319%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; udb_accdata=0017743250239; udb_biztoken=AQASJJwniKtRKXx70Kq1ARGA_pD2OwpUmNB9DUlePssAxM_x9oJspEekEfoEOBjhs3K7T5aN6oJ2eGoD7z50Y1J2iRmCZhc6CxaSkQS5SWwApAywO_z46ABwbhrTfQN8QFBF4eGwTgxLeyvCZO-5v5XWSbsBxMVrhtZCJk997B2LtLhO9ZKLG6E-7jnNu6ExNp7SZw87lo1MbK1lGKKov7tco3_TLuLbjtlPYr6mrAeJhfYMwJJ-0B2cvrnoqlwkOXiGa3LDBwBsyOCY6rea-0aXt9q57gXGyGAUxZs7vK8M4pVFxNx6FxcNNUMBCTa6p6-UuIX9_AqFRT9AsL22-O_I; h_unt=1575720571"}
 def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
 
@@ -170,7 +169,7 @@ def huyastatus(hs,thread_pool=None):
             r = requests.get(check_url,headers=check_headers,cookies = hcookies,timeout = 10)
             r.close()
             result = r.json()
-            check = 0#result['isLogined']
+            check = 1#result['isLogined']
             if not check:
                 login_url = 'https://udblgn.huya.com/web/v2/passwordLogin'
                 headers = {"reqid":"71806290","Accept":"*/*","uri":"30001","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","lcid":"2052","Accept-Language":"zh-cn","Accept-Encoding":"br, gzip, deflate","Content-Type":"application/json;charset=UTF-8","Origin":"https//udblgn.huya.com","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"https//udblgn.huya.com/web/middle/2.4/71782117/https/0bbad9f2e2cf4e1a991053879674cda8","Content-Length":"572","Connection":"close"}

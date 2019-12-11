@@ -5,11 +5,25 @@ do
 do
 	if [ ${f} != "*.flv" ]
 	then
-		ffmpeg -i "${f}" -y -vcodec copy -acodec copy -copyts -g 1 "waitting${f}"
-		#yamdi -i "waitting${f}" -o "${f}"
-		mv "waitting${f}" ${f}
-		echo "${f}转换完成"
-
+		n=$(du -sm ${f} | awk '{print $1}')
+		if [ $n -lt 2 ]
+		then
+			echo "${f} 文件过小，删除"
+			rm "${f}"
+			continue
+		fi
+		ffmpeg -i "${f}" -y -vcodec copy -acodec copy -flvflags add_keyframe_index  "waitting${f}"
+		m=$(du -sm "waitting${f}" | awk '{print $1}')
+		sum=$(($n-$m))
+		echo "原：$n 新：$m"
+		echo "文件大小误差$sum m"
+		if [ $sum -lt 7 ]
+		then
+			mv "waitting${f}" ${f}
+		else
+			rm "waitting${f}"
+		fi
+		echo "${f}转换完成"	
 		OLD_IFS="$IFS" 
 		IFS="-" 
 		arr=($f) 
@@ -60,6 +74,13 @@ for f in *.mp4
 do
 	if [ ${f} != "*.mp4" ]
 	then
+		n=$(du -sm ${f} | awk '{print $1}')
+                if [ $n -lt 2 ]
+		then
+                        echo "${f} 文件过小，删除"
+                        rm ${f}
+                        continue
+                fi
 		OLD_IFS="$IFS"
 		IFS="-"
 		arr=($f)

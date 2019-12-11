@@ -434,7 +434,7 @@ class Room():
                         self.sUrl = self.curl
                     with requests.get(self.sUrl,stream = True,timeout = timeout,headers=headers,proxies=proxies) as r:
                         if r.status_code == 200:
-                            for chunk in r.iter_content(chunk_size=1024*8):
+                            for chunk in r.iter_content(chunk_size=1024):
                                 if chunk:
                                     yield chunk
                                 else:
@@ -451,10 +451,10 @@ class Room():
                         break
             if not 'r' in locals():
                 print('url 未接通')
-                yield False
+                yield None
             if r.status_code !=200:
                 print('url get error',r.status_code)
-                yield False
+                yield None
             
         sUrl = self.sUrl;
         bBuffer = ''
@@ -517,7 +517,7 @@ class Room():
         try:
             if bBuffer:
                 f1 = open(sPath, 'wb');
-                print('{} starting download from:\n{}\n    to:\n{}'.format(self.nId, sUrl, sPath));
+                print('{} starting download from:\n{}\n    to:\n{}'.format(self.nId, self.sUrl, sPath));
             if (nVerbose):
                 stream.write('\n');
             nSize = 0;
@@ -1024,8 +1024,7 @@ def newgetonline():
         '''
         sys.stdout.write('\033[F')
         sys.stdout.write('\033[F')
-        time.sleep(random.randint(0,2))
-    
+        time.sleep(2)
 def getfollow():
     global cookies
     headers ={
@@ -1105,8 +1104,7 @@ def getfollow():
         loop.close()
         thread_pool.shutdown()
         _process_pool.shutdown()
-        time.sleep(random.randint(0,3))
-    
+        time.sleep(3)
 
 async def get_spider(i,loop,thread_pool,f2,uids,_process_pool,s):
     rurl = 'http://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid={}'.format(i)
@@ -1161,6 +1159,8 @@ def get_header(data,f2,uids,i):
 def check_useful():
     global allips
     print('检查可用ip')
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     while True:
         ips = None
         while not ips:
@@ -1170,15 +1170,16 @@ def check_useful():
             except:
                 time.sleep(0.1)
         allips = ips
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
         while allips:
-            for i in range(10):
+            if len(allips)>10:
+                num=10
+            else:
+                num=len(allips)
+            for i in range(num):
                 tasks = [asyncio.ensure_future(test())]
             loop.run_until_complete(asyncio.wait(tasks))
             sys.stdout.write("\r\033[Kip:"+str(len(streamip))+" 剩余:"+str(len(allips)))
-        loop.close()
-        time.sleep(10)
+        time.sleep(20)
 async def test():
     if not allips:
         return
@@ -1220,7 +1221,7 @@ async def test():
                             else:
                                 return
                             try:
-                                async with session.get(surl,headers=headers,proxy=proxy,timeout = 5,allow_redirects = False) as r:
+                                async with session.get(surl,headers=headers,proxy=proxy,timeout = 5) as r:
                                     if r.status == 200 or r.status ==302:
                                         nogood = 0
                                     else:
@@ -1303,22 +1304,26 @@ def parseArg():
 def getcookies():
     global cookies
     global access_key
-    os.system("python3.6 bilibili.py")
-    try:
-        config = toml.load('config.toml')
-    except:
-        print("无法加载config")
-        return
-    line = config['user']['account'].splitlines()[0]
-    pairs={}
-    for pair in line.strip(";").split(";"):
-        if len(pair.split("=")) == 2:
-            key, value = pair.split("=")
-            pairs[key] = value
-    cookie = all(key in pairs for key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])
-    cookies={'cookie':";".join(f"{key}={value}" for key, value in pairs.items() if key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])}
-    access_key = pairs['access_token']
-    return cookies
+    while 1:
+        try:
+            os.system("python3 bilibili.py")
+            try:
+                config = toml.load('config.toml')
+            except:
+                print("无法加载config")
+                return
+            line = config['user']['account'].splitlines()[0]
+            pairs={}
+            for pair in line.strip(";").split(";"):
+                if len(pair.split("=")) == 2:
+                    key, value = pair.split("=")
+                    pairs[key] = value
+            cookie = all(key in pairs for key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])
+            cookies={'cookie':";".join(f"{key}={value}" for key, value in pairs.items() if key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])}
+            access_key = pairs['access_token']
+            return cookies
+        except:
+            pass
 
 
 def main():
