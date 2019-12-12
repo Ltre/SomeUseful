@@ -424,15 +424,15 @@ class Room():
             while 1:
                 try:
                     if self.burl:
-                        proxies = 0
-                        self.sUrl = self.burl
+                        proxyg = 0
+                        sUrl = self.sUrl = self.burl
                     elif self.aurl:
-                        proxies = {'http':self.ip}
-                        self.sUrl = self.aurl
+                        proxyg = {'http':self.ip}
+                        sUrl = self.sUrl = self.aurl
                     elif self.curl:
-                        proxies = {'http':self.ip}
-                        self.sUrl = self.curl
-                    with requests.get(self.sUrl,stream = True,timeout = timeout,headers=headers,proxies=proxies) as r:
+                        proxyg = {'http':self.ip}
+                        sUrl = self.sUrl = self.curl
+                    with requests.get(sUrl,stream = True,timeout = timeout,headers=headers,proxies=proxyg) as r:
                         if r.status_code == 200:
                             for chunk in r.iter_content(chunk_size=1024):
                                 if chunk:

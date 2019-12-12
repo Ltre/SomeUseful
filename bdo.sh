@@ -13,15 +13,20 @@ do
 			continue
 		fi
 		ffmpeg -i "${f}" -y -vcodec copy -acodec copy -flvflags add_keyframe_index  "waitting${f}"
-		m=$(du -sm "waitting${f}" | awk '{print $1}')
-		sum=$(($n-$m))
-		echo "原：$n 新：$m"
-		echo "文件大小误差$sum m"
-		if [ $sum -lt 7 ]
+		if [ -f "waitting${f}" ]
 		then
-			mv "waitting${f}" ${f}
+			m=$(du -sm "waitting${f}" | awk '{print $1}')
+			sum=$(($n-$m))
+			echo "原：$n 新：$m"
+			echo "文件大小误差$sum m"
+			if [ $sum -lt 7 ]
+			then
+				mv "waitting${f}" ${f}
+			else
+				rm "waitting${f}"
+			fi
 		else
-			rm "waitting${f}"
+			echo "没有待转换文件"
 		fi
 		echo "${f}转换完成"	
 		OLD_IFS="$IFS" 
