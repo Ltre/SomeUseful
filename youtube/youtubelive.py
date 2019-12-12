@@ -16,6 +16,9 @@ os.system('bash t.sh')
 namelist = []
 streaming = []
 def is_streaming(names):
+    if names in namelist:
+        return
+    namelist.append(names)
     url = 'https://www.youtube.com/{}'.format(names)
     while 1:
         try:
@@ -46,8 +49,8 @@ def is_streaming(names):
             if 'title' in locals() and title in streaming:
                 streaming.remove(title)
                 del title
-            if names in streaming:
-                streaming.remove(names)
+            if names in namelist:
+                namelist.remove(names)
             sleep(randint(0,5))
 def stream_download(names,title,data):
     name=names.split('/')[-1]
@@ -103,7 +106,6 @@ def main():
             for name in f.read().splitlines():
                 if name:
                     if name not in namelist:
-                        namelist.append(name)
                         a = Thread(target = is_streaming,name = str(name),args = (name,))
                         a.start()
             sys.stdout.write('\r正在追踪的频道：{}\r\n'.format(len(namelist)))
