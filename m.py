@@ -985,7 +985,7 @@ def newgetonline():
                 print('rec',len(wanted),wanted)
                 for user in wanted:
                     room = Room(int(user),sUser=infos[user]['uname'],sTitle=infos[user]['title'],sUrl=None)#infos[user]['playurl'])
-                    thread = threading.Thread(target = checkrun,args = (room,),daemon = True)
+                    thread = threading.Thread(target = checkrun,name=infos[user]['uname'],args = (room,),daemon = True)
                     thread.start()
                     if testt == '1':
                         thread.join()
@@ -1220,6 +1220,8 @@ async def test():
                                 proxy = 0
                             else:
                                 return
+                            nogood = 0
+                            '''
                             try:
                                 async with session.get(surl,headers=headers,proxy=proxy,timeout = 5) as r:
                                     if r.status == 200 or r.status ==302:
@@ -1229,6 +1231,7 @@ async def test():
                             except Exception as e:
                                 #print(e)
                                 nogood = 1
+                            '''
                     if nogood:
                         if ip in streamip:
                             streamip.remove(ip)
@@ -1251,9 +1254,9 @@ def run():
     sUsers = USERS or '';
     aUsers = sUsers.split(',');
     #synMonitor(aIds, aUsers);
-    gf = threading.Thread(target=getfollow,daemon=True)
+    gf = threading.Thread(target=getfollow,name = "getfollow",daemon=True)
     gf.start()
-    ch_us = threading.Thread(target=check_useful,daemon=True)
+    ch_us = threading.Thread(target=check_useful,name="checkip",daemon=True)
     ch_us.start()
     newgetonline()
 

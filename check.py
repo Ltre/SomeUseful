@@ -32,7 +32,10 @@ def ck(fp1,fp2,fstr):
     sys.stdout.write("\r\033[K"+fp1+": "+fstr+" "+str(files)+"\n\r\033[K"+fp2+": "+fstr+" "+str(files2))
     sys.stdout.write("\033[A")
     if emp and hasf:
-        shutil.move(hasf,emp)
+        try:
+            shutil.move(hasf,emp)
+        except:
+            pass
         time.sleep(1)
         sys.stdout.write("\r\033[K"+hasf+" to "+emp)
     time.sleep(1)
