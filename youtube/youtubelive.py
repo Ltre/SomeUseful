@@ -20,38 +20,37 @@ def is_streaming(names):
         return
     namelist.append(names)
     url = 'https://www.youtube.com/{}'.format(names)
-    while 1:
-        try:
-            with requests.get(url,timeout = 10) as r:
-                if 'Live now' in r.text:
-                    title = re.findall(r'og:title" content="(.+)"',r.text)[0]
-                    rstr = r"[\/\\\:\*\?\"\<\>\| ]"
-                    title = re.sub(rstr, "_", title)
-                    data = re.findall('live-promo" href="(.+)" ',r.text)
-                    if data:
-                        data = data[0]
-                    r.close()
-                    if title not in streaming:
-                        streaming.append(title)
-                    else:
-                        del r,title,data
-                        return
-                    po = Process(target = stream_download,args=(names,title,data))
-                    po.start()
-                    po.join()
-                    del r,data
+    try:
+        with requests.get(url,timeout = 10) as r:
+            if 'Live now' in r.text:
+                title = re.findall(r'og:title" content="(.+)"',r.text)[0]
+                rstr = r"[\/\\\:\*\?\"\<\>\| ]"
+                title = re.sub(rstr, "_", title)
+                data = re.findall('live-promo" href="(.+)" ',r.text)
+                if data:
+                    data = data[0]
+                r.close()
+                if title not in streaming:
+                    streaming.append(title)
                 else:
-                    r.close()
-                    del r
-        except Exception as e:
-            print_exc()
-        finally:
-            if 'title' in locals() and title in streaming:
-                streaming.remove(title)
-                del title
-            if names in namelist:
-                namelist.remove(names)
-            sleep(randint(0,5))
+                    del r,title,data
+                    return
+                po = Process(target = stream_download,args=(names,title,data))
+                po.start()
+                po.join()
+                del r,data
+            else:
+                r.close()
+                del r
+    except Exception as e:
+        #print_exc()\
+        print(e)
+    finally:
+        if 'title' in locals() and title in streaming:
+            streaming.remove(title)
+            del title
+        if names in namelist:
+            namelist.remove(names)
 def stream_download(names,title,data):
     name=names.split('/')[-1]
     try:
