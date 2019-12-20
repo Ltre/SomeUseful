@@ -338,7 +338,7 @@ class Room():
         if self.sUrl:
             return True
         else:
-            print(self.nUser,"开始未能获得url，用备用方法获取")
+            print(self.sUser,"开始未能获得url，用备用方法获取")
         '''
         if self.nId == 151159:
             proxies = None
@@ -442,6 +442,9 @@ class Room():
                         else:
                             proxyg = 0
                         sUrl = self.sUrl = self.curl
+                    else:
+                        print(self.sUser,"无 url")
+                        yield None
                     with requests.get(sUrl,stream = True,timeout = timeout,headers=headers,proxies=proxyg) as r:
                         if r.status_code == 200:
                             for chunk in r.iter_content(chunk_size=1024*8):
@@ -449,6 +452,7 @@ class Room():
                                     yield chunk
                                 else:
                                     yield None
+                            '''
                             if self.burl:
                                 self.burl = 0
                             elif self.aurl:
@@ -457,6 +461,7 @@ class Room():
                                 hasproxy = 1
                             else:
                                 break
+                            '''
                         elif r.status_code == 302:
                                 self.aurl = r.headers.get("Location")
                                 self.aurlc = 1
@@ -471,6 +476,7 @@ class Room():
                                 break
                         elif r.status_code == 404:
                             if self.burl:
+                                break
                                 self.burl = 0
                             elif self.aurl:
                                 self.aurl = 0
@@ -486,6 +492,7 @@ class Room():
                             break
                     else:
                         print('newdown 的错误是',e)
+                        traceback.print_exc()
                         break
             if not 'r' in locals():
                 print('url 未接通')
@@ -1062,7 +1069,7 @@ def newgetonline():
         '''
         sys.stdout.write('\033[F')
         sys.stdout.write('\033[F')
-        time.sleep(2)
+        time.sleep(random.randint(0,2))
 def getfollow():
     global cookies
     headers ={
@@ -1132,8 +1139,8 @@ def getfollow():
             print('follow update',y-x,'s')
             sys.stdout.write('\033[F')
         except Exception as e:
-            print(fdata)
-            traceback.print_exc()
+            #print(fdata)
+            #traceback.print_exc()
             proxies ={'https':get_proxy()}#getip('国内')
             #print(e)
             print('getfollow',proxies)
@@ -1142,7 +1149,7 @@ def getfollow():
         loop.close()
         thread_pool.shutdown()
         _process_pool.shutdown()
-        time.sleep(3)
+        time.sleep(random.randint(1,3))
 
 async def get_spider(i,loop,thread_pool,f2,uids,_process_pool,s):
     rurl = 'http://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid={}'.format(i)
@@ -1196,10 +1203,13 @@ def get_header(data,f2,uids,i):
 def check_useful():
     global allips
     print('检查可用ip')
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    sem = asyncio.Semaphore(10)
     while True:
+        while len(streamip) >5:
+            sys.stdout.write("\r\033[Kip目前剩余："+str(len(streamip)))
+            time.sleep(10)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        sem = asyncio.Semaphore(10)
         ips = None
         while not ips:
             try:
@@ -1211,6 +1221,7 @@ def check_useful():
         tasks = [test(sem,ip.get('proxy')) for ip in ips]
         loop.run_until_complete(asyncio.wait(tasks))
         sys.stdout.write("\r\033[K有效ip:"+str(len(streamip))+" 总量:"+str(len(allips)))
+        loop.close()
         time.sleep(20)
 async def test(sem,ip):
     proxy = 'http://' +ip
@@ -1286,7 +1297,7 @@ def run():
     #synMonitor(aIds, aUsers);
     gf = threading.Thread(target=getfollow,name = "getfollow",daemon=True)
     gf.start()
-    ch_us = threading.Thread(target=check_useful,name="checkip",daemon=False)
+    ch_us = threading.Thread(target=check_useful,name="checkip",daemon=True)
     ch_us.start()
     newgetonline()
 
