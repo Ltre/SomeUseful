@@ -585,7 +585,7 @@ class Room():
                     #stream.write('剩余空间%.2f\n' % (available))
                     #tnumber = 0
                 if (nSize/n >= 1024 and self.nId != 151159):
-                    print('%s 大小到达限制，进行存储\n' % sPath)
+                    print('%s 大小到达限制，进行存储' % sPath)
                     if 'r' in locals():
                         print("关闭上一个链接")
                         r.close()
@@ -1203,13 +1203,13 @@ def get_header(data,f2,uids,i):
 def check_useful():
     global allips
     print('检查可用ip')
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    sem = asyncio.Semaphore(10)
     while True:
-        while len(streamip) >5:
+        while len(streamip) >1:
             sys.stdout.write("\r\033[Kip目前剩余："+str(len(streamip)))
             time.sleep(10)
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        sem = asyncio.Semaphore(10)
         ips = None
         while not ips:
             try:
@@ -1221,14 +1221,14 @@ def check_useful():
         tasks = [test(sem,ip.get('proxy')) for ip in ips]
         loop.run_until_complete(asyncio.wait(tasks))
         sys.stdout.write("\r\033[K有效ip:"+str(len(streamip))+" 总量:"+str(len(allips)))
-        loop.close()
         time.sleep(20)
 async def test(sem,ip):
     proxy = 'http://' +ip
     url = 'http://api.live.bilibili.com/room/v1/Room/playUrl?cid=279430&otype=json&platform=web&qn=4'
     try:
         async with sem:
-            async with aiohttp.ClientSession() as session:
+            conn=aiohttp.TCPConnector(verify_ssl=False)
+            async with aiohttp.ClientSession(connector=conn) as session:
                 async with session.get(url,proxy = proxy,timeout = 5) as r:
                         nogood = 1
                         if r.status == 200:
@@ -1237,6 +1237,7 @@ async def test(sem,ip):
                                 nogood = 0
                                 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Referer': 'https://live.bilibili.com/279430'}
                                 durl = rjson['data']['durl']
+                                aurl=burl=curl=0
                                 for i in durl:
                                     uurl = i['url']
                                     if 'live-bvc' in uurl:
