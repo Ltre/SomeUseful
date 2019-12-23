@@ -5,12 +5,12 @@ export PATH
 #=================================================
 #	System Required: CentOS 6/7,Debian 8/9,Ubuntu 16+
 #	Description: BBR+BBR魔改版+BBRplus+Lotserver
-#	Version: 1.2.1
+#	Version: 1.3.2
 #	Author: 千影,cx9208
 #	Blog: https://www.94ish.me/
 #=================================================
 
-sh_ver="1.2.1"
+sh_ver="1.3.2"
 github="raw.githubusercontent.com/chiakge/Linux-NetSpeed/master"
 
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
@@ -53,11 +53,12 @@ installbbr(){
 
 #安装BBRplus内核
 installbbrplus(){
-	kernel_version="4.14.91"
+	kernel_version="4.14.129-bbrplus"
 	if [[ "${release}" == "centos" ]]; then
 		wget -N --no-check-certificate https://${github}/bbrplus/${release}/${version}/kernel-${kernel_version}.rpm
 		yum install -y kernel-${kernel_version}.rpm
 		rm -f kernel-${kernel_version}.rpm
+		kernel_version="4.14.129_bbrplus" #fix a bug
 	elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
 		mkdir bbrplus && cd bbrplus
 		wget -N --no-check-certificate http://${github}/bbrplus/debian-ubuntu/${bit}/linux-headers-${kernel_version}.deb
@@ -88,21 +89,9 @@ installlot(){
 		yum install -y http://${github}/lotserver/${release}/${version}/${bit}/kernel-headers-${kernel_version}.rpm
 		yum install -y http://${github}/lotserver/${release}/${version}/${bit}/kernel-devel-${kernel_version}.rpm
 	elif [[ "${release}" == "ubuntu" ]]; then
-		mkdir bbr && cd bbr
-		wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-headers-${kernel_version}-all.deb
-		wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-headers-${kernel_version}.deb
-		wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-image-${kernel_version}.deb
-	
-		dpkg -i linux-headers-${kernel_version}-all.deb
-		dpkg -i linux-headers-${kernel_version}.deb
-		dpkg -i linux-image-${kernel_version}.deb
-		cd .. && rm -rf bbr
+		bash <(wget --no-check-certificate -qO- "http://${github}/Debian_Kernel.sh")
 	elif [[ "${release}" == "debian" ]]; then
-		mkdir bbr && cd bbr
-		wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-image-${kernel_version}.deb
-	
-		dpkg -i linux-image-${kernel_version}.deb
-		cd .. && rm -rf bbr
+		bash <(wget --no-check-certificate -qO- "http://${github}/Debian_Kernel.sh")
 	fi
 	detele_kernel
 	BBR_grub
@@ -215,13 +204,17 @@ startbbrmod_nanqinlang(){
 startlotserver(){
 	remove_all
 	if [[ "${release}" == "centos" ]]; then
-		yum install -y unzip
+		yum install ethtool
 	else
 		apt-get update
-		apt-get install -y unzip
+		apt-get install ethtool
 	fi
-	wget --no-check-certificate -O appex.sh https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh && chmod +x appex.sh && bash appex.sh install
-	rm -f appex.sh
+	bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/chiakge/lotServer/master/Install.sh) install
+	sed -i '/advinacc/d' /appex/etc/config
+	sed -i '/maxmode/d' /appex/etc/config
+	echo -e "advinacc=\"1\"
+maxmode=\"1\"">>/appex/etc/config
+	/appex/bin/lotServer.sh restart
 	start_menu
 }
 
@@ -263,9 +256,8 @@ remove_all(){
 	sed -i '/net.core.netdev_max_backlog/d' /etc/sysctl.conf
 	sed -i '/net.ipv4.tcp_timestamps/d' /etc/sysctl.conf
 	sed -i '/net.ipv4.tcp_max_orphans/d' /etc/sysctl.conf
-	if [[ -e /appex/bin/serverSpeeder.sh ]]; then
-		wget --no-check-certificate -O appex.sh https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh && chmod +x appex.sh && bash appex.sh uninstall
-		rm -f appex.sh
+	if [[ -e /appex/bin/lotServer.sh ]]; then
+		bash <(wget --no-check-certificate -qO- https://github.com/MoeClub/lotServer/raw/master/Install.sh) uninstall
 	fi
 	clear
 	echo -e "${Info}:清除加速完成。"
@@ -579,12 +571,17 @@ check_sys_Lotsever(){
 			echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
 		fi
 	elif [[ "${release}" == "debian" ]]; then
-		if [[ ${version} -ge "7" ]]; then
+		if [[ ${version} = "7" || ${version} = "8" ]]; then
 			if [[ ${bit} == "x64" ]]; then
 				kernel_version="3.16.0-4"
 				installlot
 			elif [[ ${bit} == "x32" ]]; then
 				kernel_version="3.2.0-4"
+				installlot
+			fi
+		elif [[ ${version} = "9" ]]; then
+			if [[ ${bit} == "x64" ]]; then
+				kernel_version="4.9.0-4"
 				installlot
 			fi
 		else
@@ -610,19 +607,19 @@ check_sys_Lotsever(){
 check_status(){
 	kernel_version=`uname -r | awk -F "-" '{print $1}'`
 	kernel_version_full=`uname -r`
-	if [[ ${kernel_version_full} = "4.14.91-bbrplus" ]]; then
+	if [[ ${kernel_version_full} = "4.14.129-bbrplus" ]]; then
 		kernel_status="BBRplus"
-	elif [[ ${kernel_version} = "3.10.0" || ${kernel_version} = "3.16.0" || ${kernel_version} = "3.2.0" || ${kernel_version} = "4.4.0" || ${kernel_version} = "3.13.0"  || ${kernel_version} = "2.6.32" ]]; then
+	elif [[ ${kernel_version} = "3.10.0" || ${kernel_version} = "3.16.0" || ${kernel_version} = "3.2.0" || ${kernel_version} = "4.4.0" || ${kernel_version} = "3.13.0"  || ${kernel_version} = "2.6.32" || ${kernel_version} = "4.9.0" ]]; then
 		kernel_status="Lotserver"
-	elif [[ `echo ${kernel_version} | awk -F'.' '{print $1}'` == "4" ]] && [[ `echo ${kernel_version} | awk -F'.' '{print $2}'` -ge 9 ]]; then
+	elif [[ `echo ${kernel_version} | awk -F'.' '{print $1}'` == "4" ]] && [[ `echo ${kernel_version} | awk -F'.' '{print $2}'` -ge 9 ]] || [[ `echo ${kernel_version} | awk -F'.' '{print $1}'` == "5" ]]; then
 		kernel_status="BBR"
 	else 
 		kernel_status="noinstall"
 	fi
 
 	if [[ ${kernel_status} == "Lotserver" ]]; then
-		if [[ -e /appex/bin/serverSpeeder.sh ]]; then
-			run_status=`bash /appex/bin/serverSpeeder.sh status | grep "ServerSpeeder" | awk  '{print $3}'`
+		if [[ -e /appex/bin/lotServer.sh ]]; then
+			run_status=`bash /appex/bin/lotServer.sh status | grep "LotServer" | awk  '{print $3}'`
 			if [[ ${run_status} = "running!" ]]; then
 				run_status="启动成功"
 			else 
