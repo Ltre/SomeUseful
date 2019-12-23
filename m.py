@@ -430,23 +430,26 @@ class Room():
                         proxyg = 0
                         sUrl = self.sUrl = self.burl
                         self.burl = 0
-                    elif self.aurl:
-                        if self.aurlc:
-                            proxyg = 0
-                        else:
-                            proxyg = {'http':self.ip}
-                        sUrl = self.sUrl = self.aurl
                     elif self.curl:
                         if hasproxy:
                             proxyg = {'http':self.ip}
                         else:
                             proxyg = 0
                         sUrl = self.sUrl = self.curl
+                    elif self.aurl:
+                        if self.aurlc:
+                            proxyg = 0
+                        else:
+                            proxyg = {'http':self.ip}
+                        sUrl = self.sUrl = self.aurl
                     else:
                         print(self.sUser,"无 url")
                         yield None
-                    with requests.get(sUrl,stream = True,timeout = timeout,headers=headers,proxies=proxyg) as r:
+                    with requests.get(sUrl,stream = True,timeout = timeout,headers=headers,proxies=proxyg,allow_redirects = False) as r:
                         if r.status_code == 200:
+                            if 'live-bvc' in sUrl and not self.aurlc:
+                                self.aurlc = 1
+                                continue
                             for chunk in r.iter_content(chunk_size=1024*8):
                                 if chunk:
                                     yield chunk
@@ -468,17 +471,16 @@ class Room():
                         elif r.status_code == 403:
                             if self.burl:
                                 self.burl = 0
-                            elif self.aurl:
-                                self.aurl = 0
-                            elif self.curl and not hasproxy:
-                                hasproxy = 1
+                            elif self.curl:
+                                self.curl = 0
                             else:
                                 break
                         elif r.status_code == 404:
                             if self.burl:
                                 break
                                 self.burl = 0
-                            elif self.aurl:
+                            elif self.curl:
+                                break
                                 self.aurl = 0
                             else:
                                 break
@@ -487,7 +489,7 @@ class Room():
                 except Exception as e:
                     if "timed" in str(e) or "refused" in str(e):
                         if not hasproxy:
-                            hasproxy=1
+                            break#hasproxy=1
                         else:
                             break
                     else:
@@ -1206,10 +1208,13 @@ def check_useful():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     sem = asyncio.Semaphore(10)
+    retryck = 0
     while True:
-        while len(streamip) >1:
+        while len(streamip) > 5 or retryck > 0:
             sys.stdout.write("\r\033[Kip目前剩余："+str(len(streamip)))
             time.sleep(10)
+            retryck -= 1
+        retryck = 60
         ips = None
         while not ips:
             try:
@@ -1220,7 +1225,12 @@ def check_useful():
         allips = ips
         tasks = [test(sem,ip.get('proxy')) for ip in ips]
         loop.run_until_complete(asyncio.wait(tasks))
-        sys.stdout.write("\r\033[K有效ip:"+str(len(streamip))+" 总量:"+str(len(allips)))
+        ipnum = len(streamip)
+        if ipnum <= 5:
+            subject = "bilibili"
+            contents = "有效ip只有{}个,建议检查".format(ipnum)
+            send_mail(subject,contents,password)
+        sys.stdout.write("\r\033[K有效ip:"+str(ipnum)+" 总量:"+str(len(allips)))
         time.sleep(20)
 async def test(sem,ip):
     proxy = 'http://' +ip
