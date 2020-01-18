@@ -7,6 +7,8 @@ from requests.utils import dict_from_cookiejar
 from streamlink.stream import RTMPStream
 import http.cookiejar as cj
 import livestreamer
+if not os.path.exists('/root/b/d/fc2'):
+    os.makedirs('/root/b/d/fc2')
 os.system('cd /root/u;bash fct.sh')
 
 users = []

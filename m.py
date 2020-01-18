@@ -18,15 +18,15 @@ from urllib.request import urlopen#, Request
 import time
 import io
 import socket
+socket.setdefaulttimeout(10)
 import subprocess
 import argparse
 import http.client
 import configparser,traceback
 from mail import send_mail
 import toml
-import aiohttp
 import gc
-
+import queue as Queue
 password = input('password:')
 testt = input('test?')
 ROOMS = '';
@@ -220,6 +220,7 @@ class Room():
         self.sUrl = sUrl;
         self.burl = None;
         self.curl = None;
+        self.durl = None
         self.sTitle = sTitle;
         self.sUser = sUser;
         self.sStatus = None;
@@ -231,6 +232,7 @@ class Room():
         self.ex = 0;
         self.urlopen = None;
         self.ip = None
+        self.time = 0
         #print({key: value for key, value in vars(self).items() if not key.startswith('_') and value});
     def getRoomByUser(self):
         assert self.nUser;
@@ -333,7 +335,8 @@ class Room():
         #    return sUrl;
         #else:
         #    return False;
-        global sApi8#,selectip
+        global sApi8#selectip
+        self.time = time.time()
         trytimes = 10
         if self.sUrl:
             return True
@@ -364,6 +367,7 @@ class Room():
                         raise Exception("调用出错")
                     #mData = json.loads(sData);
                     durl = mData['durl']
+                    n = 0
                     for i in durl:
                         url = i['url']
                         if 'live-bvc' in url:
@@ -372,6 +376,11 @@ class Room():
                             self.burl = url
                         elif 'live-txy' in url:
                             self.curl = url
+                        elif 'live-ws' in url:
+                            self.durl = url
+                            n+=1
+                    if n == len(durl):
+                        raise "live-ws"
                     self.ip = selectip
                         
                     print(self.sUser,"获取url成功")
@@ -389,7 +398,6 @@ class Room():
                     streamip.remove(selectip)
                 #traceback.print_exc()
                 trytimes -=1
-                time.sleep(0.1)
                 #prepare(self,'国内')
             #mData = json.loads(sData);
         return False
@@ -435,13 +443,19 @@ class Room():
                             proxyg = {'http':self.ip}
                         else:
                             proxyg = 0
-                        sUrl = self.sUrl = self.curl
+                        sUrl = self.sUrl = self.curl 
                     elif self.aurl:
                         if self.aurlc:
                             proxyg = 0
                         else:
                             proxyg = {'http':self.ip}
                         sUrl = self.sUrl = self.aurl
+                    elif self.durl:
+                        if hasproxy:
+                            proxyg = {'http':self.ip}
+                        else:
+                            proxyg = 0
+                        sUrl = self.sUrl = self.durl
                     else:
                         print(self.sUser,"无 url")
                         yield None
@@ -470,9 +484,26 @@ class Room():
                                 self.aurlc = 1
                         elif r.status_code == 403:
                             if self.burl:
+                                print(self.burl,' 403')
                                 self.burl = 0
                             elif self.curl:
-                                self.curl = 0
+                                if not hasproxy:
+                                    hasproxy = 1
+                                    print(self.sUser,'使用代理')
+                                else:
+                                    print(self.curl,' 403')
+                                    self.curl = 0
+                                    if self.ip in streamip:
+                                        streamip.remove(self.ip)
+                            elif self.durl:
+                                if not hasproxy:
+                                    hasproxy = 1
+                                    print(self.sUser,'使用代理')
+                                else:
+                                    print(self.durl,' 403')
+                                    self.durl = 0
+                                    if self.ip in streamip:
+                                        streamip.remove(self.ip)
                             else:
                                 break
                         elif r.status_code == 404:
@@ -500,7 +531,7 @@ class Room():
                 print('url 未接通')
                 yield None
             if r.status_code !=200:
-                print('url get error',r.status_code)
+                print(sUrl.split('com')[0],' get error',r.status_code)
                 yield None
             
         sUrl = self.sUrl;
@@ -564,7 +595,8 @@ class Room():
         try:
             if bBuffer:
                 f1 = open(sPath, 'wb');
-                print('{} starting download from:\n{}\n    to:\n{}'.format(self.nId, self.sUrl, sPath));
+                self.time = round(time.time()-self.time,2)
+                print('sec[{}]'.format(self.time),'{} starting download from:\n{}\n    to:\n{}'.format(self.nId, self.sUrl, sPath));
             if (nVerbose):
                 stream.write('\n');
             nSize = 0;
@@ -923,7 +955,7 @@ def checkrun(room):
         return
     recording.append(str(room.nRoom))
     #x = 1
-    prepare(room)
+    #prepare(room)
     isOn = (room.getInfo() == 'on');
     display('id: {}\nUser: {}\nroom: {}\nstatus: {}\n'.format(room.nId, room.sUser, room.sTitle, room.sStatus))
     '''
@@ -1090,7 +1122,11 @@ def getfollow():
     s.keep_alive = False
     s.headers.update(headers)
     s.cookies.update(cookies)
-    proxies = None
+    if streamip:
+        ip = random.choice(streamip)
+    else:
+        ip = None
+    proxies = {'http':ip}
     while True:
         try:
             curl='http://api.bilibili.com/x/relation/tags'
@@ -1143,7 +1179,11 @@ def getfollow():
         except Exception as e:
             #print(fdata)
             #traceback.print_exc()
-            proxies ={'https':get_proxy()}#getip('国内')
+            if streamip:
+                ip = random.choice(streamip)
+            else:
+                ip = get_proxy()
+            proxies ={'http':ip}
             #print(e)
             print('getfollow',proxies)
         if 'f2' in locals():
@@ -1205,14 +1245,16 @@ def get_header(data,f2,uids,i):
 def check_useful():
     global allips
     print('检查可用ip')
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    sem = asyncio.Semaphore(10)
+    queue = Queue.Queue()
+    for i in range(50):
+        t = mythread(queue)
+        t.setDaemon(True)
+        t.start()
     retryck = 0
     while True:
-        while len(streamip) > 5 or retryck > 0:
+        while len(streamip) > 10 or retryck > 0:
             sys.stdout.write("\r\033[Kip目前剩余："+str(len(streamip)))
-            time.sleep(10)
+            time.sleep(5)
             retryck -= 1
         retryck = 60
         ips = None
@@ -1223,80 +1265,52 @@ def check_useful():
             except:
                 time.sleep(0.1)
         allips = ips
-        tasks = [test(sem,ip.get('proxy')) for ip in ips]
-        loop.run_until_complete(asyncio.wait(tasks))
+        for ip in ips:
+            queue.put(ip.get('proxy'))
+        queue.join()
         ipnum = len(streamip)
         if ipnum <= 5:
+            continue
             subject = "bilibili"
             contents = "有效ip只有{}个,建议检查".format(ipnum)
             send_mail(subject,contents,password)
         sys.stdout.write("\r\033[K有效ip:"+str(ipnum)+" 总量:"+str(len(allips)))
-        time.sleep(20)
-async def test(sem,ip):
-    proxy = 'http://' +ip
-    url = 'http://api.live.bilibili.com/room/v1/Room/playUrl?cid=279430&otype=json&platform=web&qn=4'
-    try:
-        async with sem:
-            conn=aiohttp.TCPConnector(verify_ssl=False)
-            async with aiohttp.ClientSession(connector=conn) as session:
-                async with session.get(url,proxy = proxy,timeout = 5) as r:
+        #time.sleep(20)
+
+class mythread(threading.Thread):
+    def __init__(self,queue):
+        threading.Thread.__init__(self)
+        self.queue=queue
+    def run(self):
+        url = 'http://api.live.bilibili.com/room/v1/Room/playUrl?cid=279430&otype=json&platform=web&qn=4'
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Referer': 'https://live.bilibili.com/279430'}
+        while 1:
+            iip = self.queue.get()
+            #print(self.queue.qsize(),iip)
+            proxies = {'http':iip}
+            try:
+                nogood=1
+                r = requests.get(url,headers=headers,proxies = proxies,timeout = (3,5),allow_redirects=False)
+                rjson = r.json()
+                if rjson['data']['accept_quality']:
+                    nogood = 0
+                    durl = str(rjson['data']['durl'])
+                    if 'live-ws' in durl:
                         nogood = 1
-                        if r.status == 200:
-                            rjson = await r.json()
-                            if rjson['data']['accept_quality']:
-                                nogood = 0
-                                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Referer': 'https://live.bilibili.com/279430'}
-                                durl = rjson['data']['durl']
-                                aurl=burl=curl=0
-                                for i in durl:
-                                    uurl = i['url']
-                                    if 'live-bvc' in uurl:
-                                        aurl = uurl
-                                    elif 'live-js' in uurl:
-                                        burl = uurl
-                                    elif 'live-txy' in uurl:
-                                        curl = uurl 
-                                if aurl:
-                                    surl = aurl
-                                    if r.status ==302:
-                                        proxy = 0
-                                    else:
-                                        proxy = 'http://'+ ip
-                                    aurl = 0
-                                elif curl:
-                                    surl = curl
-                                    curl = 0
-                                    proxy = 'http://' + ip
-                                elif burl:
-                                    surl = burl
-                                    proxy = 0
-                                else:
-                                    return
-                                nogood = 0
-                                '''
-                                try:
-                                    async with session.get(surl,headers=headers,proxy=proxy,timeout = 5) as r:
-                                        if r.status == 200 or r.status ==302:
-                                            nogood = 0
-                                        else:
-                                            nogood = 1
-                                except Exception as e:
-                                    #print(e)
-                                    nogood = 1
-                                '''
-                        if nogood:
-                            if ip in streamip:
-                                streamip.remove(ip)
-                        else:
-                            if not ip in streamip:
-                                streamip.append(ip)
-    except :
-        #print(e)
-        if ip in streamip:
-            streamip.remove(ip)
-    finally:
-        if 'r' in locals():
-            r.close()
+                if nogood:
+                    if iip in streamip:
+                        streamip.remove(iip)
+                else:
+                    if not iip in streamip:
+                        streamip.append(iip)
+            except Exception as e:
+                #print(e)
+                if iip in streamip:
+                    streamip.remove(iip)
+            finally:
+                if 'r' in locals():
+                    r.close()
+                self.queue.task_done()
 
 def run():
     global ROOMS

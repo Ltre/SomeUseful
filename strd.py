@@ -23,7 +23,9 @@ ss.keep_alive = False
 islogin = 0
 sended = 0
 dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_did=8242408a3b65feb390623d6c00081501; PHPSESSID=tgvun5c1ci6c3ltnt7s1okkgc4; acf_auth=a3ecVlfGOE71GvSS26fxTjpC0g2rpMvwCuyrPEAy%2BfoWUaTL6sDxmROq3AFY3NzP5hPaMctHzoVucMxtZwx1I2vjdCExw7r7IzfyTMh8VGMldrKDfVhJVfseCuuM; wan_auth37wan=e055eff5b144Id8mxDNxZ5PDOrybYQkr8CSHWmP92V%2FtpUNgjRRfcXeR4YInW2os3cNzjH04cZNauAFh9dyNkHcfE1HV%2FKP64R05tCA8uXzxrIZz; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=45649574; acf_biz=1; acf_stk=68f690a62d404465; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1569768125,1569768354,1570418236,1570418291; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570418291"}
-hcookies = {'Cookie':'SoundValue=0.50; alphaValue=0.80; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; first_username_flag=35184377273454hy_first_1; isInLiveRoom=; sdid=; udb_origin=1; udb_other=%7B%22lt%22%3A%221575720558319%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; udb_accdata=0017743250239; udb_biztoken=AQB94SUwJZ9e3W0BSGexEQ_wPasnjbqVcALG2l3EY6BnicfSXN-2O5aWW5jt8nlY9slXUcwNm2IZMMeDIJfnL-BR5pTrjBn7NSYa3r5Y31eMBBozvl2a_DszFFL8Jy4EGTVWTUE48-BpMri8eOC7G9099u3E9VlZgsqC_tQicU7_VgWNOt543r1QZztmvjksJftoyuExuC4R-xuJzx8JFsHQCE3rHPLGV671Mq9TIrSPoeiWmRXnCawrmsUKrtsmVV06An9ei7SnhppuFKf0gzytCK-SNYtZy8yejyOlsv6D4o33fvwwmmQXxjoJiaKr2jx3OHlbMMr2ZQAygGfeWvGk; PHPSESSID=l79p1h5r40m5lanoc6sd05gbe5; __yasmid=0.5630173980060627; __yaoldyyuid=1199513272235; _yasids=__rootsid%3DC8B8540361C00001C6ACB26072B050D0; undefined=undefined; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1575720496,1576387984,1576679026,1576732023; h_unt=1576732024; udb_passdata=3; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1576732030'}
+hcookies = {"Cookie":
+        "SoundValue=0.50; alphaValue=0.80; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; first_username_flag=35184377273454hy_first_1; isInLiveRoom=; udb_accdata=undefined; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1576679026,1576732023,1577338814,1577958774; PHPSESSID=d2k1ovl0fauakmlbl44fg2g2t3; __yasmid=0.5630173980060627; udb_passdata=3; web_qrlogin_confirm_id=52c78657-d4d0-4b1e-9306-6d13f312ebb3; sdid=; udb_uid=1199513272235; yyuid=1199513272235; udb_passport=35184377273454hy; username=35184377273454hy; udb_version=1.0; udb_biztoken=AQBZ7vrqUpXWos8q2M0OU89zsElWoiKbHYJBNByB5SKLKpII2Yjl_FVHiIb5UjU155-ib8DuS17qiQ07PDq6kP3ngrW09uO0RZLxhd-MOO0poNLYKSsaFll9moVtWJBz8IUGJICkEHaoDdksxnU-HpheU595n4JrP9lccGwHYC14sX3UMbTqcueYeRDriHXzqddTSUsHLk6cKFrG_8E7cdZkGZ_yf-A65QDhKPxnzWZTv-mcyNWyb4fx5rsFufCgvH6U1kzuomneAaulRRVQyzlsAanVrWcO2bCJdAHh7lv5f2-sSVss-O-Lg1EtCrVEPu_MJ7XFdG0cHb-hHOrCA6Y0; udb_origin=0; udb_status=1; __yaoldyyuid=1199513272235; _yasids=__rootsid%3DC8BFDC03906000011AE01CFAB4004CC0; undefined=undefined; h_unt=1578753678; rep_cnt=5"
+        }
 def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
 
@@ -158,71 +160,26 @@ def gethtml(s,url):
     res.close()
     return res.json()
         
-def huyastatus(hs,thread_pool=None):
+def huyastatus(hs,name,thread_pool=None):
     global islogin
     global hcookies
     global sended
+    url = 'https://www.huya.com/'+name
     try:
-        if not islogin:
-            check_url = 'http://i.huya.com/udb_web/udbport2.php?m=HuyaHome&do=checkLogin'
-            check_headers = {"Accept":"application/json, text/javascript, */*; q=0.01","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"http//i.huya.com/","Accept-Language":"zh-cn"}
-            r = requests.get(check_url,headers=check_headers,cookies = hcookies,timeout = 10)
-            r.close()
-            result = r.json()
-            check = 1#result['isLogined']
-            if not check:
-                login_url = 'https://udblgn.huya.com/web/v2/passwordLogin'
-                headers = {"reqid":"71806290","Accept":"*/*","uri":"30001","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","lcid":"2052","Accept-Language":"zh-cn","Accept-Encoding":"br, gzip, deflate","Content-Type":"application/json;charset=UTF-8","Origin":"https//udblgn.huya.com","User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.0 Safari/534.20 QBWebViewUA/2 QBWebViewType/1 WKType/1","Referer":"https//udblgn.huya.com/web/middle/2.4/71782117/https/0bbad9f2e2cf4e1a991053879674cda8","Content-Length":"572","Connection":"close"}
-                pas ={"uri":"30001","version":"2.4","context":"WB-0bbad9f2e2cf4e1a991053879674cda8-C8950E7EEEF00001BCF21A109C1F1A14-","appId":"5002","smid":"","lcid":"2052","byPass":"3","sdid":"71782117","requestId":"71806290","data":{"userName":"15671674441","password":"0e1227966b501baf9c03cb7269f2492d5de60202","domainList":"","remember":"1","behavior":"%5B%7B%22page.login%22%3A%220.028%22%7D%2C%7B%22input.l.account%22%3A%222.625%22%7D%2C%7B%22input.l.passwd%22%3A%2212.949%22%7D%2C%7B%22button.UDBSdkLogin%22%3A%2224.181%2C170%2C228%22%7D%5D","randomStr":"","page":"http://i.huya.com/"}}
-                data = json.dumps(pas)
-                se = requests.session()
-                se.headers.update(headers)
-                r = se.post(login_url,data = data,timeout = 10)
-                r.close()
-                se.close()
-                if '进一步认证' in r.text or "未登录" in r.text:
-                    if not sended:
-                        subject = '虎牙需要验证'
-                        contents=r.json()['data']['strategys'][0]['data']
-                        send_mail(subject,contents,password)
-                        sended = 1
-                    time.sleep(10)
-                    raise Exception("error")
-                sended = 0
-                islogin = 1
-                hcookies = se.cookies
-
-        url = 'https://fw.huya.com/dispatch?do=subscribeList&uid=1199513272235&page=1&pageSize=1000'
-        '''
-        hcookies={
-                'Cookie': 
-                'udb_passdata=3; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1568030182; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606,1567927137,1568029853; __yaoldyyuid=; _yasids=__rootsid%3DC897E8EEA9100001AC58140969401BD9; h_unt=1568029853; __yasmid=0.16792272486884974; udb_accdata=15671674441; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974'
-                #'__yaoldyyuid=1199513272235; _yasids=__rootsid%3DC8974FE151100001F5BC5CE021CE8530; undefined=undefined; udb_accdata=15671674441; udb_biztoken=AQAE1MwneVM1gFBX2rT5xIArj05wUcCZogFkV-0O2OC6AhRZjf420byWLTlZjtls3oBLTax_r1zlXgroGYC6mYMjkdYQ3jo2AE8Ejc2Zy7ifF_57kHxpHuZXikRyXdsXc-1i1rlehnzvDHo8YYkrpvwJLzZ6kr2ujdvfAY_ut8p2ZTxMkxJNdgeah-7ImxNPnAqSkfcx2-hjWJ9eIKjhRJNswE0sWoEJuRu9MFA19YwXRgUha0o9X39H_GVofCNEngnlC7tmbsPAmzfrDurUEqsPIlhTgujTNfdZLslXGlYX37Jo5enp_QnAZXw_UEPRMbmoDtbl5blUfme7dW9E_0oM; udb_origin=1; udb_other=%7B%22lt%22%3A%221567869658681%22%2C%22isRem%22%3A%221%22%7D; udb_passport=35184377273454hy; udb_status=1; udb_uid=1199513272235; udb_version=1.0; username=35184377273454hy; yyuid=1199513272235; Hm_lpvt_51700b6c722f5bb4cf39906a596ea41f=1567869606; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1567264276,1567869606; __yasmid=0.16792272486884974; udb_passdata=3; PHPSESSID=afs88vfr8coe6led6cajbl67k7; first_username_flag=35184377273454hy_first_1; udb_guiddata=0bbad9f2e2cf4e1a991053879674cda8; __yamid_new=C8950E7EEEF00001BCF21A109C1F1A14; __yamid_tt1=0.16792272486884974'
-                }
-        '''
-        hs.cookies.update(hcookies)
-
-        #json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,hs,url))
-        rjson = gethtml(hs,url)
-        if not rjson.get('result'):
-            print(rjson)
-        else:
-            data = rjson['result']
-            dlist = data['list']
-            liveCount = data['liveCount']
-            livecheck = 0
-            for i in dlist:
-                if i['isLive']:
-                    livecheck+=1
-                    if i['profileRoom'] not in hrecording:
-                        down = threading.Thread(target=huyad,args=('huya',i['profileRoom'],),name=str(i['nick']),daemon=True)
+        with hs.get(url,timeout=10) as r:
+            html = r.text
+            if '哎呀，虎牙君找不到这个主播' in html:
+                print(name,'不存在')
+            else:
+                isOn = re.findall(r'\"isOn\":(.+?),',html)[0]
+                if isOn == 'true':
+                    if name not in hrecording:
+                        down = threading.Thread(target=huyad,args=('huya',name,),name=name+'record',daemon=True)
                         down.start()
-                    if livecheck>=liveCount:
-                        break
     except:
         traceback.print_exc()
         islogin = 0
-        print('虎牙登录结束')
+        print(name,'出错')
         '''
         try:
             if '未登录' in str(json):
@@ -235,9 +192,8 @@ def huyastatus(hs,thread_pool=None):
             print('虎牙错误检测出错')
         '''
     finally:
-        if "huya" in status:
-            status.remove("huya")
-        sys.stdout.write('\rhuya刷新\n')
+        if name in status:
+            status.remove(name)
     '''
     if room.thread and room.thread.isAlive():
         return
@@ -459,6 +415,7 @@ def main():
     hs = requests.session()
     hs.headers.update(hheaders)
     while True:
+        namelist = open('huser.txt').read().splitlines()
         #tasks1 = [douyustatus(loop,ds,thread_pool)]
         #tasks2 = [huyastatus(loop,hs,thread_pool)]
         #tasks = tasks1+tasks2
@@ -467,10 +424,12 @@ def main():
             status.append("douyu")
             douyu_status = threading.Thread(target=douyustatus,args=(ds,),name=douyustatus)
             douyu_status.start()
-        if 'huya' not in status:
-            status.append("huya")
-            huya_status = threading.Thread(target=huyastatus,args=(hs,),name=huyastatus)
-            huya_status.start()
+        for name in namelist:
+            if name not in hrecording:
+                if name not in status:
+                    status.append(name)
+                    huya_status = threading.Thread(target=huyastatus,args=(hs,name,),name=name)
+                    huya_status.start()
         sys.stdout.write("\r  update") 
         time.sleep(random.randint(0,5))
     

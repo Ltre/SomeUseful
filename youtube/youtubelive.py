@@ -10,18 +10,29 @@ import requests,re,shutil
 from traceback import print_exc
 import subprocess
 import gc
+import random
 #import tracemalloc
 #tracemalloc.start()
 os.system('bash t.sh')
 namelist = []
 streaming = []
+iplist = []
+def getip():
+    r = requests.get("http://127.0.0.1:5010/get_all/")
+    data = r.json()
+    for i in data:
+        iplist.append(i.get("proxy"))
+def delete_proxy(proxy):
+        requests.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
 def is_streaming(names):
     if names in namelist:
         return
     namelist.append(names)
+    proxy = iplist[random.randint(0,len(iplist) - 1)]
+    proxies = {'https':proxy}
     url = 'https://www.youtube.com/{}'.format(names)
     try:
-        with requests.get(url,timeout = 10) as r:
+        with requests.get(url,proxies = proxies,timeout = 5) as r:
             if 'Live now' in r.text:
                 title = re.findall(r'og:title" content="(.+)"',r.text)[0]
                 rstr = r"[\/\\\:\*\?\"\<\>\| ]"
@@ -44,7 +55,9 @@ def is_streaming(names):
                 del r
     except Exception as e:
         #print_exc()\
-        print(e)
+        #print(e)
+        if proxy in iplist:
+            iplist.remove(proxy)
     finally:
         if 'title' in locals() and title in streaming:
             streaming.remove(title)
@@ -101,20 +114,23 @@ def stream_download(names,title,data):
 
 def main():
     while 1:
+        if len(iplist) <10:
+            getip()
         with open('youtube_names.txt','r') as f:
             for name in f.read().splitlines():
                 if name:
                     if name not in namelist:
-                        a = Thread(target = is_streaming,name = str(name),args = (name,))
+                        a = Thread(target = is_streaming,name = str(name),args = (name,),daemon = True)
                         a.start()
-            sys.stdout.write('\r正在追踪的频道：{}\r\n'.format(len(namelist)))
-            sys.stdout.write('\r正在直播的频道：{}\r\n'.format(streaming))
+            sys.stdout.write('\r\033[K正在追踪的频道：{}\r\n'.format(len(namelist)))
+            sys.stdout.write('\r\033[K正在直播的频道：{}\r\n'.format(streaming))
             #snapshot = tracemalloc.take_snapshot()
             #top_stats = snapshot.statistics('lineno')
             #for stat in top_stats[:5]:
             #        print(stat)
             gc.collect()
             sys.stdout.write('\033[2A')
+        sys.stdout.write('{}'.format(len(iplist)))
         sys.stdout.flush()
         sleep(5)
     

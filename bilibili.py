@@ -43,6 +43,7 @@ __version__ = "2019.3.13"
 
 class Bilibili():
     app_key = "1d8b6e7d45233436"
+    app_key = "4409e2ce8ffd12b8"
     #app_key = "27eb53fc9058f8c3"
     patterns = {
         'video': {
@@ -94,6 +95,7 @@ class Bilibili():
         print(f"[{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}][{self.username if self.username else '#' + self.get_uid() if self.get_uid() else ''}] {message}")
 
     def _requests(self, method, url, decode_level=2, enable_proxy=True, retry=10, timeout=15, **kwargs):
+        #self.set_proxy()
         if method in ["get", "post"]:
             for _ in range(retry + 1):
                 try:
@@ -113,6 +115,7 @@ class Bilibili():
     @staticmethod
     def calc_sign(param):
         salt = "560c52ccd288fed045859ed18bffd973"
+        salt = "59b43e04ad6965f34319062b478f83dd"
         sign_hash = hashlib.md5()
         sign_hash.update(f"{param}{salt}".encode())
         return sign_hash.hexdigest()
@@ -125,7 +128,7 @@ class Bilibili():
         if self.proxy_pool:
             proxy = random.sample(self.proxy_pool, 1)[0]
             self.proxy = {self.protocol: f"{self.protocol}://{proxy}"}
-            # self._log(f"使用{self.protocol.upper()}代理: {proxy}")
+            self._log(f"使用{self.protocol.upper()}代理: {proxy}")
         else:
             self.proxy = None
         return self.proxy

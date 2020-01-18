@@ -1,2 +1,7 @@
 #/bin/bash
-apt -y install git python3-pip ;git clone https://github.com/Miloxing/ChaturbateRecorder.git cr; cd cr; vim config/con*
+name=milooo
+folder=milo
+echo "${name}"
+
+sed -i '4i\name='${name}'' autoupload.sh
+sed -i '4i\folder='${folder}'' autoupload.sh

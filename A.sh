@@ -21,7 +21,9 @@ Error="${Red}[Error]${Font}"
 #folder
 nginx_conf_dir="/etc/nginx/conf.d"
 aria2ng_new_ver="0.3.0"
+aria2ng_new_ver="1.1.4"
 aria2ng_download_http="https://github.com/mayswind/AriaNg/releases/download/${aria2ng_new_ver}/aria-ng-${aria2ng_new_ver}.zip"
+aria2ng_download_http="https://github.com/mayswind/AriaNg/releases/download/${aria2ng_new_ver}/AriaNg-${aria2ng_new_ver}.zip"
 aria2_new_ver=$(wget -qO- "https://github.com/q3aql/aria2-static-builds/tags"| grep "/q3aql/aria2-static-builds/releases/tag/"| head -n 1| awk -F "/tag/v" '{print $2}'| sed 's/\">//') && echo -e "${aria2_new_ver}"
 
 
@@ -266,7 +268,7 @@ DirectoryLister_install(){
 	mkdir Cloud
 }
 aria2ng_install(){
-    mkdir -p /home/wwwroot/${domain2} && cd /home/wwwroot/${domain2} && wget ${aria2ng_download_http} && unzip aria-ng-${aria2ng_new_ver}.zip
+    mkdir -p /home/wwwroot/${domain2} && cd /home/wwwroot/${domain2} && wget ${aria2ng_download_http} && unzip AriaNg-${aria2ng_new_ver}.zip
 	if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} AriaNg 下载成功 ${Font}"
         sleep 1
@@ -330,21 +332,20 @@ echo -e "${GreenBG} 开始安装Aria2 ${Font}"
 apt-get install build-essential cron -y
 cd /root
 mkdir Download
-#wget -N --no-check-certificate "https://github.com/q3aql/aria2-static-builds/releases/download/v${aria2_new_ver}/aria2-${aria2_new_ver}-linux-gnu-${KernelBit}bit-build1.tar.bz2"
-#Aria2_Name="aria2-${aria2_new_ver}-linux-gnu-${KernelBit}bit-build1"
-#tar jxvf "${Aria2_Name}.tar.bz2"
-#mv "${Aria2_Name}" "aria2"
-
-git clone "https://github.com/Miloxing/aria2.git"
+wget -N --no-check-certificate "https://github.com/q3aql/aria2-static-builds/releases/download/v${aria2_new_ver}/aria2-${aria2_new_ver}-linux-gnu-${KernelBit}bit-build1.tar.bz2"
+Aria2_Name="aria2-${aria2_new_ver}-linux-gnu-${KernelBit}bit-build1"
+tar jxvf "${Aria2_Name}.tar.bz2"
+mv "${Aria2_Name}" "aria2"
+#git clone "https://github.com/Miloxing/aria2.git"
 
 cd "aria2/"
 
 apt-get update
 apt-get install libgnutls28-dev nettle-dev libgmp-dev libssh2-1-dev libc-ares-dev libxml2-dev zlib1g-dev libsqlite3-dev pkg-config libcppunit-dev autoconf automake autotools-dev autopoint libtool git gcc g++ libxml2-dev make quilt
-autoreconf -i
+#autoreconf -i
 #autoconf configure.ac
-./configure
-make
+#./configure
+#make
 
 sudo make install
 cd /root
