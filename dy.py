@@ -12,8 +12,6 @@ url = 'https://aweme.snssdk.com/aweme/v1/life/feed/?version_code=7.9.0&pass-regi
 headers = {"x-Tt-Token":"009eb6296810343ae341cb7841294dabcad389438632df3ac5d994b75eca174b3ef10c25b328e36dc06be51d9cb0b604fc1a","sdk-version":"1","User-Agent":"Aweme 7.9.0 rv","x-tt-trace-id":"00-29feca87f033b1aa8144163a3366e0e4-29feca87f033b1aa-01","Accept-Encoding":"gzip, deflate","Cookie":"sid_guard=9eb6296810343ae341cb7841294dabca%7C1567870522%7C5184000%7CWed%2C+06-Nov-2019+15%3A35%3A22+GMT; uid_tt=b58f6ed0f43b1e3f100f44d55b36d672; sid_tt=9eb6296810343ae341cb7841294dabca; sessionid=9eb6296810343ae341cb7841294dabca; odin_tt=42f64d634c20908096376178a33edbc139450b81995e83eea22255b6b1f154da54bd9b1153717dfda3cb734f25dc4b9f; install_id=85477742411; ttreq=1$10179bfdd42fe841ad94af1bed38bbc1ef93ed34","X-Khronos":"1568269877","X-Gorgon":"830099902001e24feb1a2ca41a8de732caf9abbc62fa0ab4d63a"}
 if not os.path.exists('/root/b/d/dy'):
     os.makedirs('/root/b/d/dy')
-else:
-    os.system('cd /root/b/d/dy;mv *flv /root/b/d/bu')
 class room():
     def __init__(self,nickname,url):
         self.nickname = nickname
@@ -23,6 +21,8 @@ def download(room):
     path = '/root/b/d/dy/{}/'.format(room.nickname)
     if not os.path.exists(path):
         os.makedirs(path)
+    else:
+        os.system("cd '{}';mv * /root/b/d/dy".format(path))
     filepath = path+filename
     f = open(filepath,'wb')
     try:
@@ -35,9 +35,9 @@ def download(room):
                     sys.stdout.write('\r\033[K{}  {}M'.format(filename,filesize/(1024*1024)))
                 if filesize/(1024*1024) >= 1024:
                     f.close()
-                    shutil.move(filepath,'/root/b/d/bu/bt')
-                    filename = '{}-{}-_.flv'.format(time.strftime('%y%m%d_%H%M%S'),room.nickname)
-                    filepath = '/root/b/d/dy/'+filename
+                    shutil.move(filepath,'/root/b/d/dy')
+                    filename = '{}-{}-_.flv'.format(room.nickname,time.strftime('%y%m%d_%H%M%S'))
+                    filepath = path+filename
                     f = open(filepath,'wb')
     except Exception as e:
         print(e)
