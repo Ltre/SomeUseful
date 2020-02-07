@@ -6,11 +6,12 @@ from datetime import datetime
 from requests.utils import dict_from_cookiejar
 from streamlink.stream import RTMPStream
 import http.cookiejar as cj
-import livestreamer
+import livestreamer#streamlink
 if not os.path.exists('/root/b/d/fc2'):
     os.makedirs('/root/b/d/fc2')
 os.system('cd /root/u;bash fct.sh')
-
+trytimes = input('重试次数')
+threads = input('线程数')
 users = []
 recording = []
 class FC2():
@@ -71,7 +72,7 @@ class FC2():
         }
         sys.stdout.write('\r\033[K'+str(user_id)+' get version')
         res = self.session.post(self.url_member_api, data=data,timeout=10)
-        #print(res.text)
+        #print('\r\033[K',res.text)
         #time.sleep(100)
         try:
             res_data = res.json()
@@ -83,7 +84,7 @@ class FC2():
         user_data = res_data['data']['user_data']
 
         if (channel_data['login_only'] != 0 and user_data['is_login'] != 1):
-            sys.stdout.write('\rA login is required for this stream.')
+            sys.stdout.write(f'\r\033[K{self.user_id}A login is required for this stream.')
             return 'login'
 
         if channel_data['fee'] != 0:
@@ -154,7 +155,7 @@ class FC2():
                     rdata = ws.recv()
                     data = json.loads(rdata)
                 except:
-                    print(rdata)
+                    print('\r\033[K',rdata)
                     break
                 time_utc = datetime.utcnow().strftime('%H:%M:%S UTC')
                 #if data['name'] not in ['comment', 'ng_commentq',
@@ -177,20 +178,27 @@ class FC2():
                         sys.stdout.write('\rDisconnected from Server')
                         break
                 elif data['name'] == 'publish_stop':
-                    print('Stream ended')
+                    print('\r\033[K',f'{self.user_id}Stream ended')
                     break
                 elif data['name'] == 'channel_information':
                     if data['arguments'].get('fee') != 0:
-                        print('Stream requires a fee now.'.format(
+                        print(f'\r\033[K{self.user_id}Stream requires a fee now.'.format(
                             data['arguments'].get('fee')))
+                        timewait = 0
+                        while timewait<4:
+                            if not self.end:
+                                time.sleep(5)
+                                timewait+=1
+                            else:
+                                break
                         break
                 elif data['name'] == 'media_disconnection':
                     if data.get('arguments').get('code') == 104:
-                        print('Disconnected. '
+                        print('\r\033[K','Disconnected. '
                                     'Multiple connections has been detected.')
                         break
                     elif data.get('arguments').get('code'):
-                        print('error code {0}'.format(
+                        print('\r\033[K','error code {0}'.format(
                             data['arguments']['code']))
                         break
 
@@ -200,7 +208,7 @@ class FC2():
         try:
             ws_ping()
         except:
-            print('ws_ping 出错')
+            print('\r\033[K',f'{self.user_id}ws_ping 出错')
         t2 = Thread(target=ws_recv)
         t2.daemon = True
         t2.start()
@@ -356,6 +364,7 @@ def main(test=None):
                     else:
                         a.thread=t=Thread(target=dodownload,args=(a,),name=a.user_id,daemon=True)
                         t.start()
+            sys.stdout.write(f'\r\033[K正在录制{len(recording)}')
             time.sleep(random.randint(5,10))
 
 def getfollow():
@@ -410,14 +419,14 @@ def checkuser():
                 if(sameid ==1):
                     continue
                 else:
-                    print('find new id :',i)
+                    print('\r\033[K','find new id :',i)
                     u = FC2(int(i),a)
                     u.sameid = 1
                     u.ex = 1
                     users.append(u)
         for user in users:
             if(user.ex == 0):
-                print(user.user_id,' end')
+                print('\r\033[K',user.user_id,' end')
                 users.remove(user)
                 user.sameid = 0
             user.ex = 0
@@ -434,16 +443,27 @@ def dodownload(a):
     if a.user_id in recording:
         return
     recording.append(a.user_id)
-    print(a.user_id,'start')
+    print(f'\r\033[K{a.user_id}start')
     live=a.get_streams()
     if live:
-        master=a.host_data['arguments']['playlists_middle_latency'][0]['url']
-        session = livestreamer.Livestreamer()
-        #session.set_option('http-headers','User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36')
+        playlists=a.host_data['arguments']['playlists']
+        for i in playlists:
+            if i['mode'] == 0 or i['mode']== '0':
+                print(f'\r\033[K{a.user_id}获取主列表{i["url"]}')
+                master = i['url']
+        session = livestreamer.Livestreamer()#streamlink.Streamlink()
+        if threads:
+            session.set_option('hls-segment-threads',int(threads))
+        if trytimes:
+            session.set_option('hls-segment-attempts',int(trytimes))
+        session.set_option('hls-live-edge',9999)
+        session.set_option('hls-segment-timeout',5.0)
+        session.set_option('hls-timeout',10.0)
         #cmd = ['streamlink','hls://{}'.format(master),'best','-o','/root/te/t.ts']
         #subprocess.call(cmd)
         streams = session.streams('hlsvariant://'+master)
         stream = streams["best"]
+        #print(stream.url)
         error = 0
         rstr = r"[\/\\\:\*\?\"\<\>\|\- \n]"
         oname = a.profile_data['name']
@@ -453,45 +473,44 @@ def dodownload(a):
         path = '/root/b/d/fc2/'+str(a.user_id)
         if not os.path.exists(path):
             os.makedirs(path)
+        userid = str(a.user_id)
         while(not error):
             if a.sameid == 0:
                 break
-            filename = path+'/'+str(a.user_id)+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
+            filename = path+'/'+userid+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
             if len(filename) >=130:
                 title = '_'
-                filename = path+'/'+str(a.user_id)+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
-            '''
-            #cmd = ['ffmpeg','-loglevel','quiet','-y','-i',master,'-c','copy','-fs','1073741824',filename]
-            cmd = ['ffmpeg','-y','-i',master,'-c','copy','-fs','1073741824',filename,'-loglevel','debug']
-            error=subprocess.call(cmd)
-            '''
+                filename = path+'/'+userid+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
             fs = 0
             try:
+                '''
+                cmd = ['ffmpeg','-loglevel','quiet','-y','-i',master,'-c','copy','-fs','1073741824',filename]
+                #cmd = ['ffmpeg','-y','-i',master,'-c','copy','-fs','1073741824',filename,'-loglevel','debug']
+                error=subprocess.call(cmd)
+                '''
                 fd = stream.open()
                 f = open(filename,'wb')
-                readbuffer=1024*8
-                desize = 1024*1024/8
-                while True:
-                    ddata = fd.read(readbuffer)
+                desize = 1024*1024*1024
+                while 1:
+                    ddata = fd.read(1024*8)
                     if ddata:
-                        f.write(ddata)
-                        fs+=1
-                        if fs % 100 == 0:
-                            sys.stdout.write('\r\033[K'+name+'---'+str(fs*8/1024)+'m')
+                        fs+=f.write(ddata)
+                        #if fs % 64 == 0:
+                        #    sys.stdout.write(f'\r\033[K正在录制{len(recording)}{name}{userid}---{round(fs/1024/1024,2)}m')
                         if fs>=desize:
                             fs=0
                             f.close()
-                            print(filename,'文件大小达到限制，切割')
+                            print('\r\033[K',filename,'文件大小达到限制，切割')
                             shutil.move(filename,'/root/b/d/fc2')
-                            filename = path+'/'+str(a.user_id)+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
+                            filename = path+'/'+userid+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
                             f = open(filename,'wb')
-                        ddata=fd.read(readbuffer)
                     else:
+                        print(f'{userid}停止录制')
                         break
-
+                
             except Exception as e:
-                print(e)
-                traceback.print_exc()
+                print(f'\r\033[K{a.user_id}',e)
+                #traceback.print_exc()
             finally:
                 if 'fd' in locals():
                     fd.close()
@@ -499,16 +518,22 @@ def dodownload(a):
                     f.close()
                     ff = os.path.getsize(filename)
                     if ff<=1024*100:
-                        print('文件下载失败')
+                        print('\r\033[K',f'userid文件下载失败')
                         #cmd = ['ffmpeg','-y','-i',master,'-c','copy','-fs','1073741824',filename,'-loglevel','debug']
                         #error=subprocess.call(cmd)
 
                     shutil.move(filename,'/root/b/d/fc2')
-                os.removedirs(path)
+                os.rmdir(path)
                 break
+            #'''
+            print(error)
+            break
     a.end = True
     if a.user_id in recording:
+        print(f'\r\033[K{a.user_id}从列表删除')
         recording.remove(a.user_id)
+    else:
+        print(f'\r\033[K{a.user_id}在列表中找不到{recording}')
 
             #os.system("mv '%s' /root/b/d/fc2" % filename)
 
