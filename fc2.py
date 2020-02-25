@@ -4,9 +4,9 @@ from websocket import create_connection
 import json
 from datetime import datetime
 from requests.utils import dict_from_cookiejar
-from streamlink.stream import RTMPStream
 import http.cookiejar as cj
-import livestreamer#streamlink
+from streamlink import Streamlink
+from livestreamer import Livestreamer
 if not os.path.exists('/root/b/d/fc2'):
     os.makedirs('/root/b/d/fc2')
 os.system('cd /root/u;bash fct.sh')
@@ -57,11 +57,11 @@ class FC2():
             'FCSID', 'fcu', 'fgcv', 'glgd_val',
             'login_status', 'PHPSESSID', 'secure_check_fc2',
         ]
-        count = 0
+        c_count = 0
         for c in required_cookies:
             if c in cookies_list:
-                count += 1
-        return (count == len(required_cookies))
+                c_count += 1
+        return (c_count == len(required_cookies))
     
     def get_version(self, user_id):
         data = {
@@ -142,10 +142,13 @@ class FC2():
         def ws_ping():
             ''' ping the WebSocket '''
             if ws.connected is True:
-                t1 = Timer(30.0, ws_ping)
-                t1.daemon = True
-                t1.start()
-                ws.send(self.payload_msg('heartbeat'))
+                try:
+                    t1 = Timer(30.0, ws_ping)
+                    t1.daemon = True
+                    t1.start()
+                    ws.send(self.payload_msg('heartbeat'))
+                except:
+                    pass
 
         def ws_recv():
             ''' print WebSocket messages '''
@@ -157,12 +160,13 @@ class FC2():
                 except:
                     print('\r\033[K',rdata)
                     break
-                time_utc = datetime.utcnow().strftime('%H:%M:%S UTC')
+                #time_utc = datetime.utcnow().strftime('%H:%M:%S UTC')
                 #if data['name'] not in ['comment', 'ng_commentq',
                 #                        'user_count', 'ng_comment']:
                 #    print('{0} - {1} - {2}'.format(
                 #        time_utc, self.count, data['name']))
-
+                if self.end:
+                    break
                 if (data['name'] == '_response_'
                         and data['arguments'].get('playlists')):
                     sys.stdout.write('\rFound host data')
@@ -174,6 +178,7 @@ class FC2():
                     if self.count <= 30:
                         # User with points restricted program being broadcasted
                         self.count = 30
+                        break
                     if data.get('arguments').get('code') == 4512:
                         sys.stdout.write('\rDisconnected from Server')
                         break
@@ -182,15 +187,8 @@ class FC2():
                     break
                 elif data['name'] == 'channel_information':
                     if data['arguments'].get('fee') != 0:
-                        print(f'\r\033[K{self.user_id}Stream requires a fee now.'.format(
-                            data['arguments'].get('fee')))
-                        timewait = 0
-                        while timewait<4:
-                            if not self.end:
-                                time.sleep(5)
-                                timewait+=1
-                            else:
-                                break
+                        print(f'\r\033[K{self.user_id}Stream requires a fee now.')
+                        time.sleep(5)
                         break
                 elif data['name'] == 'media_disconnection':
                     if data.get('arguments').get('code') == 104:
@@ -209,7 +207,7 @@ class FC2():
             ws_ping()
         except:
             print('\r\033[K',f'{self.user_id}ws_ping 出错')
-        t2 = Thread(target=ws_recv)
+        t2 = Thread(target=ws_recv,daemon=True)
         t2.daemon = True
         t2.start()
 
@@ -221,6 +219,7 @@ class FC2():
             if self.count >= 30:
                 host_timeout = True
                 break
+            time.sleep(3)
 
         sys.stdout.write('\rhost_timeout is {0}'.format(host_timeout))
         if host_timeout:
@@ -303,10 +302,7 @@ def main(test=None):
         a = FC2(int(test),r)
         dodownload(a)
     else:
-        #if os.path.exists('cookies.txt'):
-        #    r.cookies = cj.LWPCookieJar(filename='cookies.txt')
-        #    r.cookies.load(filename='cookies.txt', ignore_discard=True)
-        while True:
+        while 1:
             users=[]
             fav = requests.session()
             fav.keep_alive = False
@@ -340,14 +336,7 @@ def main(test=None):
                                     a=FC2(int(i),r)
                                     users.append(a)
                                 break
-
-                #u =Thread(target=upload,name='fc2upload',daemon = False)
-                #u.start()
-                #fo = Thread(target=getfollow,daemon = True)
-                #fo.start()
-                #ck = Thread(target=checkuser,daemon = True)
-                #ck.start()
-                if os.path.exists('fuser.txt'):
+                '''if os.path.exists('fuser.txt'):
                     rr=open('fuser.txt','r')
                     for i in rr.readlines():
                         i=i.strip()
@@ -356,90 +345,15 @@ def main(test=None):
                             r.keep_alive = False
                             a=FC2(int(i),r)
                             users.append(a)
-                    rr.close()
+                    rr.close()'''
                 for a in users:
-                    #if(a.thread and a.thread.is_alive()):
-                    if a.user_id in recording:
-                        pass
-                    else:
+                    if not a.user_id in recording:
                         a.thread=t=Thread(target=dodownload,args=(a,),name=a.user_id,daemon=True)
                         t.start()
             sys.stdout.write(f'\r\033[K正在录制{len(recording)}')
             time.sleep(random.randint(5,10))
 
-def getfollow():
-    r = requests.session()
-    while True:
-        r.cookies = cj.LWPCookieJar(filename='cookies.txt')
-        r.cookies.load(filename='cookies.txt', ignore_discard=True)
-        url_favor ='https://live.fc2.com/api/favoriteManager.php'
-        print('update followings')
-        i = 0
-        data = {
-                'mode':'list',
-                'page':i
-                }
-        res=r.post(url_favor,data=data)
-        datas = res.json()['data']
-        while datas != []:
-            with open ('/root/u/fc2.txt',"a") as f:
-                for j in datas :
-                    sameid = 0
-                    for id in open('/root/u/fc2.txt',"r").read().splitlines():
-                        if(j['id'] == id):
-                            sameid =1
-                            break
-                    if sameid ==1:
-                        continue
-                    else:
-                        f.writelines(j['id'])
-                        f.write('\n')
-                f.close()
-            i+=1
-            data.update({'page':i})
-            res = r.post(url_favor,data=data)
-            datas = res.json()['data']
-        time.sleep(random.randint(5,10))
-
-def checkuser():
-    global users
-    a = requests.session()
-    a.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36',
-        })
-    while True:
-        for i in open('/root/u/fc2.txt',"r").read().splitlines():
-            if(i):
-                sameid = 0
-                for user in users:
-                    if(int(i) == user.user_id):
-                        sameid = 1
-                        user.ex = 1
-                        break
-                if(sameid ==1):
-                    continue
-                else:
-                    print('\r\033[K','find new id :',i)
-                    u = FC2(int(i),a)
-                    u.sameid = 1
-                    u.ex = 1
-                    users.append(u)
-        for user in users:
-            if(user.ex == 0):
-                print('\r\033[K',user.user_id,' end')
-                users.remove(user)
-                user.sameid = 0
-            user.ex = 0
-        time.sleep(5)
-
-def upload():
-    while True:
-        os.system('cd /root/u;bash fc2.sh')
-        time.sleep(10)
-
 def dodownload(a):
-    if a.sameid == 0:
-        pass
     if a.user_id in recording:
         return
     recording.append(a.user_id)
@@ -451,14 +365,16 @@ def dodownload(a):
             if i['mode'] == 0 or i['mode']== '0':
                 print(f'\r\033[K{a.user_id}获取主列表{i["url"]}')
                 master = i['url']
-        session = livestreamer.Livestreamer()#streamlink.Streamlink()
+        #session = Streamlink()
+        session = Livestreamer()
         if threads:
             session.set_option('hls-segment-threads',int(threads))
         if trytimes:
             session.set_option('hls-segment-attempts',int(trytimes))
         session.set_option('hls-live-edge',9999)
-        session.set_option('hls-segment-timeout',5.0)
+        session.set_option('hls-segment-timeout',6.0)
         session.set_option('hls-timeout',10.0)
+        session.set_loglevel("none")
         #cmd = ['streamlink','hls://{}'.format(master),'best','-o','/root/te/t.ts']
         #subprocess.call(cmd)
         streams = session.streams('hlsvariant://'+master)
@@ -477,10 +393,10 @@ def dodownload(a):
         while(not error):
             if a.sameid == 0:
                 break
-            filename = path+'/'+userid+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
+            filename = path+'/'+userid+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+name+'-'+title+'.ts'
             if len(filename) >=130:
                 title = '_'
-                filename = path+'/'+userid+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
+                filename = path+'/'+userid+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+name+'-'+title+'.ts'
             fs = 0
             try:
                 '''
@@ -492,7 +408,7 @@ def dodownload(a):
                 f = open(filename,'wb')
                 desize = 1024*1024*1024
                 while 1:
-                    ddata = fd.read(1024*8)
+                    ddata = fd.read(8192)
                     if ddata:
                         fs+=f.write(ddata)
                         #if fs % 64 == 0:
@@ -500,9 +416,9 @@ def dodownload(a):
                         if fs>=desize:
                             fs=0
                             f.close()
-                            print('\r\033[K',filename,'文件大小达到限制，切割')
+                            print(f'\r\033[K{filename}文件大小达到限制，切割')
                             shutil.move(filename,'/root/b/d/fc2')
-                            filename = path+'/'+userid+'-'+name+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+title+'.ts'
+                            filename = path+'/'+userid+'-'+time.strftime('%y%m%d_%H%M%S')+'-'+name+'-'+title+'.ts'
                             f = open(filename,'wb')
                     else:
                         print(f'{userid}停止录制')
@@ -518,7 +434,7 @@ def dodownload(a):
                     f.close()
                     ff = os.path.getsize(filename)
                     if ff<=1024*100:
-                        print('\r\033[K',f'userid文件下载失败')
+                        print(f'\r\033[K{userid}文件下载失败')
                         #cmd = ['ffmpeg','-y','-i',master,'-c','copy','-fs','1073741824',filename,'-loglevel','debug']
                         #error=subprocess.call(cmd)
 
@@ -534,9 +450,9 @@ def dodownload(a):
         recording.remove(a.user_id)
     else:
         print(f'\r\033[K{a.user_id}在列表中找不到{recording}')
-
-            #os.system("mv '%s' /root/b/d/fc2" % filename)
-
+    time.sleep(5)
+    del a
+    
 if __name__ =='__main__':
     test=input('testid:')
     if test:

@@ -1,8 +1,6 @@
 #/bin/sh
-omilolist=(milo milo2 milo3 milo5 milo6 milo4)
-milolist=(${omilolist[@]})
-runtime=0
-echo ${milolist[0]}
+milolist=['milo','milo2','milo3','milo4','milo5']
+
 while [ true ]
 do
 	for f in *.flv
@@ -37,29 +35,25 @@ do
 		IFS="-" 
 		arr=($f) 
 		IFS="$OLD_IFS"
+		echo "开始上传${f}至milo:milo/b/${arr[1]}"
         while [ -f $f ]
         do
             #rclone move "${f}" "milo:milo/b/${arr[1]}" --bwlimit 10M
-            temp=${milolist[0]}
-	    echo "$temp"
-            echo "开始上传${f}至${temp}:milo/b/${arr[1]}"
-	    if [ ! -d "/home/${temp}/b/${arr[1]}" ]
+            temp = S{milolist[0]}
+            if [ ! -d "/home/${temp}/b/${arr[1]}" ]
             then mkdir -p "/home/${temp}/b/${arr[1]}"
             fi
             rclone move "${f}" "${temp}:milo/b/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
             if [ -f $f ]
             then
-		    milolist=("${milolist[@]:1:5}" $temp)
+                unset milolist[0]
+                milolist[4]=${temp}
             fi
 		done
 			echo "${f} 上传完成"
+	else
+		sleep 1
 	fi
-    let runtime++
-    if [ $runtime > 25 ]
-    then
-        milolist=(${omilolist[@]})
-        runtime=0
-    fi
 done
 for f in *.mp4
 do
@@ -79,24 +73,34 @@ do
 		#rclone move "${f}" "milo:milo/b/huya/${arr[1]}" --bwlimit 10M
         while [ -f $f ]
         do
-            temp=${milolist[0]}
-	    echo "$temp"
+            temp = S{milolist[0]}
             if [ ! -d "/home/${temp}/b/huya/${arr[1]}" ]
             then mkdir -p "/home/${temp}/b/huya/${arr[1]}"
             fi
             rclone move "${f}" "${temp}:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
             if [ -f $f ]
             then
-		    milolist=("${milolist[@]:1:5}" $temp)
+                unset milolist[0]
+                milolist[4]=${temp}
             fi
         done
 		echo "${f}上传成功"
+	else
+		echo "没有mp4"
 	fi
-    let runtime++
-    if [ $runtime > 25 ]
+done
+for f in *.flv
+do
+    if [ -f $f ]
     then
-        milolist=(${omilolist[@]})
-        runtime=0
+        continue
+    fi
+done
+for f in *.mp4
+do
+    if [ -f $f ]
+    then
+        continue
     fi
 done
 sleep 5

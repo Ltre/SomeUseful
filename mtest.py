@@ -110,6 +110,8 @@ def get_proxy():
         except:
             time.sleep(0.1)
 
+class FError(Exception):
+    pass
 proxyg={'http':get_proxy()}#getip('国内')
 streamip = []
 allips = []
@@ -123,46 +125,6 @@ def prepare(room,s=None):
     
     global ii
     global ipnum
-
-    '''
-    config = configparser.ConfigParser()
-    config.read(sys.path[0] + "/proxy.ini")
-    try:
-        sourceip = socket.gethostbyname(config.get('proxy','ip'))
-        r = requests.get('http://%s:8765/?count=1000&protocol=1' % sourceip,timeout=10)
-    except Exception as e:
-        sourceip = "127.0.0.1"
-        r = requests.get('http://%s:8765/?count=1000&protocol=1' % sourceip,timeout=10)
-    try:
-        ip_ports = json.loads(r.text)
-    except Exception as e:
-        print(e)
-        time.sleep(0.1)
-        prepare(room)
-        return
-    print("数量：")
-    print(len(ip_ports))
-    ipnum=int(len(ip_ports))
-    try:
-        ip = ip_ports[ii][0]
-    except Exception as e:
-        print(e)
-        try:
-            r = requests.get('http://%s:8765/?count=1000&protocol=1' % sourceip,timeout=10)
-            ip = ip_ports[ii][0]
-        except Exception as e:
-            ii += 1
-            if(ii>=ipnum):
-                ii=0
-            prepare(room)
-            return
-    port = ip_ports[ii][1]    
-    proxies={'https':'%s:%s'%(ip,port)}
-    print('取用第{}个IP地址：{}\n'.format(ii+1,proxies))
-    ii += 1
-    if(ii>=ipnum):
-        ii=0
-    '''
     
     while True:
     
@@ -221,6 +183,7 @@ class Room():
         self.burl = None;
         self.curl = None;
         self.durl = None
+        self.urls= []
         self.sTitle = sTitle;
         self.sUser = sUser;
         self.sStatus = None;
@@ -324,17 +287,6 @@ class Room():
             finally:
                 if ('res2' in locals()): res2.close();
     def getStream(self):
-        #global sApi3
-        #with urlopen(sApi3.format(self.nId)) as res:
-        #    sData = res.read().decode('utf-8');
-        #iMatches = re.finditer(r'<(?:b\d)?url><!\[CDATA\[(.+)\]\]><\/(?:b\d)?url>', sData);
-        #aMatches = list(iMatches);
-        #if (aMatches):
-        #    self.aUrls = [x.group(1) for x in aMatches];
-        #    sUrl = self.sUrl = self.aUrls[0];
-        #    return sUrl;
-        #else:
-        #    return False;
         global sApi8#selectip
         self.time = time.time()
         trytimes = 10
@@ -370,15 +322,16 @@ class Room():
                     n = 0
                     for i in durl:
                         url = i['url']
-                        if 'live-bvc' in url:
+                        if 'live-js' in url:
                             self.aurl = url
-                        elif 'live-js' in url:
-                            self.burl = url
                         elif 'live-txy' in url:
+                            self.burl = url
+                        elif 'live-bvc' in url:
                             self.curl = url
                         elif 'live-ws' in url:
                             self.durl = url
                             n+=1
+                        self.urls.append(url)
                     if n == len(durl):
                         raise "live-ws"
                     self.ip = selectip
@@ -401,7 +354,35 @@ class Room():
                 #prepare(self,'国内')
             #mData = json.loads(sData);
         return False
-        
+    
+    def link(self):
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Referer': 'https://live.bilibili.com/{}'.format(self.nId)}
+        noproxy = 1
+        while self.urls:
+            url = self.urls[0]
+            print('检测',url)
+            try:
+                if noproxy:
+                    r = requests.get(url,headers=headers,stream=True,timeout=10)
+                else:
+                    r = requests.get(url,headers=headers,proxies=proxies,stream=True,timeout=10)
+                print(r.status_code)
+                if r.status_code==200:
+                    print('通过')
+                    return r
+                else:# r.status_code ==403:
+                    r.close()
+                    if noproxy:
+                        print(url,'使用代理')
+                        proxies = {'http':'34.92.3.74:3654'}
+                        noproxy = 0
+                    else:
+                        self.urls.remove(url)
+                        noproxy = 1
+                    continue
+            except:
+                self.urls.remove(url)
+        return False
 
     def download(self, sPath, stream=sys.stdout, nVerbose=1):
         sDir = expanduser(FILEDIR) or sHome;
@@ -423,258 +404,49 @@ class Room():
             sPath = os.path.join(sDir,sName)
             return sPath
         proxyg = {};
-        selectip = None
-        def newdown(proxyg = proxyg,selectip=selectip,pro = 0):#pro:是否代理
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Referer': 'https://live.bilibili.com/{}'.format(self.nId)}
-            if not proxyg and pro:
-                proxyg['https']=selectip
-                proxyg['http']=selectip
-            #proxyg = {'http':'34.92.99.59:3247'}
-            timeout = 5
-            hasproxy = 0
-            while 1:
-                try:
-                    if self.burl:
-                        if hasproxy:
-                            proxyg = {'http':'34.92.3.74:3654'}
-                        else:
-                            proxyg = 0
-                        sUrl = self.sUrl = self.burl
-                        #self.burl = 0
-                    elif self.curl:
-                        if hasproxy:
-                            proxyg = {'http':self.ip}
-                        else:
-                            proxyg = 0
-                        sUrl = self.sUrl = self.curl 
-                    elif self.aurl:
-                        if self.aurlc:
-                            proxyg = 0
-                        else:
-                            proxyg = {'http':self.ip}
-                        sUrl = self.sUrl = self.aurl
-                    elif self.durl:
-                        if hasproxy:
-                            proxyg = {'http':self.ip}
-                        else:
-                            proxyg = 0
-                        sUrl = self.sUrl = self.durl
-                    else:
-                        print(self.sUser,"无 url")
-                        yield None
-                    if testt:
-                        print(f'\r\033[K{sUrl}')
-                    with requests.get(sUrl,stream = True,timeout = timeout,headers=headers,proxies=proxyg,allow_redirects = False) as r:
-                        if r.status_code == 200:
-                            if 'live-bvc' in sUrl and not self.aurlc:
-                                self.aurlc = 1
-                                continue
-                            for chunk in r.iter_content(chunk_size=1024*8):
-                                if chunk:
-                                    yield chunk
-                                else:
-                                    yield None
-                            '''
-                            if self.burl:
-                                self.burl = 0
-                            elif self.aurl:
-                                self.aurl = 0
-                            elif self.curl and not hasproxy:
-                                hasproxy = 1
-                            else:
-                                break
-                            '''
-                        elif r.status_code == 302:
-                                self.aurl = r.headers.get("Location")
-                                self.aurlc = 1
-                        elif r.status_code == 403:
-                            if self.burl:
-                                if not hasproxy:
-                                    hasproxy = 1
-                                    print(self.sUser,'使用代理')
-                                else:
-                                    print(self.burl,'403')
-                                print(self.burl,' 403')
-                                self.burl = 0
-                            elif self.curl:
-                                if not hasproxy:
-                                    hasproxy = 1
-                                    print(self.sUser,'使用代理')
-                                else:
-                                    print(self.curl,' 403')
-                                    self.curl = 0
-                                    if self.ip in streamip:
-                                        streamip.remove(self.ip)
-                            elif self.durl:
-                                if not hasproxy:
-                                    hasproxy = 1
-                                    print(self.sUser,'使用代理')
-                                else:
-                                    print(self.durl,' 403')
-                                    self.durl = 0
-                                    if self.ip in streamip:
-                                        streamip.remove(self.ip)
-                            else:
-                                break
-                        elif r.status_code == 404:
-                            if self.burl:
-                                break
-                                self.burl = 0
-                            elif self.curl:
-                                break
-                                self.aurl = 0
-                            else:
-                                break
-                        else:
-                            break
-                except Exception as e:
-                    if "timed" in str(e) or "refused" in str(e):
-                        if not hasproxy:
-                            break#hasproxy=1
-                        else:
-                            break
-                    else:
-                        print('newdown 的错误是',e)
-                        traceback.print_exc()
-                        break
-            if not 'r' in locals():
-                print('url 未接通')
-                yield None
-            if r.status_code !=200:
-                print(sUrl,' get error',r.status_code)
-                yield None
-            
-        sUrl = self.sUrl;
         bBuffer = ''
         data = ''
-        if True:
-            try:
-                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0'}
-                raise Exception('403')
-                req=urllib.request.Request(sUrl,headers=headers)
-                r=urlopen(req)
-                #r = urlopen(sUrl, timeout=4)
-            except Exception as e:
-                #print(self.sUser,e,'主线中断，切换备线\n')
-                #aaaa=self.getStream()
-                #if aaaa:
-                #    sUrl = self.ssUrl
-                #else:
-                #    return False,sPath
-                '''
-                while True:
-                    try:
-                        r = urlopen(sUrl, timeout=20)
-                    except Exception as e:
-                        print(e)
-                        if "403" in str(e):
-                            print(self.sUser,'被拒，继续尝试')
-                        else:
-                            break
-                '''
-                try:
-                    if '4' in str(e):
-                        data = newdown()
-                        if data:
-                            bBuffer = data.__next__()
-                        else:
-                            return False,sPath
-                    else:
-                        r = urlopen(sUrl, timeout=5)
-                except Exception as e:
-                    traceback.print_exc();
-                    print(self.sUser,e,'失败\n')
-                    return False,sPath
-                '''
-                    sUrl = self.ssUrl
-                    try:
-                        r=urlopen(sUrl,timeout=5)
-                    except Exception as e:
-                        print(e)
-                        return False,sPath
-                '''
-            except socket.timeout as e:
-                print(e)
-                return False,sPath
-            else:
-                pass
         sPath = newName();
         sPath = adaptName(sPath);
-        #iUrls = iter(aUrl);
-        #sUrl = next(iUrls);
         try:
-            if bBuffer:
-                f1 = open(sPath, 'wb');
-                self.time = round(time.time()-self.time,2)
-                print('sec[{}]'.format(self.time),'{} starting download from:\n{}\n    to:\n{}'.format(self.nId, self.sUrl, sPath));
-            if (nVerbose):
-                stream.write('\n');
+            url = self.urls[0]
+            r = self.link()
+            if not r:
+                raise FError("403")
+            f1 = open(sPath, 'wb');
+            self.time = round(time.time()-self.time,20)
+            print('sec[{}]'.format(self.time),'{} starting download from:\n{}\n    to:\n{}'.format(self.nId, url, sPath));
             nSize = 0;
             n = 1024*1024;
             readbuffer = 1024*8
             limitsize = 1024*1024*1024
+            if testt:
+                limitsize = 1024*1024*20
             tnumber = 0
-            #vfs=os.statvfs("/root")
-            #available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
-            #stream.write('\r剩余空间%.2f\n' % (available))
-            while bBuffer:
-                nSize += f1.write(bBuffer);
-                #f1.flush()
-                #if (nVerbose):
-                    #stream.write('\r{:<4.2f} MB downloaded'.format(nSize/n));
-                #tnumber+=1               
-                #if (tnumber>=200):
-                    #break
-                    #vfs=os.statvfs("/root")
-                    #available=vfs.f_bavail*vfs.f_bsize/(1024*1024*1024)
-                    #stream.write('剩余空间%.2f\n' % (available))
-                    #tnumber = 0
-                if (nSize >= limitsize and self.nId != 151159):
-                    print('%s 大小到达限制，进行存储' % sPath)
-                    if 'r' in locals():
-                        print("关闭上一个链接")
-                        r.close()
-                    nSize = 0
-                    f1.close()
-                    upload(sPath)
-                    '''
-                    sTime = time.strftime('%y%m%d_%H%M%S');
-                    sName = '{}-{}-{}.flv'.format(sTime, self.sUser, self.sTitle);
-                    sName = re.sub(r'[^\w_\-.()]', '_', sName);
-                    sPath = os.path.join(sDir,sName)
-                    '''
-                    sPath = newName()
-                    f1 = open(sPath,'wb')
-                    data = newdown()
-                #if (self.ii == 0 and available>25):
-                #    self.ii = 1
-                #if (available<15 and (self.ii == 1 and self.nId !=151159)):
-                #    self.ii = 0
-                #    print('剩余空间不足，进行存储\n')
-                #    stillrec = 1
-                #    break
-                if data:
-                    bBuffer = data.__next__()
-                else:
-                    bBuffer = res.read(readbuffer);
-                trytry=0
-                waittime = 0.2
-                '''
-                while not bBuffer and trytry <2:
-                    time.sleep(waittime)
-                    try:
-                        #res = urlopen(sUrl, timeout=25);
-                        data=newdown()
-                    except:
+            while 1:
+                keepdownload=0
+                for chunk in r.iter_content(chunk_size=1024*8):
+                    if chunk:
+                        nSize += f1.write(chunk);
+                    if (nSize >= limitsize and self.nId != 151159):
+                        print('%s 大小到达限制，进行存储' % sPath)
+                        if 'r' in locals():
+                            print("关闭上一个链接")
+                            r.close()
+                        nSize = 0
+                        f1.close()
+                        upload(sPath)
+                        r  = self.link()
+                        if not r:
+                            break
+                        sPath = newName()
+                        f1 = open(sPath,'wb')
+                        keepdownload=1
                         break
-                    bBuffer = data.__next__()
-                    #bBuffer = res.read(1024*128);
-                    trytry+=1
-                    waittime+=0.1
-                '''
+                if keepdownload:
+                    continue
+                break
 
-            #if (nVerbose):
-                #stream.write('\n');
         except StopIteration:
             print('{} 数据流结束'.format(self.sUser))
         except socket.timeout as e:
@@ -683,13 +455,14 @@ class Room():
             print('downloading reset: {}'.format(e));
         except http.client.IncompleteRead as e:
             print('downloading break:{}'.format(e));
-        except:
-            traceback.print_exc()
+        except FError as e:
+            print(e)#traceback.print_exc()
         finally:
             if ('res' in locals()): 
                 res.close();
             if ('r' in locals()): 
-                r.close();
+                if r:
+                    r.close();
             if ('f1' in locals()): f1.close();
             if (os.path.isfile(sPath) and os.path.getsize(sPath) < 1024*1024):
                 os.remove(sPath);
@@ -757,8 +530,14 @@ def doCleanup(room, sPath, sScript=None, sCom=None, sLogFile=None):
 def upload(sPath):
     global mvselect
     
+    if testt:
+        tpath = '/root'
+        shutil.move(sPath,tpath)
+        return
     if(not os.path.exists('/root/b/d/bu')):
         os.makedirs('/root/b/d/bu')
+    shutil.move(sPath,'/root/b/d/bu')
+    '''
     if mvselect==1:
         shutil.move(sPath,'/root/b/d/bu')
         mvselect+=1
@@ -769,7 +548,8 @@ def upload(sPath):
         shutil.move(sPath,'/root/b')
         mvselect=1
     #exit()
-    '''
+    
+    
     jishu=0;
     change ='waitting'+sName
     cPath = os.path.join(sDir, change)
