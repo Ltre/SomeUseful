@@ -42,7 +42,7 @@ do
         sleep 1
     fi
     let runtime++
-    if [ $runtime > 25 ]
+    if [ $runtime -ge 25 ]
     then
         milolist=(${omilolist[@]})
         runtime=0

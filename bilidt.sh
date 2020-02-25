@@ -2,7 +2,7 @@
 omilolist=(milo4)
 milolist=(${omilolist[@]})
 runtime=0
-cd /root/b/d/pic
+cd /root/bilidt
 while [ true ]
 do
 for f in *
@@ -25,11 +25,11 @@ do
         do
             temp=${milolist[0]}
             echo "$temp"
-            echo "开始上传${f}至${temp}:milo/b/pic/${arr[0]}"
-            if [ ! -d "/home/${temp}/b/pic/${arr[0]}" ]
-            then mkdir -p "/home/${temp}/b/pic/${arr[0]}"
+            echo "开始上传${f}至${temp}:milo/b/bilidt/${arr[0]}"
+            if [ ! -d "/home/${temp}/b/bilidt/${arr[0]}" ]
+            then mkdir -p "/home/${temp}/b/bilidt/${arr[0]}"
             fi
-            rclone move "${f}" "${temp}:milo/b/pic/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
+            rclone move "${f}" "${temp}:milo/b/bilidt/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
             if [ -f "$f" ]
             then
                 sleep 1

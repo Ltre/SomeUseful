@@ -55,9 +55,9 @@ do
 			echo "${f} 上传完成"
 	fi
     let runtime++
-    if [ $runtime > 25 ]
+    if [ $runtime -ge 25 ]
     then
-        milolist=(${omilolist[@]})
+	milolist=(${omilolist[@]})
         runtime=0
     fi
 done
@@ -93,7 +93,7 @@ do
 		echo "${f}上传成功"
 	fi
     let runtime++
-    if [ $runtime > 25 ]
+    if [ $runtime -ge 25 ]
     then
         milolist=(${omilolist[@]})
         runtime=0

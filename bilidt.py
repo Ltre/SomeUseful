@@ -69,14 +69,18 @@ for uid in uids:
     if uid in dtlist:
         print(uid,'跳过')
         continue
-    url= 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=10432972&offset_dynamic_id=0&need_top=1'
+    url= f'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid={uid}&offset_dynamic_id=0&need_top=1'
     while 1:
         name=''
         r = get_url(url)
         data=r.json()['data']
         r.close()
         hasmore = data['has_more']
-        cards = data['cards']
+        try:
+            cards = data['cards']
+        except:
+            print(f"{uid}没有动态")
+            break
         for i in cards:
             card_str = i['card']
             card = json.loads(card_str)
@@ -92,7 +96,17 @@ for uid in uids:
                     else:
                         print('昵称获取失败')
                         break
+            if not oname:
+                print("获取oname失败")
+                with open('/root/bilitest.txt',"w") as f:
+                    f.write(str(card))
+                exit(1)
             name = re.sub(rstr,"_",oname)
+            if not name:
+                print("获取name失败")
+                with open('/root/bilitest.txt',"w") as f:
+                    f.write(str(card))
+                exit(1)
             path = os.path.join(opath,name)
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -148,7 +162,7 @@ for uid in uids:
                 print(f"\r\033[K{filename}下载成功")
         if hasmore:
             next_offset = data['next_offset']
-            url = f'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=10432972&offset_dynamic_id={next_offset}&need_top=1'
+            url = f'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid={uid}&offset_dynamic_id={next_offset}&need_top=1'
         else:
             break
     print(name,'动态下载完成')
@@ -156,3 +170,4 @@ for uid in uids:
     f = open('bilidt.txt','a')
     f.write(f'{uid}\n')
     f.close()
+    dtlist.append(uid)
