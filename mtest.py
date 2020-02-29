@@ -436,6 +436,7 @@ class Room():
                         nSize = 0
                         f1.close()
                         upload(sPath)
+                        self.getStream()
                         r  = self.link()
                         if not r:
                             break

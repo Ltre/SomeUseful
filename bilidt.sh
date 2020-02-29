@@ -1,6 +1,5 @@
 #/bin/sh
-omilolist=(milo4)
-milolist=(${omilolist[@]})
+source /root/u/milo.conf
 runtime=0
 cd /root/bilidt
 while [ true ]
@@ -23,7 +22,7 @@ do
                 
         while [ -f "$f" ]
         do
-            temp=${milolist[0]}
+            temp=${milostatic}
             echo "$temp"
             echo "开始上传${f}至${temp}:milo/b/bilidt/${arr[0]}"
             if [ ! -d "/home/${temp}/b/bilidt/${arr[0]}" ]
@@ -33,11 +32,22 @@ do
             if [ -f "$f" ]
             then
                 sleep 1
+		let runtime++
+		if [ $runtime -ge 25 ]
+		then
+			source milo.conf
+			runtime=0
+		fi
             #    milolist=("${milolist[@]:1:5}" $temp)
             fi
         done
         echo "${f}上传成功"
         fi
+	if [ $runtime -ge 25 ]
+	then
+		source /root/u/milo.conf
+		runtime=0
+	fi
 done
 sleep 10
 done

@@ -1,7 +1,8 @@
 #/bin/sh
-omilolist=(milo milo2 milo3 milo5 milo6 milo4)
-milolist=(${omilolist[@]})
+source /root/u/milo.conf
 runtime=0
+num=${#milolist[@]}
+let num--
 echo ${milolist[0]}
 while [ true ]
 do
@@ -49,7 +50,7 @@ do
             rclone move "${f}" "${temp}:milo/b/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
             if [ -f $f ]
             then
-		    milolist=("${milolist[@]:1:5}" $temp)
+		    milolist=("${milolist[@]:1:$num}" $temp)
             fi
 		done
 			echo "${f} 上传完成"
@@ -57,7 +58,7 @@ do
     let runtime++
     if [ $runtime -ge 25 ]
     then
-	milolist=(${omilolist[@]})
+	source /root/u/milo.conf 
         runtime=0
     fi
 done
@@ -87,7 +88,7 @@ do
             rclone move "${f}" "${temp}:milo/b/huya/${arr[1]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
             if [ -f $f ]
             then
-		    milolist=("${milolist[@]:1:5}" $temp)
+		    milolist=("${milolist[@]:1:$num}" $temp)
             fi
         done
 		echo "${f}上传成功"
@@ -95,8 +96,8 @@ do
     let runtime++
     if [ $runtime -ge 25 ]
     then
-        milolist=(${omilolist[@]})
-        runtime=0
+        source /root/u/milo.conf
+	runtime=0
     fi
 done
 sleep 5

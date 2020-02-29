@@ -38,12 +38,17 @@ def get_stream(url):
     while 1:
         try:
             dheaders = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36'}
-            r = requests.get(url,headers=dheaders,timeout=10,stream=True)
+            r = requests.get(url,headers=dheaders,timeout=5,stream=True)
             if r.status_code==200:
                 return r
-        except:
-            pass
-        print(r.status_code)
+            elif r.status_code == 404:
+                r.close()
+                return 404
+        except Exception as e:
+            if 'time' in str(e):
+                time.sleep(1)
+                continue
+        print(r.status_code,url)
         time.sleep(1)
         
 def getuids():
@@ -52,11 +57,15 @@ def getuids():
     f.close()
     return uids
     
-headers = get_headers(headers_raw)    
+headers = get_headers(headers_raw)
 opath = input("路径：")
 if not opath:
     opath = 'C:/Users/zhang/Desktop'
 opath+='/bilidt'
+
+if not os.path.exists('/root/bili404.txt'):
+    f = open('/root/bili404.txt','w')
+    f.close()
 
 rstr = r"[\/\\\:\*\?\"\<\>\|\- \n]"
 uids = getuids()
@@ -70,8 +79,8 @@ for uid in uids:
         print(uid,'跳过')
         continue
     url= f'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid={uid}&offset_dynamic_id=0&need_top=1'
+    name=''
     while 1:
-        name=''
         r = get_url(url)
         data=r.json()['data']
         r.close()
@@ -88,14 +97,20 @@ for uid in uids:
                 try:
                     oname = card['owner']['name']
                 except:
-                    user = card['user']
-                    if 'name' in user:
-                        oname = user['name']
-                    elif 'uname' in user:
-                        oname = user['uname']
+                    if 'user' in card:
+                        user = card['user']
+                        if 'name' in user:
+                            oname = user['name']
+                        elif 'uname' in user:
+                            oname = user['uname']
+                        else:
+                            print('昵称获取失败')
+                            break
                     else:
-                        print('昵称获取失败')
-                        break
+                        try:
+                            oname=card['upper']
+                        except:
+                            oname = card['author']['name']
             if not oname:
                 print("获取oname失败")
                 with open('/root/bilitest.txt',"w") as f:
@@ -130,6 +145,10 @@ for uid in uids:
                     while 1:
                         try:
                             rr = get_stream(img_src)
+                            if rr == 404:
+                                with open('/root/bili404.txt','a') as f:
+                                    f.write(f"{name},{ftime},404,{img_src}\n")
+                                break
                             with open(filepath,"wb") as f:
                                 for chunk in rr.iter_content(chunk_size=8192):
                                     if chunk:
@@ -138,8 +157,11 @@ for uid in uids:
                         except:
                             rr.close()
                             time.sleep(0.5)
-                    rr.close()
-                    print(f"\r\033[K{filename}下载成功")
+                    if rr != 404:
+                        rr.close()
+                        print(f"\r\033[K{filename}下载成功")
+                    else:
+                        print(f"\r\033[K{filename}未找到")
             if 'video_playurl' in item:
                 upload_time=item['upload_time']
                 ftime = time.strftime("%Y%m%d_%H%M%S",time.strptime(upload_time, "%Y-%m-%d %H:%M:%S"))
@@ -150,6 +172,10 @@ for uid in uids:
                 while 1:
                     try:
                         rr = get_stream(video_playurl)
+                        if rr == 404:
+                            with open('/root/bili404.txt','a') as f:
+                                f.write(f"{name},{ftime},404,{video_playurl}\n")
+                            break
                         with open(filepath,"wb") as f:
                             for chunk in rr.iter_content(chunk_size=8192):
                                 if chunk:
@@ -158,8 +184,11 @@ for uid in uids:
                     except:
                         rr.close()
                         time.sleep(0.5)
-                rr.close()
-                print(f"\r\033[K{filename}下载成功")
+                if rr != 404:
+                    rr.close()
+                    print(f"\r\033[K{filename}下载成功")
+                else:
+                    print(f"\r\033[K{filename}未找到")
         if hasmore:
             next_offset = data['next_offset']
             url = f'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid={uid}&offset_dynamic_id={next_offset}&need_top=1'

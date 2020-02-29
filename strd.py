@@ -9,6 +9,7 @@ import sys
 import json
 import nest_asyncio
 from mail import send_mail
+tryy = input('test?')
 password = input('password:')
 proxies = {}
 justone = 1
@@ -22,8 +23,16 @@ ss = requests.session()
 ss.keep_alive = False
 islogin = 0
 sended = 0
-dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_did=8242408a3b65feb390623d6c00081501; PHPSESSID=tgvun5c1ci6c3ltnt7s1okkgc4; acf_auth=a3ecVlfGOE71GvSS26fxTjpC0g2rpMvwCuyrPEAy%2BfoWUaTL6sDxmROq3AFY3NzP5hPaMctHzoVucMxtZwx1I2vjdCExw7r7IzfyTMh8VGMldrKDfVhJVfseCuuM; wan_auth37wan=e055eff5b144Id8mxDNxZ5PDOrybYQkr8CSHWmP92V%2FtpUNgjRRfcXeR4YInW2os3cNzjH04cZNauAFh9dyNkHcfE1HV%2FKP64R05tCA8uXzxrIZz; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=45649574; acf_biz=1; acf_stk=68f690a62d404465; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1569768125,1569768354,1570418236,1570418291; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570418291"}
+#dcookies = {"cookie": "Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1582781071; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1582775420,1582779677; dy_did=b3eabab7bce9386ba96de9c600071501; acf_did=b3eabab7bce9386ba96de9c600071501; dy_auth=4a4cul%2FxmwaKex3A3V6MNXtJUB5k%2F5LZFL6C%2FsRP%2B3Zwj9YVc0vxFlfKPgC28yw9uLDr2iEO2QigHH4jq0x033Oh2bwCMsfy7IdvA3eDswMb4sG%2B2ZjYDAdxmezB; smidV2=20200227120001377cbf560207cfb17d37a526a0cda3b200eb03c6acf42a4c0; wan_auth37wan=b3e8e47148393416M%2F2CXWe%2Fc%2Bku3LqGKSjs11iozVaXEwS9E%2B7aT4uiHjxM084feIbqA%2B3CFASdUphbSg4rvoYatahnsmdu%2FowXclxBsc8bOl2q; acf_auth=6c7fgcAk9TOh%2B5MzcmV13%2FL04O0%2BkSr3oQ4E3HRmgqQxpE1QZvVxQfvrsNOj7Hre8jRurM3QDXRMeEMbFJa9Ruth8o0K5h8sRoMrkzgp%2BBRA4EvHBfXHrs8vNbzD; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_biz=1; acf_ct=0; acf_groupid=1; acf_ltkid=45649582; acf_nickname=Miloxin; acf_own_room=0; acf_phonestatus=1; acf_stk=741d2e29fed30476; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; PHPSESSID=ov73opef8fn6edi9n5n6bb9r55"}
 
+dcookies_raw = '''Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1582781071; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1582775420,1582779677; dy_did=b3eabab7bce9386ba96de9c600071501; acf_did=b3eabab7bce9386ba96de9c600071501; dy_auth=4a4cul%2FxmwaKex3A3V6MNXtJUB5k%2F5LZFL6C%2FsRP%2B3Zwj9YVc0vxFlfKPgC28yw9uLDr2iEO2QigHH4jq0x033Oh2bwCMsfy7IdvA3eDswMb4sG%2B2ZjYDAdxmezB; smidV2=20200227120001377cbf560207cfb17d37a526a0cda3b200eb03c6acf42a4c0; wan_auth37wan=b3e8e47148393416M%2F2CXWe%2Fc%2Bku3LqGKSjs11iozVaXEwS9E%2B7aT4uiHjxM084feIbqA%2B3CFASdUphbSg4rvoYatahnsmdu%2FowXclxBsc8bOl2q; acf_auth=6c7fgcAk9TOh%2B5MzcmV13%2FL04O0%2BkSr3oQ4E3HRmgqQxpE1QZvVxQfvrsNOj7Hre8jRurM3QDXRMeEMbFJa9Ruth8o0K5h8sRoMrkzgp%2BBRA4EvHBfXHrs8vNbzD; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_biz=1; acf_ct=0; acf_groupid=1; acf_ltkid=45649582; acf_nickname=Miloxin; acf_own_room=0; acf_phonestatus=1; acf_stk=741d2e29fed30476; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; PHPSESSID=ov73opef8fn6edi9n5n6bb9r55'''
+
+def get_cookies(cookie_raw):
+    return dict(line.split("=", 1) for line in cookie_raw.split("; "))
+dcookies = get_cookies(dcookies_raw)
+def get_headers(header_raw):
+    return dict(line.split(": ", 1) for line in header_raw.split("\n"))
+    
 def delete_proxy(proxy):
     return ss.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
 
@@ -145,15 +154,6 @@ def checkuser():
         time.sleep(5)
 
 def gethtml(s,url):
-    '''
-    headers = {
-        'user-agent': 'Mozilla/5.0 (iPad; CPU OS 8_1_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B466 Safari/600.1.4'
-    }
-    async with aiohttp.ClientSession() as session:
-3        async with session.get("http://m.douyu.com/{}".format(room.nRoom),headers=headers,timeout = 10) as res:
-            assert res.status == 200
-            return await res.json()
-    '''
     res = s.get(url,timeout=10)
     data = res.json()
     res.close()
@@ -223,8 +223,10 @@ def douyustatus(ds,thread_pool=None):
     global dcookies
     #print('run')
     #url = 'https://www.douyu.com/wgapi/livenc/liveweb/followlist/0?sort=0&cid1=0'
-    url = "https://www.douyu.com/wgapi/livenc/liveweb/follow/list?sort=0&cid1=0" 
-    ds.cookies.update(dcookies)
+    url = "https://www.douyu.com/wgapi/livenc/liveweb/follow/list?sort=0&cid1=0"
+    cookies = requests.utils.dict_from_cookiejar(ds.cookies)
+    with open("/root/u/dscookies.txt", "w") as fp:
+        json.dump(cookies, fp)
     while 1:
         try:
             #json = await loop.run_in_executor(thread_pool,functools.partial(gethtml,ds,url))
@@ -234,34 +236,52 @@ def douyustatus(ds,thread_pool=None):
             for i in dlist:
                 if i['show_status'] == 1:
                     if i['room_id'] not in drecording:
+                        print(f"开始下载{i['room_id']},{i['nickname']}")
                         down = threading.Thread(target=youd,args=('douyu',i['room_id'],),name=str(i['nickname']),daemon=True)
                         down.start()
-        except:
+        except Exception as e:
+            print("获取json失败",e)
             try:
-                dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_did=8242408a3b65feb390623d6c00081501; PHPSESSID=tgvun5c1ci6c3ltnt7s1okkgc4; acf_auth=a3ecVlfGOE71GvSS26fxTjpC0g2rpMvwCuyrPEAy%2BfoWUaTL6sDxmROq3AFY3NzP5hPaMctHzoVucMxtZwx1I2vjdCExw7r7IzfyTMh8VGMldrKDfVhJVfseCuuM; wan_auth37wan=e055eff5b144Id8mxDNxZ5PDOrybYQkr8CSHWmP92V%2FtpUNgjRRfcXeR4YInW2os3cNzjH04cZNauAFh9dyNkHcfE1HV%2FKP64R05tCA8uXzxrIZz; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=45649574; acf_biz=1; acf_stk=68f690a62d404465; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1569768125,1569768354,1570418236,1570418291; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570418291; LTP0=f59ad3EDaPuUGY1EQxElM%2BObWmUwxNR09ZsFcIg980X5xWYI3rNT6FiIYMerOsRDHPowpPivNRJ7vPzLQY4mHZHRMlJ5u0nk87P8NcX6xcwgEdL1Ygb8EpANCS6wWAQ4BFfimXYD5ZNNsyjdaGE4xoyb%2BNzKKLB3kiIeEhjpwM2zWlOz2NjBBMMx1m3VRJ7AQuKGk"}
+                if tryy:
+                    print('douyu开始重登录')
+                #dcookies = {"Cookie": "dy_did=8242408a3b65feb390623d6c00081501; smidV2=2019051418520294dca99b6773cfe1c2a03077977c1b0d007f7dac9e8893840; acf_did=8242408a3b65feb390623d6c00081501; PHPSESSID=tgvun5c1ci6c3ltnt7s1okkgc4; acf_auth=a3ecVlfGOE71GvSS26fxTjpC0g2rpMvwCuyrPEAy%2BfoWUaTL6sDxmROq3AFY3NzP5hPaMctHzoVucMxtZwx1I2vjdCExw7r7IzfyTMh8VGMldrKDfVhJVfseCuuM; wan_auth37wan=e055eff5b144Id8mxDNxZ5PDOrybYQkr8CSHWmP92V%2FtpUNgjRRfcXeR4YInW2os3cNzjH04cZNauAFh9dyNkHcfE1HV%2FKP64R05tCA8uXzxrIZz; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; acf_nickname=Miloxin; acf_own_room=0; acf_groupid=1; acf_phonestatus=1; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_ct=0; acf_ltkid=45649574; acf_biz=1; acf_stk=68f690a62d404465; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1569768125,1569768354,1570418236,1570418291; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570418291; LTP0=f59ad3EDaPuUGY1EQxElM%2BObWmUwxNR09ZsFcIg980X5xWYI3rNT6FiIYMerOsRDHPowpPivNRJ7vPzLQY4mHZHRMlJ5u0nk87P8NcX6xcwgEdL1Ygb8EpANCS6wWAQ4BFfimXYD5ZNNsyjdaGE4xoyb%2BNzKKLB3kiIeEhjpwM2zWlOz2NjBBMMx1m3VRJ7AQuKGk"}
+                #dcookies = {"cookie":"Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1582781071; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1582775420,1582779677; dy_did=b3eabab7bce9386ba96de9c600071501; acf_did=b3eabab7bce9386ba96de9c600071501; dy_auth=4a4cul%2FxmwaKex3A3V6MNXtJUB5k%2F5LZFL6C%2FsRP%2B3Zwj9YVc0vxFlfKPgC28yw9uLDr2iEO2QigHH4jq0x033Oh2bwCMsfy7IdvA3eDswMb4sG%2B2ZjYDAdxmezB; smidV2=20200227120001377cbf560207cfb17d37a526a0cda3b200eb03c6acf42a4c0; wan_auth37wan=b3e8e47148393416M%2F2CXWe%2Fc%2Bku3LqGKSjs11iozVaXEwS9E%2B7aT4uiHjxM084feIbqA%2B3CFASdUphbSg4rvoYatahnsmdu%2FowXclxBsc8bOl2q; acf_auth=6c7fgcAk9TOh%2B5MzcmV13%2FL04O0%2BkSr3oQ4E3HRmgqQxpE1QZvVxQfvrsNOj7Hre8jRurM3QDXRMeEMbFJa9Ruth8o0K5h8sRoMrkzgp%2BBRA4EvHBfXHrs8vNbzD; acf_avatar=https%3A%2F%2Fapic.douyucdn.cn%2Fupload%2Favatar%2F005%2F55%2F00%2F12_avatar_; acf_biz=1; acf_ct=0; acf_groupid=1; acf_ltkid=45649582; acf_nickname=Miloxin; acf_own_room=0; acf_phonestatus=1; acf_stk=741d2e29fed30476; acf_uid=5550012; acf_username=auto_7NcKZj9sbL; PHPSESSID=ov73opef8fn6edi9n5n6bb9r55; LTP0=19a2f2nryMtCpWOL6pDrO%2Fm37T6NLODoRXAYpRxJLNdou63Swu%2B1by5BsUKnX%2Fs8BrrmduuGLyX0VEwaysZo1lO7twpphl1AIFAOPTPLRnZQ%2BbtuCNDhvew4ZsZodHVGuWZuFGJyJpa9ThhFFFg%2BaLMXKj96Qmma2yml9%2Brjq4%2BdNVD5lZ9sc%2B97WLweNaiyRqSOs;"}
+                dcookies['LTP0'] = '19a2f2nryMtCpWOL6pDrO%2Fm37T6NLODoRXAYpRxJLNdou63Swu%2B1by5BsUKnX%2Fs8BrrmduuGLyX0VEwaysZo1lO7twpphl1AIFAOPTPLRnZQ%2BbtuCNDhvew4ZsZodHVGuWZuFGJyJpa9ThhFFFg%2BaLMXKj96Qmma2yml9%2Brjq4%2BdNVD5lZ9sc%2B97WLweNaiyRqSOs'
                 s = requests.session()
                 s.keep_alive=False
-                print(rjson)
-                headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36","Referer":"https://www.douyu.com/directory/myFollow"}
-                url = 'https://passport.douyu.com/lapi/passport/iframe/safeAuth?client_id=1&t={t}&_={t}'.format(t=int(time.time()*1000))
-                res = requests.get(url,headers=headers,cookies=dcookies,allow_redirects=False)
+                #print(rjson)
+                #headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36","Referer":"https://www.douyu.com/directory/myFollow"}
+                headers=ds.headers
+                lurl = 'https://passport.douyu.com/lapi/passport/iframe/safeAuth?client_id=1&t={t}&_={t}'.format(t=int(time.time()*1000))
+                res = requests.get(lurl,headers=headers,cookies=dcookies,allow_redirects=False)
                 if res.headers.get('Set-Cookie'):
-                    dcookies={"Cookie":"{}".format(dcookies['Cookie'].split("LTP0")[0]+res.headers['Set-Cookie'])}
-                print(dcookies)
-                if res.headers.get('Location'):
-                    url = 'https:'+res.headers['Location']
-                    res = s.get(url,headers=headers,cookies=dcookies,allow_redirects=False)
-                    ds.cookies=dcookies = s.cookies
+                    #dcookies={"Cookie":"{}".format(dcookies['Cookie'].split("LTP0")[0]+res.headers['Set-Cookie'])}
+                    dcookies['LTP0'] =res.headers['Set-Cookie'].split('=')[-1]
+                if tryy:
                     print(dcookies)
-                    douyustatus(ds)
+                if res.headers.get('Location'):
+                    llurl = 'https:'+res.headers['Location']
+                    #s.cookies.update(dcookies)
+                    res = s.get(llurl,headers=headers,cookies=dcookies,allow_redirects=False)
+                    cookies = requests.utils.dict_from_cookiejar(s.cookies)
+                    for cookie in cookies:
+                        dcookies[cookie] = cookies[cookie]
+                    print('登录后cookies',dcookies)
+                    ds.cookies.update(dcookies)
+                    if tryy:
+                        print(res.headers)
+                    #douyustatus(ds)
                 elif '过期' in str(json):
                     subject = '斗鱼出错'
                     contents = '斗鱼登录过期'
                     send_mail(subject,contents,password)
                     time.sleep(20)
+                cookies = requests.utils.dict_from_cookiejar(ds.cookies)
+                with open("/root/u/dscookies.txt", "w") as fp:
+                    json.dump(cookies, fp)
                 
-            except:
-                pass
+            except Exception as e:
+                print(e)
         #if "douyu" in status:
         #   status.remove("douyu")
         
@@ -288,16 +308,25 @@ def main():
                 if (not os.path.exists(dpath)):
                     os.makedirs(dpath)
             i+=1
-    dheaders = {
+    '''dheaders = {
         "Connection":"close",
         "Accept":"application/json, text/plain, */*",
         "X-Requested-With":"XMLHttpRequest",
         "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
         "Referer":"https://www.douyu.com/directory/myFollow",
         "Accept-Encoding":"gzip, deflate",
-        "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"} 
+        "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"} '''
+    dheaders_raw='''accept: application/json, text/plain, */*
+x-dy-traceid: 4ccba279366641e3:4ccba279366641e3:0:008828
+accept-language: zh-cn
+x-requested-with: XMLHttpRequest
+user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15
+referer: https://www.douyu.com/directory/myFollow
+accept-encoding: gzip, deflate'''
+    dheaders=get_headers(dheaders_raw)
     ds = requests.session()
     ds.headers.update(dheaders)
+    ds.cookies.update(dcookies)
     hheaders={
             "Connection":"close",
             "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
@@ -311,6 +340,8 @@ def main():
     hs = requests.session()
     hs.headers.update(hheaders)
     hs.cookies.update(hcookies)
+    if tryy:
+        douyustatus(ds)
     while True:
         if 'douyu' not in status:
             status.append("douyu")

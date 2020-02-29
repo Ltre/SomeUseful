@@ -113,7 +113,7 @@ def download(user_id,broad_no,user_nick):
         session.set_option('hls-segment-attempts',int(trytimes))
     session.set_option('hls-live-edge',9999)
     session.set_option('http-timeout',10.0)
-    session.set_loglevel('error')
+    session.set_loglevel('none')
     userurl = f'http://play.afreecatv.com/{user_id}/{broad_no}'
     #print(user_id,userurl)
     streams = session.streams(userurl)

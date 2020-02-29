@@ -33,7 +33,15 @@ def send_mail(content,uid,image,subject=None):
     msg['From'] = username
     msg['To'] = receiver
     
-    r = requests.get(image)
+    while 1:
+        try:
+            r = requests.get(image,timeout=8)
+            break
+        except Exception as e:
+            if not 'time' in str(e):
+                print(image)
+                r=''
+                break
     # 设置附件的MIME和文件名，这里是png类型:
     mime = MIMEBase('image', 'jpg', filename=f'{uid}.jpg')
     # 加上必要的头信息:
@@ -41,7 +49,10 @@ def send_mail(content,uid,image,subject=None):
     mime.add_header('Content-ID', '<0>')
     mime.add_header('X-Attachment-Id', '0')
     # 把附件的内容读进来:
-    mime.set_payload(r.content)
+    if r:
+        mime.set_payload(r.content)
+    else:
+        mime.set_payload(b'1')
     # 用Base64编码:
     encoders.encode_base64(mime)
     # 添加到MIMEMultipart:

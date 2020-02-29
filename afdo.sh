@@ -1,6 +1,7 @@
 #/bin/sh
-omilolist=(milo milo2 milo3 milo5 milo6 milo4)
-milolist=(${omilolist[@]})
+source /root/u/milo.conf
+num=${#milolist[@]}
+let num--
 runtime=0
 cd /root/b/d/kr
 while [ true ]
@@ -20,9 +21,6 @@ do
         IFS="-"
         arr=($f)
         IFS="$OLD_IFS"
-    if [ ! -d "/home/${temp}/b/kr/${arr[0]}" ]
-        then mkdir -p "/home/${temp}/b/kr/${arr[0]}"
-        fi
     while [ -f "$f" ]
     do
         temp=${milolist[0]}
@@ -34,7 +32,7 @@ do
         rclone move "${f}" "${temp}:milo/b/kr/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
         if [ -f "$f" ]
         then
-            milolist=("${milolist[@]:1:5}" $temp)
+            milolist=("${milolist[@]:1:$num}" $temp)
         fi
     done
     echo "${f}上传成功"
@@ -44,7 +42,7 @@ do
     let runtime++
     if [ $runtime -ge 25 ]
     then
-        milolist=(${omilolist[@]})
+        source /root/u/milo.conf
         runtime=0
     fi
 done
