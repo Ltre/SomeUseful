@@ -143,7 +143,7 @@ def hot_record(uid,start,new):
     else:
         for i in hotlist:
             if not recorded:
-                if not '--' in i and i == str(uid)+'\n':
+                if not '--' in i and i == str(uid)+'\n' and not finduid:
                     finduid = 1
                 elif finduid and '--' in i:
                     check_start = i.split('--')[1].split(',')[0]
@@ -153,6 +153,7 @@ def hot_record(uid,start,new):
                         recorded = 1
                 elif finduid and not '--' in i:
                     i = f'--{start},{new},{name},{title}\n'+i
+                    recorded = 1
             data+=i
         if not finduid:
             write_str = f'{uid}\n--{start},{new},{name},{title}\n'
@@ -213,6 +214,7 @@ while 1:
     if is_adult:
         channel = data['channel']
         for i in channel:
+            uid = category = count = image = 0
             uid = i['id']
             category = i['category']
             count = i['count']
@@ -246,7 +248,7 @@ while 1:
                         send_mail(content,uid,image)
                         hot_spot[uid] = -1
                         hot_record(uid,start,new)
-                if count >=500 and count < 1000:
+                elif count >=500 and count < 1000:
                     do = 0
                     if not uid in hot_spot or hot_spot[uid] <=0:
                         do = 1

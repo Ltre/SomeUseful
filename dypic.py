@@ -122,7 +122,12 @@ def get_cookies():
         cookies = json.load(fp)
     lurl = 'https://passport.douyu.com/lapi/passport/iframe/safeAuth?callback=jQuery11130874597182652241_1582781156133&client_id=5&did=&t=1582781157458&_=1582781156134'
     s = requests.session()
-    r = s.get(lurl,headers=headers,cookies=cookies,timeout=10)
+    while 1:
+        try:
+            r = s.get(lurl,headers=headers,cookies=cookies,timeout=10)
+            break
+        except:
+            time.sleep(1)
     scookies = requests.utils.dict_from_cookiejar(s.cookies)
     r.close()
     for cookie in scookies:

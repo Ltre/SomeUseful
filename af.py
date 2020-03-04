@@ -210,7 +210,9 @@ while 1:
         continue
     s=s.replace('ON_AIR_FAVORITE_BROAD_TOTAL_CNT','"ON_AIR_FAVORITE_BROAD_TOTAL_CNT"')
     s=s.replace('FAVORITE_ALL_TOTAL_CNT','"FAVORITE_ALL_TOTAL_CNT"')
-    s=s.replace("\&#039;","_")
+    s=s.replace("\\","_")
+    #s=s.replace("\&#039;","_")
+    #s=s.replace("\&quot;","_")
     try:
         data=json.loads(s)
     except Exception as e:

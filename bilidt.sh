@@ -1,7 +1,7 @@
 #/bin/sh
 source /root/u/milo.conf
 runtime=0
-cd /root/bilidt
+cd /root/b/d/bilidt
 while [ true ]
 do
 for f in *
