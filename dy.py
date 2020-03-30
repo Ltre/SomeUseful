@@ -189,7 +189,7 @@ while True:
                     hls_params = sroom['stream_url']['hls_pull_url_params']
                 else:
                     hls_params = 'h264'
-                if 'h264' in hls_params or not hls_params:
+                if 'h264' in hls_params or hls_params == '{}':
                     print('\r\033[K',nickname,'h264格式，启用flv')
                     a = room(nickname,sroom['stream_url']['rtmp_pull_url'])
                     #a = room(nickname,sroom['data']['stream_url']['rtmp_pull_url'])
@@ -203,7 +203,10 @@ while True:
                     x.start()
                     names.append(nickname)
                 else:
-                    print('\r\033[K','未知格式',hls_params)
+                    if not hls_params:
+                        print('hls_params为空')
+                    else:
+                        print('\r\033[K','未知格式',hls_params)
     except:
         traceback.print_exc()
     namenum = len(names)

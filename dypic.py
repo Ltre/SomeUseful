@@ -5,6 +5,7 @@ import sys
 import shutil
 import json
 from threading import Thread as Th
+import traceback
 #from requests.cookies import RequestsCookieJar
 
 def get_headers(header_raw):
@@ -45,7 +46,10 @@ def download(i,nick_name=None):
             download(source_feed,nick_name)    
     if feed_id in piclist:
         sys.stdout.write(f'\r\033[K{feed_id}跳过')
-        return feed_id
+        if first_run:
+            return feed_id
+        else:
+            return 0
     #video = i['video']
     path = '/root/b/d/pic/{}'.format(nick_name)
     if not os.path.exists(path):
@@ -124,9 +128,14 @@ def get_cookies():
     s = requests.session()
     while 1:
         try:
-            r = s.get(lurl,headers=headers,cookies=cookies,timeout=10)
+            r = s.get(lurl,headers=headers,cookies=cookies,timeout=(5,6))
+            error = r.text
+            if '登录' in error:
+                print('登录失败')
             break
-        except:
+        except Exception as e:
+            print("cookies Error:",e)
+            traceback.print_exc()
             time.sleep(1)
     scookies = requests.utils.dict_from_cookiejar(s.cookies)
     r.close()
@@ -155,18 +164,34 @@ hasmore=True
 runmax = 1
 ah = Th(target=maxdl,daemon = True)
 ah.start()
+first_run = 1
 while hasmore:
     sys.stdout.write('\r\033[K'+num)
     try:
-        r = requests.get(url,headers=headers,cookies=cookies,timeout=10)
+        r = requests.get(url,headers=headers,cookies=cookies,timeout=(5,6))
+        status_code = r.json()['status_code']
+        if status_code ==4206:
+            print('未登录')
         data = r.json()['data']
     except Exception as e:
+        if 'time' in str(e):
+            continue
+        else:
+            print('第一个error',e)
         print('\r\033[K',e)
-        time.sleep(5)
         cookies= get_cookies()
         continue
-    unreadnum = data['unreadnum']
-    hasmore = data['hasMore']
+    try:
+        unreadnum = data['unreadnum']
+    except:
+        pass
+    try:
+        hasmore = data['hasMore']
+    except Exception as e:
+        print('hasmore 错误:',e,data)
+        time.sleep(1)
+        cookies= get_cookies()
+        continue
     dlist = data['list']
     #i = dlist[1]
     if not os.path.exists('/root/u/dypic.txt'):
@@ -179,12 +204,16 @@ while hasmore:
         if uid not in uidlist:
             uidlist.append(uid)
             uidlist2.append(uid)
-        feed_id = download(i)     
-    if hasmore:
+        feed_id = download(i)
+        if not feed_id:
+            print("end动态\033[A")
+            break
+    if hasmore and feed_id:
         num=feed_id
         url = ourl+str(num)
     else:
         print('end\033[A')
+        first_run = 0
         num='0'
         url = ourl+str(num)
         hasmore=True

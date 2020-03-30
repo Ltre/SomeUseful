@@ -10,8 +10,8 @@ from livestreamer import Livestreamer
 if not os.path.exists('/root/b/d/fc2'):
     os.makedirs('/root/b/d/fc2')
 os.system('cd /root/u;bash fct.sh')
-trytimes = input('重试次数')
-threads = input('线程数')
+trytimes = 1#input('重试次数')
+threads = 1#input('线程数')
 users = []
 recording = []
 class FC2():
@@ -454,7 +454,7 @@ def dodownload(a):
     del a
     
 if __name__ =='__main__':
-    test=input('testid:')
+    test=''#input('testid:')
     if test:
         main(test)
     else:

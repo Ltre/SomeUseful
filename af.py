@@ -6,6 +6,7 @@ Created on Fri Feb  7 20:45:54 2020
 """
 import os,time
 import streamlink
+import livestreamer
 import json
 import re
 import shutil
@@ -13,6 +14,7 @@ import sys
 from threading import Thread
 import random
 from streamlink.stream import HLSStream
+#from livestreamer.stream import HLSStream
 def login(username,password):
     
     data = {
@@ -116,8 +118,8 @@ def download(user_id,broad_no,user_nick):
     session.set_loglevel('none')
     userurl = f'http://play.afreecatv.com/{user_id}/{broad_no}'
     #print(user_id,userurl)
-    streams = session.streams(userurl)
     try:
+        streams = session.streams(userurl)
         stream = streams['best']
         #fd = stream.open()
     except:
@@ -181,8 +183,8 @@ def download(user_id,broad_no,user_nick):
             os.rmdir(path)
 recording = []
 passwordlist= []
-trytimes = input('重试次数')
-threads = input('线程数')
+trytimes = 1#input('重试次数')
+threads = 2#input('线程数')
 url='http://live.afreecatv.com/afreeca/favorite_list_api.php?callback=jQuery1102022963313071578284_1581209013959&szPlatformType=main&nFixBroadCnt=6&szFrom=webk&szClub=y&lang=zh_CN&_=1581209013963'
 #headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36","Accept":"*/*","Referer":"http//vod.afreecatv.com/PLAYER/STATION/52807259","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8","Cookie":"_ga=GA1.2.1950263840.1580971200; _au=0x68facd496a942393; OAX=IlwDSl478IoADU3Q; _gid=GA1.2.1741676268.1581074348; _lang=zh_CN; NextChangePwd=1; UserClipToolTip=off; PdboxTicket=.A32.7bbT56vyHM9fKZk.L7Wmc_lCQVxGEjJgS8bL9DW181YoaVEWSL3ShiwS8uYuHnw9EkvxkCeOkYFLqhmC2fnBFWx8uMdND1AhLoTZrb6AyiB8YF2sQcNUjpR9PvwmKwfLCMl7kQLFT4Fe14WKu_du0kNvGfEeW-pxre07w0TWIOkENX5pMs26TjDy_osnLd5mLaX_bP8McHPWw-6O9pF3kbaEUSEbISke0dqcnSXr9gr9MsG_hkNLVwB88sMHfWLpV8-cDVL4zV9k52FjQDn5yXhgXVkzPMjgqMQfvV8VQf9HHr9_smx2S9XCEMpFE8gdHA3ykhczroP-WaAEqeh0ltDFnpZqPEabeNpAVqJm8TSZvi-YmAYBGFXHs9fYz3KCKcoLyD65d1nctCUyROjo822IU9hRuVTy6gwT_dwlUq3lsqkXnndJq_NVE6jxhYCJhaCCAoyEI8gvRscEURrimzIK6Gb2-Fon5c-ZP2Ik1LzccOcbmTGVOH_3DGj9Jd6D4XMWvnTVVOvCyn2r; PdboxBbs=danyulh; PdboxUser=uid%3Ddanyulh%26uno%3D37845633%26age%3D25%26sex%3DA%26A%3DAAD%26B%3DBACF%26unick%3Ddanyulh%26apply_date%3D1482400106%26name_chk%3D1%26sess_adult_chk%3D1%26broad_name_chk%3D1%26change_password%3D1; isBbs=1; RDB=c803000000000000000000000000000000000000000000000100000019190000000000000001; PdboxSaveTicket=.A32.7bbT56vyHM9fKZk.rtMRUg95LfpIBehpPnGVWw; _csk=%uC784%uC9C0%uAE08%0C%uC730%uB315%0C%uB9C8%uC131%uC758%uC0AC%uC2B4%0C%uB3C4%uBCF5%uC21C%0C%uAE40%uC774%uBE0C; bjStationHistory=921345%023364971%0220790211%02848340%0213679665%0217007600%0219909393%0221026876%0214941146%0219784724; AbroadChk=OK; AbroadVod=OK; _ausb=0x9fd5d7ba; XSRF-TOKEN=gQ1MC8GDbnAwYthNWS7LHOa8oCCwqXA2YdtPJLeu; laravel_session=cuSrfTzqM60vKcHkRVyxMbNNVAbThejOBsOZ0WrT; _ausa=0x35818914"}
 login_url = "https://member.afreecatv.com:8111/login/LoginAction.php"

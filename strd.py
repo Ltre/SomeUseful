@@ -8,6 +8,7 @@ import threading
 import sys
 import json
 import nest_asyncio
+import toml
 from mail import send_mail
 tryy = input('test?')
 password = input('password:')
@@ -154,7 +155,7 @@ def checkuser():
         time.sleep(5)
 
 def gethtml(s,url):
-    res = s.get(url,timeout=10)
+    res = s.get(url,timeout=(5,6))
     data = res.json()
     res.close()
     return data
@@ -193,26 +194,30 @@ def huyastatus(hs,thread_pool=None):
                 check = False
         else:
             sys.stdout.write(f"\r\033[K虎牙未登录")
+            hcookies_raw = toml.load("/root/u/huya.conf")['hcookies_raw']
+            hcookies=get_cookies(hcookies_raw)
+            hs.cookies.update(hcookies)
             f = open('huser.txt')
             namelist = f.read().splitlines()
             f.close()
-            if name not in hrecording:
-                url = 'https://www.huya.com/'+name
-                try:
-                    with hs.get(url,timeout=10) as r:
-                        html = r.text
-                        if '哎呀，虎牙君找不到这个主播' in html:
-                            print(name,'不存在')
-                        else:
-                            isOn = re.findall(r'\"isOn\":(.+?),',html)[0]
-                            if isOn == 'true':
-                                if name not in hrecording:
-                                    down = threading.Thread(target=huyad,args=('huya',name,),name=name+'record',daemon=True)
-                                    down.start()
-                except:
-                    traceback.print_exc()
-                    islogin = 0
-                    print(name,'出错')
+            for name in namelist:
+                if name not in hrecording:
+                    url = 'https://www.huya.com/'+name
+                    try:
+                        with hs.get(url,timeout=10) as r:
+                            html = r.text
+                            if '哎呀，虎牙君找不到这个主播' in html:
+                                print(name,'不存在')
+                            else:
+                                isOn = re.findall(r'\"isOn\":(.+?),',html)[0]
+                                if isOn == 'true':
+                                    if name not in hrecording:
+                                        down = threading.Thread(target=huyad,args=('huya',name,),name=name+'record',daemon=True)
+                                        down.start()
+                    except:
+                        traceback.print_exc()
+                        islogin = 0
+                        print(name,'出错')
         runtime+=1
         sys.stdout.write(f'\r\033[Khuyastatus')
         time.sleep(random.randint(5,10))
@@ -240,6 +245,9 @@ def douyustatus(ds,thread_pool=None):
                         down = threading.Thread(target=youd,args=('douyu',i['room_id'],),name=str(i['nickname']),daemon=True)
                         down.start()
         except Exception as e:
+            if 'time' in str(e):
+            	print('获取json超时,重试')
+            	continue
             print("获取json失败",e)
             try:
                 if tryy:
@@ -334,9 +342,8 @@ accept-encoding: gzip, deflate'''
             "Referer":"https://i.huya.com/",
             "Accept-Encoding":"gzip, deflate, br",
             "Accept-Language":"zh-CN,zh;q=0.9,ja;q=0.8"}
-    hcookies = {"Cookie":
-        "SoundValue=0.50; alphaValue=0.80; __yamid_tt1=0.5630173980060627; __yamid_new=C8736F6698800001A3314BF01CD08350; udb_guiddata=4d0af64ce63b43f29a7a5975d914b205; udb_accdata=undefined; Hm_lvt_51700b6c722f5bb4cf39906a596ea41f=1576679026,1576732023,1577338814,1577958774; guid=0ad6867c39df195e6201245925596308; isInLiveRoom=; udb_passdata=3; __yasmid=0.5630173980060627; web_qrlogin_confirm_id=07537ea4-50e2-4875-b740-6d96faf478f2; udb_uid=1199513272235; yyuid=1199513272235; udb_passport=35184377273454hy; username=35184377273454hy; udb_version=1.0; udb_origin=0; udb_status=1; h_unt=1582507113; __yaoldyyuid=1199513272235; _yasids=__rootsid%3DC8CDD793BB500001F81513A0DDB018DD; udb_biztoken=AQAR_ZWuvDSX-euEpEE_X9orLG5qCZzq3eWN2xe_Z6iOZ46k2l1ZCdRflqfiQUe0No_1vruXDQRGMqDSKPqJO-bi-XKG0-1lBTPxlnWOEQpM7FA56BTcKCb2kB1wFiiDY0fv16_OoJ_aGS47BPzVeV7XGUKzxscbm6x9QRQSydJKQSXAVD1x0pbn2WwTacI6XrI41UcoJuJ7qD2H5-Nz5ZUs7FGDgbprp9U1IBrw9_VungRuitvYpFjeVPLZayYtW2Y2BtNdDSJecgDKMEOpIG_v0lVh68j6dyiqac6juwuKNDUMhq89HBgEYCnUyZpp7fsk3FPzwbLG2GAxwOjFlnre; rep_cnt=24"
-        }
+    hcookies_raw = toml.load("/root/u/huya.conf")['hcookies_raw']
+    hcookies=get_cookies(hcookies_raw)
     hs = requests.session()
     hs.headers.update(hheaders)
     hs.cookies.update(hcookies)

@@ -1,8 +1,8 @@
 #LWP-Cookies-2.0
-Set-Cookie3: FC2_GDPR=true; path="/"; domain=".fc2.com"; path_spec; domain_dot; expires="2020-09-02 12:09:16Z"; version=0
-Set-Cookie3: PHPSESSID=f5b11pukq0vt49sl1k6ha73vn3; path="/"; domain=".fc2.com"; path_spec; domain_dot; discard; version=0
-Set-Cookie3: fcu="35940324-4288ad429fe9d2b9b682e1072e951c51-2ea654af7edd03aa91eeacba0d99496e-23e5ffc2-1582978156-142-cda7b60a8e162012586a828511112f99"; path="/"; domain=".fc2.com"; path_spec; domain_dot; discard; HttpOnly=None; version=0
-Set-Cookie3: glgd_val="215726050%26e136078893881bf512c8e8844b8deebb"; path="/"; domain=".fc2.com"; path_spec; domain_dot; expires="2020-03-31 12:09:16Z"; httponly=None; version=0
-Set-Cookie3: FCSID=f35ofofd7rabvn3g7gvugtgashqma41mjkb91ukjpnmbh8l2t0s1; path="/"; domain=".id.fc2.com"; path_spec; domain_dot; secure; discard; version=0
-Set-Cookie3: login_status="1%7C35940324%7CezJd5eRwIoiWBXIT3Lkp%7C1582978156%7C1%7C3f3640fe72fc2196a4daa589b2cd17a4"; path="/"; domain=".id.fc2.com"; path_spec; domain_dot; secure; expires="2020-03-31 12:09:16Z"; httponly=None; version=0
+Set-Cookie3: FC2_GDPR=true; path="/"; domain=".fc2.com"; path_spec; domain_dot; expires="2020-09-17 13:22:07Z"; version=0
+Set-Cookie3: PHPSESSID=dj3g44dru8n8d6o17qrqlr47mc; path="/"; domain=".fc2.com"; path_spec; domain_dot; discard; version=0
+Set-Cookie3: fcu="35940324-e75bce0767b40766b82735a657b7ca83-2ea654af7edd03aa91eeacba0d99496e-23e5ffc2-1584278527-201-6a54d0594933937650901614bbb0fb72"; path="/"; domain=".fc2.com"; path_spec; domain_dot; discard; HttpOnly=None; version=0
+Set-Cookie3: glgd_val="215726050%26e136078893881bf512c8e8844b8deebb"; path="/"; domain=".fc2.com"; path_spec; domain_dot; expires="2020-04-15 13:22:07Z"; httponly=None; version=0
+Set-Cookie3: FCSID=5gt2cr16mlsnbs7jfb2tqiju0ef6f91a4p12ari5qtl35tg27jh1; path="/"; domain=".id.fc2.com"; path_spec; domain_dot; secure; discard; version=0
+Set-Cookie3: login_status="1%7C35940324%7CezJd5eRwIoiWBXIT3Lkp%7C1584278527%7C1%7Cc3611c9e43723b9d94981769e74b4def"; path="/"; domain=".id.fc2.com"; path_spec; domain_dot; secure; expires="2020-04-15 13:22:07Z"; httponly=None; version=0
 Set-Cookie3: secure_check_fc2=075e9c63aac3f6dc5b326b07734634ca60659eb6; path="/"; domain=".id.fc2.com"; path_spec; domain_dot; secure; discard; httponly=None; version=0

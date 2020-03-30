@@ -9,7 +9,7 @@ do
         if [ -f "${f}" ]
         then
                	n=$(du -sk ${f} | awk '{print $1}')
-                if [ $n -lt 2 ]
+                if [ $n -lt 8 ]
                 then
                         echo "${f} 文件过小，删除"
                         rm ${f}
@@ -25,9 +25,9 @@ do
             temp=${milostatic}
             echo "$temp"
             echo "开始上传${f}至${temp}:milo/b/pic/${arr[0]}"
-            if [ ! -d "/home/${temp}/b/pic/${arr[0]}" ]
-            then mkdir -p "/home/${temp}/b/pic/${arr[0]}"
-            fi
+            #if [ ! -d "/home/${temp}/b/pic/${arr[0]}" ]
+            #then mkdir -p "/home/${temp}/b/pic/${arr[0]}"
+            #fi
             rclone move "${f}" "${temp}:milo/b/pic/${arr[0]}" --buffer-size 32M --transfers 4 -P --low-level-retries 1
             if [ -f "$f" ]
             then

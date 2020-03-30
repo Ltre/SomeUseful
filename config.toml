@@ -12,7 +12,7 @@ pool = "proxy.txt" # 代理池
 [user]
 update = true # 自动更新凭据
 account = """
-username=1650658858@qq.com;password=zongqian12345;access_token=45e4b0f38903fa0740224cfc98bb5d21;refresh_token=ef55f5f427598be6c78bc0f52d66a821;DedeUserID=1836737;DedeUserID__ckMd5=326caeb00bc9daa3;SESSDATA=747333e4%2C1583900473%2Ce114e121;bili_jct=effdbb02756531e0891a321ebc185689;sid=d9pi92by;
+username=1650658858@qq.com;password=zongqian12345!;
 """
 # 请在上方填写您的账号凭据, 每一条凭据应至少包含下述三种身份校验方式之一的完整键值对:
 # Password: username=...;password=...;

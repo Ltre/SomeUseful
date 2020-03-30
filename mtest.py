@@ -863,6 +863,8 @@ def newgetonline():
             f.close()
         except Exception as e:
             print(e)
+            if 'rooms' in str(e):
+                getcookies()
             if streamip:
                 ip = streamip[random.randint(0,len(streamip) - 1)]
             else:
@@ -1169,13 +1171,15 @@ def getcookies():
     global access_key
     while 1:
         try:
-            os.system("python3 bilibili.py")
+            #os.system("python3 bilibili.py")
             try:
-                config = toml.load('config.toml')
+                #config = toml.load('config.toml')
+                config = toml.load('/root/bb/conf/user.toml')['users'][0]
             except:
                 print("无法加载config")
-                return
-            line = config['user']['account'].splitlines()[0]
+                return  
+            #line = config['user']['account'].splitlines()[0]
+            line= config['cookie']
             pairs={}
             for pair in line.strip(";").split(";"):
                 if len(pair.split("=")) == 2:
@@ -1183,10 +1187,12 @@ def getcookies():
                     pairs[key] = value
             cookie = all(key in pairs for key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])
             cookies={'cookie':";".join(f"{key}={value}" for key, value in pairs.items() if key in ["bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "SESSDATA"])}
-            access_key = pairs['access_token']
+            #access_key = pairs['access_token']
+            access_key = config['access_key']
             return cookies
         except:
-            pass
+            traceback.print_exc()
+            time.sleep(5)
 
 
 def main():
